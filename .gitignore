@@ -13,3 +13,7 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# 개인 토큰 포함 — git 추적 제외
+.mcp.json
+.claude/settings.local.json
