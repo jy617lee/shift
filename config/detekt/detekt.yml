@@ -38,6 +38,7 @@ naming:
   FunctionNaming:
     active: true
     functionPattern: '[a-z][a-zA-Z0-9]*'
+    ignoreAnnotated: ['Composable', 'Preview']
     excludes: ["**/test/**", "**/androidTest/**"]
   VariableNaming:
     active: true

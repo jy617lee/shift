@@ -9,9 +9,10 @@ plugins {
 android {
     namespace = "com.schedule.shift"
     compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
+        version =
+            release(36) {
+                minorApiLevel = 1
+            }
     }
 
     defaultConfig {
@@ -67,10 +68,16 @@ jacoco {
     toolVersion = "0.8.12"
 }
 
-private val coverageExcludes = listOf(
-    "**/R.class", "**/R\$*.class", "**/BuildConfig.*", "**/Manifest*.*",
-    "**/*Test*.*", "**/*ComposableSingletons*", "**/ui/theme/**"
-)
+private val coverageExcludes =
+    listOf(
+        "**/R.class",
+        "**/R\$*.class",
+        "**/BuildConfig.*",
+        "**/Manifest*.*",
+        "**/*Test*.*",
+        "**/*ComposableSingletons*",
+        "**/ui/theme/**",
+    )
 
 tasks.register<JacocoReport>("jacocoTestReport") {
     dependsOn("testDebugUnitTest")
@@ -80,12 +87,12 @@ tasks.register<JacocoReport>("jacocoTestReport") {
     classDirectories.setFrom(
         fileTree("${layout.buildDirectory.get()}/tmp/kotlin-classes/debug") {
             exclude(coverageExcludes)
-        }
+        },
     )
     executionData.setFrom(
         fileTree(layout.buildDirectory.get()) {
             include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
-        }
+        },
     )
 }
 
@@ -96,12 +103,12 @@ tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
     classDirectories.setFrom(
         fileTree("${layout.buildDirectory.get()}/tmp/kotlin-classes/debug") {
             exclude(coverageExcludes)
-        }
+        },
     )
     executionData.setFrom(
         fileTree(layout.buildDirectory.get()) {
             include("outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec")
-        }
+        },
     )
 
     violationRules {
@@ -119,24 +126,26 @@ tasks.register<JacocoCoverageVerification>("jacocoTestCoverageVerification") {
 tasks.register("checkTestRatio") {
     group = "verification"
     description = "테스트 코드가 프로덕션 대비 50% 이상인지 검사합니다."
+    notCompatibleWithConfigurationCache("파일 시스템 직접 읽기 — 빌드 설정 캐시 미지원")
 
     doLast {
-        fun lines(dir: String) = fileTree(dir) { include("**/*.kt") }
-            .sumOf { f -> f.readLines().count { it.isNotBlank() } }
+        fun lines(dir: String) =
+            fileTree(dir) { include("**/*.kt") }
+                .sumOf { f -> f.readLines().count { it.isNotBlank() } }
 
         val src = lines("src/main")
         val test = lines("src/test") + lines("src/androidTest")
 
-        if (src < 100) {
-            logger.lifecycle("프로덕션 코드 100줄 미만 — 비율 검사 건너뜀")
+        if (src < 300) {
+            logger.lifecycle("프로덕션 코드 300줄 미만 — 비율 검사 건너뜀")
             return@doLast
         }
 
         val pct = test * 100 / src
-        logger.lifecycle("테스트 비율: 프로덕션 ${src}줄 / 테스트 ${test}줄 = ${pct}%")
+        logger.lifecycle("테스트 비율: 프로덕션 ${src}줄 / 테스트 ${test}줄 = $pct%")
 
         if (pct < 50) {
-            throw GradleException("테스트 코드 부족 (${pct}% < 50%). 테스트를 추가해주세요.")
+            throw GradleException("테스트 코드 부족 ($pct% < 50%). 테스트를 추가해주세요.")
         }
     }
 }

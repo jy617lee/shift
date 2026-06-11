@@ -76,7 +76,10 @@ fi
 # ── 6. 중복 코드 (jscpd) ─────────────────────────────
 step "중복 코드 검사 (jscpd)"
 if command -v jscpd &>/dev/null; then
-    if jscpd --config .jscpd.json 2>&1; then
+    NODE_MAJOR=$(node -e "process.stdout.write(process.version.split('.')[0].replace('v',''))" 2>/dev/null)
+    if [ -z "$NODE_MAJOR" ] || [ "$NODE_MAJOR" -lt 14 ]; then
+        skip "Node.js 14+ 필요 (현재: $(node --version 2>/dev/null || echo '미설치')). nvm 또는 brew로 업그레이드 후 활성화됩니다."
+    elif jscpd --config .jscpd.json 2>&1; then
         pass
     else
         fail
