@@ -1,0 +1,70 @@
+build:
+  maxIssues: 0
+
+complexity:
+  CyclomaticComplexMethod:
+    active: true
+    threshold: 10
+  CognitiveComplexMethod:
+    active: true
+    threshold: 15
+  LongMethod:
+    active: true
+    threshold: 40
+  LongParameterList:
+    active: true
+    functionThreshold: 3
+    constructorThreshold: 6
+    ignoreDefaultParameters: true
+  TooManyFunctions:
+    active: true
+    thresholdInClasses: 15
+    thresholdInObjects: 10
+    thresholdInInterfaces: 10
+
+style:
+  MagicNumber:
+    active: true
+    ignoreNumbers: ["-1", "0", "1", "2"]
+    ignorePropertyDeclaration: true
+    ignoreCompanionObjectPropertyDeclaration: true
+  UnusedPrivateMember:
+    active: true
+  ForbiddenComment:
+    active: true
+    comments: ["FIXME:", "STOPSHIP:"]
+
+naming:
+  FunctionNaming:
+    active: true
+    functionPattern: '[a-z][a-zA-Z0-9]*'
+    excludes: ["**/test/**", "**/androidTest/**"]
+  VariableNaming:
+    active: true
+    variablePattern: '[a-z][A-Za-z0-9]*'
+  ForbiddenClassName:
+    active: false
+
+potential-bugs:
+  UnsafeCallOnNullableType:
+    active: true  # !! 연산자 금지
+  IgnoredReturnValue:
+    active: true
+  UnreachableCode:
+    active: true
+
+empty-blocks:
+  EmptyCatchBlock:
+    active: true
+    allowedExceptionNameRegex: "(_|(ignored))"
+  EmptyFunctionBlock:
+    active: true
+    ignoreOverridden: true
+
+coroutines:
+  GlobalCoroutineUsage:
+    active: true  # GlobalScope 금지
+  RedundantSuspendModifier:
+    active: true
+  SuspendFunWithFlowReturnType:
+    active: true

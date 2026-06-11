@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <!-- 사용하지 않는 리소스/ID → 에러로 격상 -->
+    <issue id="UnusedResources" severity="error" />
+    <issue id="UnusedIds" severity="error" />
+
+    <!-- 잠재적 버그 -->
+    <issue id="WrongConstant" severity="error" />
+    <issue id="CheckResult" severity="error" />
+
+    <!-- 빌드 파일 자동 생성 경로 제외 -->
+    <issue id="UnusedResources">
+        <ignore path="**/generated/**" />
+    </issue>
+</lint>
