@@ -8,12 +8,7 @@ plugins {
 
 android {
     namespace = "com.schedule.shift"
-    compileSdk {
-        version =
-            release(36) {
-                minorApiLevel = 1
-            }
-    }
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.schedule.shift"
@@ -30,15 +25,16 @@ android {
             enableUnitTestCoverage = true
         }
         release {
-            optimization {
-                enable = false
-            }
+            isMinifyEnabled = false
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     buildFeatures {
         compose = true
     }
@@ -77,6 +73,10 @@ private val coverageExcludes =
         "**/*Test*.*",
         "**/*ComposableSingletons*",
         "**/ui/theme/**",
+        "**/di/**",
+        "**/*_Factory*",
+        "**/*_HiltComponents*",
+        "**/*Hilt*",
     )
 
 tasks.register<JacocoReport>("jacocoTestReport") {
@@ -153,6 +153,12 @@ tasks.register("checkTestRatio") {
 // ── Dependencies ─────────────────────────────────────────────────────────────
 
 dependencies {
+    implementation(project(":ui"))
+    implementation(project(":domain"))
+    implementation(project(":data"))
+    implementation(project(":ocr"))
+    implementation(project(":analytics"))
+
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.material3)
@@ -161,6 +167,9 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.navigation.compose)
+    implementation(libs.kotlinx.coroutines.android)
+
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
