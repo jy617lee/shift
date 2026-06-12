@@ -24,3 +24,8 @@ dependencyResolutionManagement {
 
 rootProject.name = "shift"
 include(":app")
+include(":domain")
+include(":data")
+include(":ocr")
+include(":analytics")
+include(":ui")

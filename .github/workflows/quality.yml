@@ -37,22 +37,22 @@ jobs:
         run: chmod +x gradlew
 
       - name: "[1] detekt 정적 분석"
-        run: ./gradlew :app:detekt
+        run: ./gradlew detekt
 
       - name: "[2] ktlint 린터"
-        run: ./gradlew :app:ktlintCheck
+        run: ./gradlew ktlintCheck
 
       - name: "[3] Android Lint"
         run: ./gradlew :app:lint
 
       - name: "[4] 단위 테스트 + 커버리지 검증"
-        run: ./gradlew :app:testDebugUnitTest :app:jacocoTestCoverageVerification
+        run: ./gradlew testDebugUnitTest :app:jacocoTestCoverageVerification
 
       - name: "[5] 테스트 코드 비율 검사"
         run: ./gradlew :app:checkTestRatio
 
       - name: "[6] jscpd 설치"
-        run: npm install -g jscpd
+        run: npm install -g jscpd@3
 
       - name: "[6] 중복 코드 검사"
         run: jscpd --config .jscpd.json
@@ -66,4 +66,9 @@ jobs:
             app/build/reports/detekt/
             app/build/reports/lint/
             app/build/reports/jacoco/
+            domain/build/reports/detekt/
+            data/build/reports/detekt/
+            ocr/build/reports/detekt/
+            ui/build/reports/detekt/
+            analytics/build/reports/detekt/
           retention-days: 7
