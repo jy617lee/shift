@@ -175,8 +175,10 @@ private fun WorkDaySection(state: WidgetState.WorkDay, now: LocalTime, nextWorkD
         now.isAfter(state.endTime) -> {
             val text = if (nextWorkDay != null) {
                 val d = nextWorkDay.date.format(DateTimeFormatter.ofPattern("M/d(E)"))
-                val t = nextWorkDay.startTime?.format(timeFmt) ?: ""
-                "다음 근무 $d $t"
+                val start = nextWorkDay.startTime?.format(timeFmt) ?: ""
+                val end = nextWorkDay.endTime?.format(timeFmt) ?: ""
+                val timeRange = if (start.isNotEmpty() && end.isNotEmpty()) "$start-$end" else start
+                "다음 근무 $d $timeRange"
             } else {
                 "오늘 근무 종료"
             }
