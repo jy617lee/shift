@@ -3,6 +3,7 @@ package com.schedule.shift.ui.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.schedule.shift.domain.repository.ScheduleRepository
+import com.schedule.shift.ui.di.TodayDate
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.LocalDate
 import javax.inject.Inject
@@ -14,7 +15,7 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val repository: ScheduleRepository,
-    private val today: LocalDate = LocalDate.now(),
+    @TodayDate private val today: LocalDate,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<HomeUiState>(HomeUiState.Loading)

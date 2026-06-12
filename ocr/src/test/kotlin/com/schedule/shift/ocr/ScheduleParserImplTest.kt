@@ -208,6 +208,61 @@ class ScheduleParserImplTest {
         assertEquals(6, firstDay.date.dayOfMonth)
     }
 
+    // ── 실이미지 OCR 출력 검증 (test_img/test_1.jpeg) ─────────────────────
+
+    @Test
+    fun `sample_11 real image jun22 parses 7 days correctly`() = runTest {
+        val text = loadSample("sample_11_real_schedule_jun22.txt")
+        val result = parser.parse(text) as ParseResult.Success
+
+        assertEquals(1, result.weeks.size)
+        val days = result.weeks.first().days
+        assertEquals(ScheduleWeek.DAYS_IN_WEEK, days.size)
+        assertEquals(LocalDate.of(2026, 6, 22), result.weeks.first().weekStartDate)
+    }
+
+    @Test
+    fun `sample_11 work days have correct times`() = runTest {
+        val text = loadSample("sample_11_real_schedule_jun22.txt")
+        val days = (parser.parse(text) as ParseResult.Success).weeks.first().days
+
+        assertEquals(LocalTime.of(14, 0), days[0].startTime)
+        assertEquals(LocalTime.of(19, 30), days[0].endTime)
+
+        assertEquals(LocalTime.of(15, 0), days[1].startTime)
+        assertEquals(LocalTime.of(20, 30), days[1].endTime)
+
+        assertEquals(LocalTime.of(15, 0), days[3].startTime)
+        assertEquals(LocalTime.of(20, 30), days[3].endTime)
+
+        assertEquals(LocalTime.of(6, 30), days[6].startTime)
+        assertEquals(LocalTime.of(12, 0), days[6].endTime)
+    }
+
+    @Test
+    fun `sample_11 day types are correct`() = runTest {
+        val text = loadSample("sample_11_real_schedule_jun22.txt")
+        val days = (parser.parse(text) as ParseResult.Success).weeks.first().days
+
+        assertEquals(DayType.WORK, days[0].type)  // 월 14:00~19:30
+        assertEquals(DayType.WORK, days[1].type)  // 화 15:00~20:30
+        assertEquals(DayType.OTHER, days[2].type) // 수 정규휴일
+        assertEquals(DayType.WORK, days[3].type)  // 목 15:00~20:30
+        assertEquals(DayType.WORK, days[4].type)  // 금 15:00~20:30
+        assertEquals(DayType.OTHER, days[5].type) // 토 정규휴일
+        assertEquals(DayType.WORK, days[6].type)  // 일 06:30~12:00
+    }
+
+    @Test
+    fun `sample_11 code labels stored verbatim`() = runTest {
+        val text = loadSample("sample_11_real_schedule_jun22.txt")
+        val days = (parser.parse(text) as ParseResult.Success).weeks.first().days
+
+        assertEquals("정상", days[0].codeLabel)
+        assertEquals("정규휴일", days[2].codeLabel)
+        assertEquals("정상", days[6].codeLabel)
+    }
+
     private fun loadSample(fileName: String): String =
         javaClass.classLoader
             ?.getResourceAsStream("ocr_samples/$fileName")
