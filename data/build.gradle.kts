@@ -52,6 +52,7 @@ dependencies {
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)
 
+    implementation(libs.datastore.preferences)
     implementation(libs.kotlinx.coroutines.android)
 
     testImplementation(libs.junit)
@@ -59,4 +60,5 @@ dependencies {
     testImplementation(libs.robolectric)
     testImplementation(libs.androidx.test.core)
     testImplementation(libs.mockk)
+    testImplementation(libs.turbine)
 }

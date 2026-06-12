@@ -188,6 +188,7 @@ dependencies {
     implementation(libs.glance.material3)
 
     implementation(libs.mlkit.text.recognition.korean)
+    implementation(libs.datastore.preferences)
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
 

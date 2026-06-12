@@ -1,9 +1,26 @@
 package com.schedule.shift.navigation
 
+import com.schedule.shift.domain.analytics.AnalyticsEvent
+import com.schedule.shift.domain.analytics.AnalyticsTracker
 import com.schedule.shift.domain.model.DayType
 import com.schedule.shift.domain.model.ScheduleDay
 import com.schedule.shift.domain.model.ScheduleWeek
 import com.schedule.shift.domain.model.SourceType
+import com.schedule.shift.domain.repository.ScheduleRepository
+import com.schedule.shift.domain.repository.SettingsRepository
+import com.schedule.shift.domain.widget.WidgetRefresher
+import io.mockk.coVerify
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -12,13 +29,34 @@ import org.junit.Before
 import org.junit.Test
 import java.time.LocalDate
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class RegistrationFlowStateHolderTest {
 
+    private val testDispatcher = StandardTestDispatcher()
+    private lateinit var scheduleRepo: ScheduleRepository
+    private lateinit var widgetRefresher: WidgetRefresher
+    private lateinit var analyticsTracker: AnalyticsTracker
     private lateinit var holder: RegistrationFlowStateHolder
 
     @Before
     fun setUp() {
-        holder = RegistrationFlowStateHolder()
+        Dispatchers.setMain(testDispatcher)
+        val settingsRepo = mockk<SettingsRepository>()
+        every { settingsRepo.skipConfirm() } returns flowOf(false)
+        scheduleRepo = mockk(relaxed = true)
+        widgetRefresher = mockk(relaxed = true)
+        analyticsTracker = mockk(relaxed = true)
+        holder = RegistrationFlowStateHolder(
+            settingsRepository = settingsRepo,
+            scheduleRepository = scheduleRepo,
+            widgetRefresher = widgetRefresher,
+            analyticsTracker = analyticsTracker,
+        )
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
     }
 
     @Test
@@ -81,12 +119,17 @@ class RegistrationFlowStateHolderTest {
     }
 
     @Test
-    fun `clear resets both fields`() {
+    fun `clear resets all fields`() {
         holder.setPendingWeeks(listOf(buildTestWeek()))
         holder.setPendingImageUri("content://test/image")
+        holder.setSession("sid", 100L)
+        holder.setReplace(true)
         holder.clear()
         assertTrue(holder.pendingWeeks.isEmpty())
         assertNull(holder.pendingImageUri)
+        assertEquals("", holder.pendingSessionId)
+        assertEquals(0L, holder.pendingSessionStartMs)
+        assertFalse(holder.pendingReplace)
     }
 
     @Test
@@ -119,6 +162,31 @@ class RegistrationFlowStateHolderTest {
         holder.clear()
         assertTrue(holder.pendingWeeks.isEmpty())
         assertNull(holder.pendingImageUri)
+    }
+
+    @Test
+    fun `autoSave saves each week to repository`() = runTest {
+        val weeks = listOf(buildTestWeek(), buildTestWeek())
+        holder.setSession("sid", 0L)
+        holder.autoSave(weeks)
+        testDispatcher.scheduler.advanceUntilIdle()
+        coVerify(exactly = weeks.size) { scheduleRepo.saveWeek(any()) }
+    }
+
+    @Test
+    fun `autoSave refreshes widgets`() = runTest {
+        holder.setSession("sid", 0L)
+        holder.autoSave(listOf(buildTestWeek()))
+        testDispatcher.scheduler.advanceUntilIdle()
+        coVerify { widgetRefresher.refreshAll() }
+    }
+
+    @Test
+    fun `autoSave tracks RegisterComplete event`() = runTest {
+        holder.setSession("test-session", 0L)
+        holder.autoSave(listOf(buildTestWeek()))
+        testDispatcher.scheduler.advanceUntilIdle()
+        verify { analyticsTracker.track(match { it is AnalyticsEvent.RegisterComplete }) }
     }
 
     private fun buildTestWeek(): ScheduleWeek {
