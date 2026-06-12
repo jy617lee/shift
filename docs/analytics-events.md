@@ -15,7 +15,7 @@
 |------|------|------|
 | `source` | `AppOpenSource` | 앱 진입 경로 |
 
-**`AppOpenSource` 값**: `icon`, `widget_2x1`, `widget_4x1`, `widget_4x2_countdown`, `widget_4x2_weekly`
+**`AppOpenSource` 값**: `icon`, `widget_2x1`, `widget_4x1`, `widget_4x2_weekly`
 
 ---
 

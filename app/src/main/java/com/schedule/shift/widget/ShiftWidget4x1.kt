@@ -1,6 +1,7 @@
 package com.schedule.shift.widget
 
 import android.app.AlarmManager
+import android.appwidget.AppWidgetManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -116,7 +117,7 @@ private fun Widget4x1Content(state: WidgetState, today: LocalDate, now: LocalTim
                     text = state.codeLabel.ifEmpty { "휴무" },
                     style = TextDefaults.defaultTextStyle.copy(
                         color = WidgetOnSurfaceVariant,
-                        fontSize = 20.sp,
+                        fontSize = 24.sp,
                         fontWeight = FontWeight.Medium,
                     ),
                 )
@@ -124,7 +125,7 @@ private fun Widget4x1Content(state: WidgetState, today: LocalDate, now: LocalTim
                     text = "스케쥴 없음",
                     style = TextDefaults.defaultTextStyle.copy(
                         color = WidgetOnSurfaceVariant,
-                        fontSize = 16.sp,
+                        fontSize = 19.sp,
                     ),
                 )
             }
@@ -154,7 +155,7 @@ private fun WorkDayCountdown(state: WidgetState.WorkDay, now: LocalTime) {
             text = workTimeText,
             style = TextDefaults.defaultTextStyle.copy(
                 color = WidgetOnSurface,
-                fontSize = 18.sp,
+                fontSize = 22.sp,
                 fontWeight = FontWeight.Bold,
             ),
         )
@@ -162,7 +163,7 @@ private fun WorkDayCountdown(state: WidgetState.WorkDay, now: LocalTime) {
             text = countdownText,
             style = TextDefaults.defaultTextStyle.copy(
                 color = countdownColor,
-                fontSize = 12.sp,
+                fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
             ),
         )
@@ -183,6 +184,11 @@ class ShiftWidget4x1Receiver : GlanceAppWidgetReceiver() {
             .cancel(secondUpdatePendingIntent(context))
     }
 
+    override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
+        super.onUpdate(context, appWidgetManager, appWidgetIds)
+        scheduleSecondUpdate(context)
+    }
+
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
         if (intent.action == ACTION_SECOND_UPDATE_4X1) {
@@ -192,7 +198,7 @@ class ShiftWidget4x1Receiver : GlanceAppWidgetReceiver() {
     }
 
     private fun scheduleSecondUpdate(context: Context) {
-        context.getSystemService(AlarmManager::class.java).set(
+        context.getSystemService(AlarmManager::class.java).setExactAndAllowWhileIdle(
             AlarmManager.RTC,
             System.currentTimeMillis() + SECOND_MS,
             secondUpdatePendingIntent(context),

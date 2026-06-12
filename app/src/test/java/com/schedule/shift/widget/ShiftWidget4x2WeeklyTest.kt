@@ -37,10 +37,9 @@ class ShiftWidget4x2WeeklyTest {
         val sources = setOf(
             SOURCE_WIDGET_2X1,
             SOURCE_WIDGET_4X1,
-            SOURCE_WIDGET_4X2_COUNTDOWN,
             SOURCE_WIDGET_4X2_WEEKLY,
         )
-        assertEquals(4, sources.size)
+        assertEquals(3, sources.size)
     }
 
     // ── Widget instantiation ──────────────────────────────────────────────────
