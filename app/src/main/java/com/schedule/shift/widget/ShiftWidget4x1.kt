@@ -1,18 +1,11 @@
 package com.schedule.shift.widget
 
-import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
-import androidx.glance.GlanceTheme
-import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
-import androidx.glance.appwidget.action.actionStartActivity
-import androidx.glance.appwidget.provideContent
-import androidx.glance.background
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
@@ -27,46 +20,15 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextDefaults
 import com.schedule.shift.domain.model.WidgetState
-import com.schedule.shift.domain.model.toWidgetState
-import com.schedule.shift.domain.repository.ScheduleRepository
-import dagger.hilt.EntryPoint
-import dagger.hilt.InstallIn
-import dagger.hilt.android.EntryPointAccessors
-import dagger.hilt.components.SingletonComponent
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-class ShiftWidget4x1 : GlanceAppWidget() {
+class ShiftWidget4x1 : BaseShiftWidget() {
+    override val widgetSource = SOURCE_WIDGET_4X1
 
-    @EntryPoint
-    @InstallIn(SingletonComponent::class)
-    interface WidgetEntryPoint {
-        fun scheduleRepository(): ScheduleRepository
-    }
-
-    override suspend fun provideGlance(context: Context, id: GlanceId) {
-        val repo = EntryPointAccessors
-            .fromApplication<WidgetEntryPoint>(context.applicationContext)
-            .scheduleRepository()
-        val today = LocalDate.now()
-        val state = repo.getWeekByDate(today)
-            ?.days?.find { it.date == today }
-            ?.toWidgetState()
-            ?: WidgetState.Unregistered
-
-        provideContent {
-            GlanceTheme {
-                Box(
-                    modifier = GlanceModifier
-                        .fillMaxSize()
-                        .background(WidgetSurface)
-                        .clickable(actionStartActivity(widgetIntent(context, SOURCE_WIDGET_4X1))),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Widget4x1Content(state = state, today = today)
-                }
-            }
-        }
+    @Composable
+    override fun WidgetBody(state: WidgetState, today: LocalDate) {
+        Widget4x1Content(state = state, today = today)
     }
 }
 
