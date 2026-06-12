@@ -160,7 +160,7 @@ class ScheduleParserImpl(
         private const val GROUP_START_TIME = 3
         private const val GROUP_END_TIME = 4
         private const val GROUP_CODE = 5
-        private const val PAST_DAYS_THRESHOLD = 7L
+        private const val PAST_DAYS_THRESHOLD = 90L
         private const val FUTURE_DAYS_THRESHOLD = 56L
         private const val DAYS_IN_WEEK = 7
     }
