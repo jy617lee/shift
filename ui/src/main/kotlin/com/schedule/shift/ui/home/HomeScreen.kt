@@ -45,17 +45,16 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.schedule.shift.domain.model.DayType
 import com.schedule.shift.domain.model.ScheduleDay
 import com.schedule.shift.domain.model.ScheduleWeek
+import com.schedule.shift.ui.COLOR_SATURDAY
+import com.schedule.shift.ui.COLOR_SUNDAY
+import com.schedule.shift.ui.TODAY_BAR_ALPHA
+import com.schedule.shift.ui.TODAY_BAR_HEIGHT
+import com.schedule.shift.ui.TODAY_BAR_WIDTH
+import com.schedule.shift.ui.WEEK_HEADER_ALPHA
+import com.schedule.shift.ui.WEEK_LAST_DAY_OFFSET
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-
-private val COLOR_SUNDAY = Color(0xFFEF4444)
-private val COLOR_SATURDAY = Color(0xFF3B82F6)
-private const val TODAY_BAR_ALPHA = 0.06f
-private const val WEEK_HEADER_ALPHA = 0.6f
-private const val TODAY_BAR_WIDTH = 3
-private const val TODAY_BAR_HEIGHT = 48
-private const val WEEK_LAST_DAY_OFFSET = 6L
 
 private val DAY_LABEL = DateTimeFormatter.ofPattern("EE")
 private val DATE_LABEL = DateTimeFormatter.ofPattern("d")
