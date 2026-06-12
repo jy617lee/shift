@@ -22,12 +22,6 @@ class WidgetDeeplinkTest {
     }
 
     @Test
-    fun `widgetIntent for 2x2 has correct source extra`() {
-        val intent = widgetIntent(context, SOURCE_WIDGET_2X2)
-        assertEquals(SOURCE_WIDGET_2X2, intent.getStringExtra(EXTRA_WIDGET_SOURCE))
-    }
-
-    @Test
     fun `widgetIntent has FLAG_ACTIVITY_NEW_TASK`() {
         val intent = widgetIntent(context, SOURCE_WIDGET_2X1)
         assertTrue(intent.flags and Intent.FLAG_ACTIVITY_NEW_TASK != 0)
@@ -50,11 +44,6 @@ class WidgetDeeplinkTest {
     }
 
     @Test
-    fun `SOURCE_WIDGET_2X2 constant is widget_2x2`() {
-        assertEquals("widget_2x2", SOURCE_WIDGET_2X2)
-    }
-
-    @Test
     fun `widgetIntent returns non-null intent`() {
         val intent = widgetIntent(context, SOURCE_WIDGET_2X1)
         assertNotNull(intent)
@@ -68,7 +57,20 @@ class WidgetDeeplinkTest {
     }
 
     @Test
-    fun `2x1 and 2x2 source strings are distinct`() {
-        assertTrue(SOURCE_WIDGET_2X1 != SOURCE_WIDGET_2X2)
+    fun `all widget source constants start with widget prefix`() {
+        listOf(SOURCE_WIDGET_2X1, SOURCE_WIDGET_4X1, SOURCE_WIDGET_4X2_COUNTDOWN, SOURCE_WIDGET_4X2_WEEKLY).forEach { source ->
+            assertTrue("$source should start with widget_", source.startsWith("widget_"))
+        }
+    }
+
+    @Test
+    fun `all widget source constants are distinct`() {
+        val sources = setOf(
+            SOURCE_WIDGET_2X1,
+            SOURCE_WIDGET_4X1,
+            SOURCE_WIDGET_4X2_COUNTDOWN,
+            SOURCE_WIDGET_4X2_WEEKLY,
+        )
+        assertEquals(4, sources.size)
     }
 }

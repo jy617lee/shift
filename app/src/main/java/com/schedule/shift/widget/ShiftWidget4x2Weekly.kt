@@ -93,16 +93,7 @@ private fun TodayHeader(
         modifier = GlanceModifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
-            text = today.dayOfMonth.toString(),
-            style = TextDefaults.defaultTextStyle.copy(
-                color = WidgetPrimary,
-                fontSize = 26.sp,
-                fontWeight = FontWeight.Bold,
-            ),
-        )
-        Spacer(modifier = GlanceModifier.defaultWeight())
-        Column(horizontalAlignment = Alignment.End) {
+        Column {
             Text(
                 text = today.format(dayFmt),
                 style = TextDefaults.defaultTextStyle.copy(
@@ -110,8 +101,17 @@ private fun TodayHeader(
                     fontSize = 11.sp,
                 ),
             )
-            TodayStateText(state = state, timeFmt = timeFmt)
+            Text(
+                text = today.dayOfMonth.toString(),
+                style = TextDefaults.defaultTextStyle.copy(
+                    color = WidgetPrimary,
+                    fontSize = 26.sp,
+                    fontWeight = FontWeight.Bold,
+                ),
+            )
         }
+        Spacer(modifier = GlanceModifier.defaultWeight())
+        TodayStateText(state = state, timeFmt = timeFmt)
     }
 }
 
@@ -174,7 +174,6 @@ private fun DayCell(
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = date.format(dayFmt),

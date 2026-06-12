@@ -1,11 +1,22 @@
 package com.schedule.shift.widget
 
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
+import androidx.glance.GlanceTheme
+import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
+import androidx.glance.appwidget.action.actionStartActivity
+import androidx.glance.appwidget.provideContent
+import androidx.glance.appwidget.updateAll
+import androidx.glance.background
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
@@ -20,21 +31,51 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextDefaults
 import com.schedule.shift.domain.model.WidgetState
+import com.schedule.shift.domain.model.toWidgetState
+import dagger.hilt.android.EntryPointAccessors
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
 
 class ShiftWidget4x1 : BaseShiftWidget() {
     override val widgetSource = SOURCE_WIDGET_4X1
 
+    override suspend fun provideGlance(context: Context, id: GlanceId) {
+        val repo = EntryPointAccessors
+            .fromApplication<ShiftWidgetEntryPoint>(context.applicationContext)
+            .scheduleRepository()
+        val today = LocalDate.now()
+        val now = LocalTime.now()
+        val state = repo.getWeekByDate(today)?.days?.find { it.date == today }
+            ?.toWidgetState() ?: WidgetState.Unregistered
+
+        provideContent {
+            GlanceTheme {
+                Box(
+                    modifier = GlanceModifier
+                        .fillMaxSize()
+                        .background(WidgetSurface)
+                        .clickable(actionStartActivity(widgetIntent(context, widgetSource))),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Widget4x1Content(state = state, today = today, now = now)
+                }
+            }
+        }
+    }
+
     @Composable
     override fun WidgetBody(state: WidgetState, today: LocalDate) {
-        Widget4x1Content(state = state, today = today)
+        Widget4x1Content(state = state, today = today, now = LocalTime.now())
     }
 }
 
 @Suppress("LongMethod")
 @Composable
-private fun Widget4x1Content(state: WidgetState, today: LocalDate) {
+private fun Widget4x1Content(state: WidgetState, today: LocalDate, now: LocalTime) {
     val dayLabel = today.format(DateTimeFormatter.ofPattern("EEE"))
     val dateLabel = today.format(DateTimeFormatter.ofPattern("d"))
 
@@ -70,20 +111,9 @@ private fun Widget4x1Content(state: WidgetState, today: LocalDate) {
             contentAlignment = Alignment.CenterStart,
         ) {
             when (state) {
-                is WidgetState.WorkDay -> {
-                    val start = state.startTime.format(DateTimeFormatter.ofPattern("H:mm"))
-                    val end = state.endTime.format(DateTimeFormatter.ofPattern("H:mm"))
-                    Text(
-                        text = "$start-$end",
-                        style = TextDefaults.defaultTextStyle.copy(
-                            color = WidgetPrimary,
-                            fontSize = 22.sp,
-                            fontWeight = FontWeight.Bold,
-                        ),
-                    )
-                }
+                is WidgetState.WorkDay -> WorkDayCountdown(state = state, now = now)
                 is WidgetState.OffDay -> Text(
-                    text = state.codeLabel,
+                    text = state.codeLabel.ifEmpty { "휴무" },
                     style = TextDefaults.defaultTextStyle.copy(
                         color = WidgetOnSurfaceVariant,
                         fontSize = 20.sp,
@@ -102,6 +132,85 @@ private fun Widget4x1Content(state: WidgetState, today: LocalDate) {
     }
 }
 
+@Composable
+private fun WorkDayCountdown(state: WidgetState.WorkDay, now: LocalTime) {
+    val timeFmt = DateTimeFormatter.ofPattern("H:mm")
+    val workTimeText = "${state.startTime.format(timeFmt)}-${state.endTime.format(timeFmt)}"
+    val countdownText = when {
+        now.isBefore(state.startTime) ->
+            "근무까지 ${formatDuration(ChronoUnit.SECONDS.between(now, state.startTime))}"
+        now.isAfter(state.endTime) ->
+            "근무 종료"
+        else ->
+            "퇴근까지 ${formatDuration(ChronoUnit.SECONDS.between(now, state.endTime))}"
+    }
+    val countdownColor = if (now.isAfter(state.endTime)) WidgetOnSurfaceVariant else WidgetPrimary
+
+    Column(
+        modifier = GlanceModifier.fillMaxHeight(),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = workTimeText,
+            style = TextDefaults.defaultTextStyle.copy(
+                color = WidgetOnSurface,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+            ),
+        )
+        Text(
+            text = countdownText,
+            style = TextDefaults.defaultTextStyle.copy(
+                color = countdownColor,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Medium,
+            ),
+        )
+    }
+}
+
 class ShiftWidget4x1Receiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = ShiftWidget4x1()
+
+    override fun onEnabled(context: Context) {
+        super.onEnabled(context)
+        scheduleSecondUpdate(context)
+    }
+
+    override fun onDisabled(context: Context) {
+        super.onDisabled(context)
+        context.getSystemService(AlarmManager::class.java)
+            .cancel(secondUpdatePendingIntent(context))
+    }
+
+    override fun onReceive(context: Context, intent: Intent) {
+        super.onReceive(context, intent)
+        if (intent.action == ACTION_SECOND_UPDATE_4X1) {
+            MainScope().launch { glanceAppWidget.updateAll(context) }
+            scheduleSecondUpdate(context)
+        }
+    }
+
+    private fun scheduleSecondUpdate(context: Context) {
+        context.getSystemService(AlarmManager::class.java).set(
+            AlarmManager.RTC,
+            System.currentTimeMillis() + SECOND_MS,
+            secondUpdatePendingIntent(context),
+        )
+    }
+
+    private fun secondUpdatePendingIntent(context: Context): PendingIntent =
+        PendingIntent.getBroadcast(
+            context,
+            REQUEST_CODE_SECOND,
+            Intent(context, ShiftWidget4x1Receiver::class.java)
+                .apply { action = ACTION_SECOND_UPDATE_4X1 },
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        )
+
+    companion object {
+        const val ACTION_SECOND_UPDATE_4X1 = "com.schedule.shift.widget.ACTION_SECOND_UPDATE_4X1"
+        private const val REQUEST_CODE_SECOND = 1002
+        private const val SECOND_MS = 1_000L
+    }
 }

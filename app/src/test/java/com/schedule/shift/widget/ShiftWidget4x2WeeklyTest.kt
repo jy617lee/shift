@@ -36,12 +36,11 @@ class ShiftWidget4x2WeeklyTest {
     fun `SOURCE_WIDGET_4X2_WEEKLY is distinct from all other widget sources`() {
         val sources = setOf(
             SOURCE_WIDGET_2X1,
-            SOURCE_WIDGET_2X2,
             SOURCE_WIDGET_4X1,
             SOURCE_WIDGET_4X2_COUNTDOWN,
             SOURCE_WIDGET_4X2_WEEKLY,
         )
-        assertEquals(5, sources.size)
+        assertEquals(4, sources.size)
     }
 
     // ── Widget instantiation ──────────────────────────────────────────────────

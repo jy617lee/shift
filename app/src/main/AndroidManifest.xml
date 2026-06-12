@@ -49,21 +49,13 @@
         </receiver>
 
         <receiver
-            android:name=".widget.ShiftWidget2x2Receiver"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
-            </intent-filter>
-            <meta-data
-                android:name="android.appwidget.provider"
-                android:resource="@xml/widget_2x2_info" />
-        </receiver>
-
-        <receiver
             android:name=".widget.ShiftWidget4x1Receiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.schedule.shift.widget.ACTION_SECOND_UPDATE_4X1" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"
@@ -77,7 +69,7 @@
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <intent-filter>
-                <action android:name="com.schedule.shift.widget.ACTION_MINUTE_UPDATE" />
+                <action android:name="com.schedule.shift.widget.ACTION_SECOND_UPDATE" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"

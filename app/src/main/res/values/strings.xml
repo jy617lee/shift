@@ -1,8 +1,7 @@
 <resources>
     <string name="app_name">shift</string>
     <string name="widget_2x1_description">오늘 교대 근무 일정 — 소형</string>
-    <string name="widget_2x2_description">오늘 교대 근무 일정 — 정방형</string>
-    <string name="widget_4x1_description">오늘 교대 근무 일정 — 와이드</string>
+<string name="widget_4x1_description">오늘 교대 근무 일정 — 와이드</string>
     <string name="widget_4x2_countdown_description">오늘 근무 카운트다운 — 진행 게이지</string>
     <string name="widget_4x2_weekly_description">이번 주 근무 일정 — 5일 미니 달력</string>
 </resources>

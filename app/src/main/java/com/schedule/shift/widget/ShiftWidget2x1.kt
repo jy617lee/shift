@@ -32,71 +32,82 @@ class ShiftWidget2x1 : BaseShiftWidget() {
     }
 }
 
-@Suppress("LongMethod")
 @Composable
 private fun Widget2x1Content(state: WidgetState, today: LocalDate) {
-    val dayLabel = today.format(DateTimeFormatter.ofPattern("EE"))
+    val dayLabel = today.format(DateTimeFormatter.ofPattern("EEE"))
     val dateLabel = today.format(DateTimeFormatter.ofPattern("d"))
 
     Row(
         modifier = GlanceModifier.fillMaxSize().padding(horizontal = 10.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        DateColumn(dayLabel = dayLabel, dateLabel = dateLabel)
+        Spacer(GlanceModifier.width(10.dp))
         Box(
-            modifier = GlanceModifier.wrapContentWidth().fillMaxHeight(),
+            modifier = GlanceModifier.defaultWeight().fillMaxHeight(),
             contentAlignment = Alignment.CenterStart,
         ) {
+            Widget2x1StateText(state = state)
+        }
+    }
+}
+
+@Composable
+private fun DateColumn(dayLabel: String, dateLabel: String) {
+    Column(
+        modifier = GlanceModifier.wrapContentWidth().fillMaxHeight(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            text = dayLabel,
+            style = TextDefaults.defaultTextStyle.copy(
+                color = WidgetOnSurfaceVariant,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Medium,
+            ),
+        )
+        Text(
+            text = dateLabel,
+            style = TextDefaults.defaultTextStyle.copy(
+                color = WidgetOnSurface,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+            ),
+        )
+    }
+}
+
+@Composable
+private fun Widget2x1StateText(state: WidgetState) {
+    when (state) {
+        is WidgetState.WorkDay -> {
+            val start = state.startTime.format(DateTimeFormatter.ofPattern("H:mm"))
+            val end = state.endTime.format(DateTimeFormatter.ofPattern("H:mm"))
             Text(
-                text = dateLabel,
+                text = "$start-$end",
                 style = TextDefaults.defaultTextStyle.copy(
-                    color = WidgetOnSurface,
-                    fontSize = 22.sp,
+                    color = WidgetPrimary,
+                    fontSize = 13.sp,
                     fontWeight = FontWeight.Bold,
                 ),
             )
         }
-        Spacer(GlanceModifier.width(8.dp))
-        Column(
-            modifier = GlanceModifier.fillMaxHeight().defaultWeight(),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = dayLabel,
-                style = TextDefaults.defaultTextStyle.copy(
-                    color = WidgetOnSurfaceVariant,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Medium,
-                ),
-            )
-            when (state) {
-                is WidgetState.WorkDay -> {
-                    val start = state.startTime.format(DateTimeFormatter.ofPattern("H:mm"))
-                    val end = state.endTime.format(DateTimeFormatter.ofPattern("H:mm"))
-                    Text(
-                        text = "$start-$end",
-                        style = TextDefaults.defaultTextStyle.copy(
-                            color = WidgetPrimary,
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold,
-                        ),
-                    )
-                }
-                is WidgetState.OffDay -> Text(
-                    text = state.codeLabel,
-                    style = TextDefaults.defaultTextStyle.copy(
-                        color = WidgetOnSurfaceVariant,
-                        fontSize = 13.sp,
-                    ),
-                )
-                is WidgetState.Unregistered -> Text(
-                    text = "미등록",
-                    style = TextDefaults.defaultTextStyle.copy(
-                        color = WidgetOnSurfaceVariant,
-                        fontSize = 13.sp,
-                    ),
-                )
-            }
-        }
+        is WidgetState.OffDay -> Text(
+            text = state.codeLabel.ifEmpty { "휴무" },
+            style = TextDefaults.defaultTextStyle.copy(
+                color = WidgetOnSurfaceVariant,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Medium,
+            ),
+        )
+        is WidgetState.Unregistered -> Text(
+            text = "미등록",
+            style = TextDefaults.defaultTextStyle.copy(
+                color = WidgetOnSurfaceVariant,
+                fontSize = 12.sp,
+            ),
+        )
     }
 }
 

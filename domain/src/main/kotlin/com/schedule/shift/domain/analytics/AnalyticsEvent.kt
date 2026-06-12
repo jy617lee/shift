@@ -71,7 +71,6 @@ sealed class AnalyticsEvent {
 enum class AppOpenSource(val value: String) {
     ICON("icon"),
     WIDGET_2X1("widget_2x1"),
-    WIDGET_2X2("widget_2x2"),
     WIDGET_4X1("widget_4x1"),
     WIDGET_4X2_COUNTDOWN("widget_4x2_countdown"),
     WIDGET_4X2_WEEKLY("widget_4x2_weekly"),

@@ -25,11 +25,6 @@ class ShiftWidget4x1Test {
     }
 
     @Test
-    fun `SOURCE_WIDGET_4X1 is distinct from SOURCE_WIDGET_2X2`() {
-        assertTrue(SOURCE_WIDGET_4X1 != SOURCE_WIDGET_2X2)
-    }
-
-    @Test
     fun `ShiftWidget4x1 can be instantiated`() {
         assertNotNull(ShiftWidget4x1())
     }
@@ -42,9 +37,8 @@ class ShiftWidget4x1Test {
     }
 
     @Test
-    fun `all three widget source constants are distinct`() {
-        val sources = setOf(SOURCE_WIDGET_2X1, SOURCE_WIDGET_2X2, SOURCE_WIDGET_4X1)
-        assertEquals(3, sources.size)
+    fun `SOURCE_WIDGET_4X1 starts with widget prefix`() {
+        assertTrue(SOURCE_WIDGET_4X1.startsWith("widget_"))
     }
 
     @Test
@@ -66,21 +60,9 @@ class ShiftWidget4x1Test {
     }
 
     @Test
-    fun `SOURCE_WIDGET_4X1 starts with widget prefix`() {
-        assertTrue(SOURCE_WIDGET_4X1.startsWith("widget_"))
-    }
-
-    @Test
     fun `widgetIntent for 4x1 returns non-null intent`() {
         val intent = widgetIntent(context, SOURCE_WIDGET_4X1)
         assertNotNull(intent)
-    }
-
-    @Test
-    fun `all widget source constants start with widget prefix`() {
-        listOf(SOURCE_WIDGET_2X1, SOURCE_WIDGET_2X2, SOURCE_WIDGET_4X1).forEach { source ->
-            assertTrue("$source should start with widget_", source.startsWith("widget_"))
-        }
     }
 
     @Test
@@ -91,5 +73,27 @@ class ShiftWidget4x1Test {
     @Test
     fun `ShiftWidget4x1Receiver is non-null`() {
         assertNotNull(ShiftWidget4x1Receiver())
+    }
+
+    @Test
+    fun `ACTION_SECOND_UPDATE_4X1 contains package name prefix`() {
+        assertTrue(
+            ShiftWidget4x1Receiver.ACTION_SECOND_UPDATE_4X1.startsWith("com.schedule.shift.widget"),
+        )
+    }
+
+    @Test
+    fun `ACTION_SECOND_UPDATE_4X1 ends with correct suffix`() {
+        assertTrue(
+            ShiftWidget4x1Receiver.ACTION_SECOND_UPDATE_4X1.endsWith("ACTION_SECOND_UPDATE_4X1"),
+        )
+    }
+
+    @Test
+    fun `ACTION_SECOND_UPDATE_4X1 is distinct from countdown receiver action`() {
+        assertTrue(
+            ShiftWidget4x1Receiver.ACTION_SECOND_UPDATE_4X1 !=
+                ShiftWidget4x2CountdownReceiver.ACTION_SECOND_UPDATE,
+        )
     }
 }
