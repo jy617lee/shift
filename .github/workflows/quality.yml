@@ -52,7 +52,7 @@ jobs:
         run: ./gradlew :app:checkTestRatio
 
       - name: "[6] jscpd 설치"
-        run: npm install -g jscpd
+        run: npm install -g jscpd@3
 
       - name: "[6] 중복 코드 검사"
         run: jscpd --config .jscpd.json
