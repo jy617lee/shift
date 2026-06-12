@@ -42,8 +42,7 @@ class HomeViewModelTest {
 
     @Test
     fun `initial state is Loading`() = runTest {
-        coEvery { repository.getWeekByDate(any()) } returns null
-        coEvery { repository.getNextWeekFrom(any()) } returns null
+        coEvery { repository.getAllWeeks() } returns emptyList()
         val viewModel = HomeViewModel(repository, today)
 
         viewModel.uiState.test {
@@ -54,53 +53,40 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `emits Success with null week when no schedule exists`() = runTest {
-        coEvery { repository.getWeekByDate(any()) } returns null
-        coEvery { repository.getNextWeekFrom(any()) } returns null
+    fun `emits Success with empty list when no schedule exists`() = runTest {
+        coEvery { repository.getAllWeeks() } returns emptyList()
         val viewModel = HomeViewModel(repository, today)
 
         viewModel.uiState.test {
             skipItems(1)
             val state = awaitItem()
             assertTrue(state is HomeUiState.Success)
-            assertTrue((state as HomeUiState.Success).currentWeek == null)
+            assertTrue((state as HomeUiState.Success).weeks.isEmpty())
             assertEquals(today, state.today)
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
-    fun `falls back to next registered week when current week is empty`() = runTest {
-        val nextWeek = buildTestWeek(LocalDate.of(2026, 6, 22))
-        coEvery { repository.getWeekByDate(any()) } returns null
-        coEvery { repository.getNextWeekFrom(any()) } returns nextWeek
+    fun `emits Success with all weeks sorted by date`() = runTest {
+        val week1 = buildTestWeek(LocalDate.of(2026, 6, 8))
+        val week2 = buildTestWeek(LocalDate.of(2026, 6, 22))
+        coEvery { repository.getAllWeeks() } returns listOf(week2, week1)
         val viewModel = HomeViewModel(repository, today)
 
         viewModel.uiState.test {
             skipItems(1)
             val state = awaitItem() as HomeUiState.Success
-            assertEquals(nextWeek, state.currentWeek)
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    @Test
-    fun `emits Success with current week when schedule exists`() = runTest {
-        val week = buildTestWeek()
-        coEvery { repository.getWeekByDate(any()) } returns week
-        val viewModel = HomeViewModel(repository, today)
-
-        viewModel.uiState.test {
-            skipItems(1)
-            val state = awaitItem() as HomeUiState.Success
-            assertEquals(week, state.currentWeek)
+            assertEquals(2, state.weeks.size)
+            assertEquals(week1, state.weeks[0])
+            assertEquals(week2, state.weeks[1])
             cancelAndIgnoreRemainingEvents()
         }
     }
 
     @Test
     fun `emits Error when repository throws`() = runTest {
-        coEvery { repository.getWeekByDate(any()) } throws RuntimeException("DB 오류")
+        coEvery { repository.getAllWeeks() } throws RuntimeException("DB 오류")
         val viewModel = HomeViewModel(repository, today)
 
         viewModel.uiState.test {
@@ -112,10 +98,9 @@ class HomeViewModelTest {
     }
 
     @Test
-    fun `refresh reloads current week`() = runTest {
+    fun `refresh reloads all weeks`() = runTest {
         val week = buildTestWeek()
-        coEvery { repository.getWeekByDate(any()) } returns null andThen week
-        coEvery { repository.getNextWeekFrom(any()) } returns null
+        coEvery { repository.getAllWeeks() } returns emptyList() andThen listOf(week)
         val viewModel = HomeViewModel(repository, today)
 
         viewModel.uiState.test {
@@ -123,7 +108,7 @@ class HomeViewModelTest {
             viewModel.refresh()
             skipItems(1)
             val state = awaitItem() as HomeUiState.Success
-            assertEquals(week, state.currentWeek)
+            assertEquals(listOf(week), state.weeks)
             cancelAndIgnoreRemainingEvents()
         }
     }

@@ -34,8 +34,8 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = HomeUiState.Loading
             _uiState.value = try {
-                val week = repository.getWeekByDate(today) ?: repository.getNextWeekFrom(today)
-                HomeUiState.Success(currentWeek = week, today = today)
+                val weeks = repository.getAllWeeks().sortedBy { it.weekStartDate }
+                HomeUiState.Success(weeks = weeks, today = today)
             } catch (e: Exception) {
                 HomeUiState.Error
             }
