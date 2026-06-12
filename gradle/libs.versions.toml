@@ -55,6 +55,7 @@ hilt-work-compiler = { group = "androidx.hilt", name = "hilt-compiler", version.
 
 # WorkManager
 work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workmanager" }
+work-testing = { group = "androidx.work", name = "work-testing", version.ref = "workmanager" }
 
 # Room
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
