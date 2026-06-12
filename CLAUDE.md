@@ -43,6 +43,15 @@ ui/ → domain/ ← data/ ocr/ analytics/
 
 ---
 
+## 위젯 프리뷰 XML 규칙
+
+`android:previewLayout`에 지정하는 XML은 일부 런처가 RemoteViews로 inflate한다.  
+**허용 뷰**: `LinearLayout`, `FrameLayout`, `RelativeLayout`, `GridLayout`, `TextView`, `ImageView`, `ImageButton`, `Button`, `ProgressBar`, `Chronometer`, `TextClock`  
+**금지 뷰**: `<Space>`, `<View>`, `<androidx.*>` 등 RemoteViews 미지원 클래스  
+→ 이를 어기면 위젯 picker에서 "위젯을 추가할 수 없습니다" 오류 발생.
+
+---
+
 ## 하드 금지
 
 - 앱 명칭·UI 어디에도 특정 프랜차이즈 상호 사용 금지.

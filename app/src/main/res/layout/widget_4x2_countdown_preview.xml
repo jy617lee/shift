@@ -36,11 +36,15 @@
             android:textColor="#00704A"
             android:textSize="15sp" />
 
-        <View
+        <ProgressBar
+            style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="match_parent"
             android:layout_height="6dp"
             android:layout_marginTop="6dp"
-            android:background="#00704A" />
+            android:max="100"
+            android:progress="60"
+            android:progressTint="#00704A"
+            android:progressBackgroundTint="#E0E0E0" />
 
     </LinearLayout>
 
