@@ -37,6 +37,7 @@ ktlint {
 dependencies {
     implementation(project(":domain"))
 
+    implementation(libs.mlkit.text.recognition.korean)
     implementation(libs.kotlinx.coroutines.android)
 
     testImplementation(libs.junit)
