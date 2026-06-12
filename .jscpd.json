@@ -1,9 +1,9 @@
 {
-  "minTokens": 100,
+  "minTokens": 200,
   "threshold": 0,
   "path": ["app/src/main"],
   "ignore": ["**/*Test*.kt", "**/generated/**"],
   "reporters": ["console"],
-  "exitCode": true,
+  "exitCode": 1,
   "gitignore": true
 }

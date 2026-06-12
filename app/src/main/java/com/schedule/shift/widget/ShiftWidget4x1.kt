@@ -23,51 +23,52 @@ import com.schedule.shift.domain.model.WidgetState
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-class ShiftWidget2x1 : BaseShiftWidget() {
-    override val widgetSource = SOURCE_WIDGET_2X1
+class ShiftWidget4x1 : BaseShiftWidget() {
+    override val widgetSource = SOURCE_WIDGET_4X1
 
     @Composable
     override fun WidgetBody(state: WidgetState, today: LocalDate) {
-        Widget2x1Content(state = state, today = today)
+        Widget4x1Content(state = state, today = today)
     }
 }
 
 @Suppress("LongMethod")
 @Composable
-private fun Widget2x1Content(state: WidgetState, today: LocalDate) {
-    val dayLabel = today.format(DateTimeFormatter.ofPattern("EE"))
+private fun Widget4x1Content(state: WidgetState, today: LocalDate) {
+    val dayLabel = today.format(DateTimeFormatter.ofPattern("EEE"))
     val dateLabel = today.format(DateTimeFormatter.ofPattern("d"))
 
     Row(
-        modifier = GlanceModifier.fillMaxSize().padding(horizontal = 10.dp, vertical = 6.dp),
+        modifier = GlanceModifier.fillMaxSize().padding(horizontal = 14.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Box(
-            modifier = GlanceModifier.wrapContentWidth().fillMaxHeight(),
-            contentAlignment = Alignment.CenterStart,
-        ) {
-            Text(
-                text = dateLabel,
-                style = TextDefaults.defaultTextStyle.copy(
-                    color = WidgetOnSurface,
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.Bold,
-                ),
-            )
-        }
-        Spacer(GlanceModifier.width(8.dp))
         Column(
-            modifier = GlanceModifier.fillMaxHeight().defaultWeight(),
+            modifier = GlanceModifier.wrapContentWidth().fillMaxHeight(),
             verticalAlignment = Alignment.CenterVertically,
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
                 text = dayLabel,
                 style = TextDefaults.defaultTextStyle.copy(
                     color = WidgetOnSurfaceVariant,
-                    fontSize = 12.sp,
+                    fontSize = 11.sp,
                     fontWeight = FontWeight.Medium,
                 ),
             )
+            Text(
+                text = dateLabel,
+                style = TextDefaults.defaultTextStyle.copy(
+                    color = WidgetOnSurface,
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold,
+                ),
+            )
+        }
+        Spacer(GlanceModifier.width(16.dp))
+        Box(
+            modifier = GlanceModifier.defaultWeight().fillMaxHeight(),
+            contentAlignment = Alignment.CenterStart,
+        ) {
             when (state) {
                 is WidgetState.WorkDay -> {
                     val start = state.startTime.format(DateTimeFormatter.ofPattern("H:mm"))
@@ -76,7 +77,7 @@ private fun Widget2x1Content(state: WidgetState, today: LocalDate) {
                         text = "$start-$end",
                         style = TextDefaults.defaultTextStyle.copy(
                             color = WidgetPrimary,
-                            fontSize = 13.sp,
+                            fontSize = 22.sp,
                             fontWeight = FontWeight.Bold,
                         ),
                     )
@@ -85,14 +86,15 @@ private fun Widget2x1Content(state: WidgetState, today: LocalDate) {
                     text = state.codeLabel,
                     style = TextDefaults.defaultTextStyle.copy(
                         color = WidgetOnSurfaceVariant,
-                        fontSize = 13.sp,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Medium,
                     ),
                 )
                 is WidgetState.Unregistered -> Text(
-                    text = "미등록",
+                    text = "스케쥴 없음",
                     style = TextDefaults.defaultTextStyle.copy(
                         color = WidgetOnSurfaceVariant,
-                        fontSize = 13.sp,
+                        fontSize = 16.sp,
                     ),
                 )
             }
@@ -100,6 +102,6 @@ private fun Widget2x1Content(state: WidgetState, today: LocalDate) {
     }
 }
 
-class ShiftWidget2x1Receiver : GlanceAppWidgetReceiver() {
-    override val glanceAppWidget: GlanceAppWidget = ShiftWidget2x1()
+class ShiftWidget4x1Receiver : GlanceAppWidgetReceiver() {
+    override val glanceAppWidget: GlanceAppWidget = ShiftWidget4x1()
 }
