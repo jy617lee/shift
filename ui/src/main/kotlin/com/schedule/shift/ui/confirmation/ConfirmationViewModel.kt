@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.schedule.shift.domain.model.ScheduleDay
 import com.schedule.shift.domain.model.ScheduleWeek
 import com.schedule.shift.domain.repository.ScheduleRepository
+import com.schedule.shift.domain.widget.WidgetRefresher
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -19,6 +20,7 @@ class ConfirmationViewModel @AssistedInject constructor(
     @Assisted private val initialWeeks: List<ScheduleWeek>,
     @Assisted private val imageUri: String?,
     private val repository: ScheduleRepository,
+    private val widgetRefresher: WidgetRefresher,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<ConfirmationUiState>(
@@ -30,6 +32,7 @@ class ConfirmationViewModel @AssistedInject constructor(
         val state = _uiState.value as? ConfirmationUiState.Reviewing ?: return
         viewModelScope.launch {
             state.weeks.forEach { repository.saveWeek(it) }
+            widgetRefresher.refreshAll()
             _uiState.value = ConfirmationUiState.Saved
         }
     }

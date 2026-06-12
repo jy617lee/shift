@@ -6,6 +6,7 @@ import com.schedule.shift.domain.model.ScheduleDay
 import com.schedule.shift.domain.model.ScheduleWeek
 import com.schedule.shift.domain.model.SourceType
 import com.schedule.shift.domain.repository.ScheduleRepository
+import com.schedule.shift.domain.widget.WidgetRefresher
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -28,11 +29,13 @@ class ConfirmationViewModelTest {
 
     private val testDispatcher = StandardTestDispatcher()
     private lateinit var repository: ScheduleRepository
+    private lateinit var widgetRefresher: WidgetRefresher
 
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         repository = mockk(relaxed = true)
+        widgetRefresher = mockk(relaxed = true)
     }
 
     @After
@@ -40,10 +43,13 @@ class ConfirmationViewModelTest {
         Dispatchers.resetMain()
     }
 
+    private fun buildViewModel(weeks: List<ScheduleWeek> = listOf(buildTestWeek())) =
+        ConfirmationViewModel(weeks, null, repository, widgetRefresher)
+
     @Test
     fun `initial state shows weeks from constructor`() = runTest {
         val weeks = listOf(buildTestWeek())
-        val viewModel = ConfirmationViewModel(weeks, null, repository)
+        val viewModel = buildViewModel(weeks)
 
         viewModel.uiState.test {
             val state = awaitItem() as ConfirmationUiState.Reviewing
@@ -56,7 +62,7 @@ class ConfirmationViewModelTest {
     fun `confirm saves all weeks and emits Saved`() = runTest {
         val weeks = listOf(buildTestWeek())
         coEvery { repository.saveWeek(any()) } returns Unit
-        val viewModel = ConfirmationViewModel(weeks, null, repository)
+        val viewModel = buildViewModel(weeks)
 
         viewModel.uiState.test {
             skipItems(1)
@@ -69,8 +75,20 @@ class ConfirmationViewModelTest {
     }
 
     @Test
+    fun `confirm refreshes widget after saving`() = runTest {
+        val viewModel = buildViewModel()
+        viewModel.uiState.test {
+            skipItems(1)
+            viewModel.confirm()
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+        coVerify(exactly = 1) { widgetRefresher.refreshAll() }
+    }
+
+    @Test
     fun `confirm with empty weeks list emits Saved without saving`() = runTest {
-        val viewModel = ConfirmationViewModel(emptyList(), null, repository)
+        val viewModel = buildViewModel(emptyList())
 
         viewModel.uiState.test {
             skipItems(1)
@@ -84,7 +102,7 @@ class ConfirmationViewModelTest {
 
     @Test
     fun `cancel emits Cancelled`() = runTest {
-        val viewModel = ConfirmationViewModel(listOf(buildTestWeek()), null, repository)
+        val viewModel = buildViewModel()
 
         viewModel.uiState.test {
             skipItems(1)
@@ -97,7 +115,7 @@ class ConfirmationViewModelTest {
     @Test
     fun `startEdit opens editing state for correct day`() = runTest {
         val week = buildTestWeek()
-        val viewModel = ConfirmationViewModel(listOf(week), null, repository)
+        val viewModel = buildViewModel(listOf(week))
 
         viewModel.startEdit(weekIndex = 0, dayIndex = 2)
 
@@ -112,7 +130,7 @@ class ConfirmationViewModelTest {
     @Test
     fun `commitEdit updates day and clears editing`() = runTest {
         val week = buildTestWeek()
-        val viewModel = ConfirmationViewModel(listOf(week), null, repository)
+        val viewModel = buildViewModel(listOf(week))
         viewModel.startEdit(weekIndex = 0, dayIndex = 0)
         val updatedDay = week.days[0].copy(codeLabel = "수정됨")
         viewModel.updateDraft(updatedDay)

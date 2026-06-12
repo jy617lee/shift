@@ -67,6 +67,7 @@ object AppModule {
     fun provideFailedImageReporter(): FailedImageReporter =
         NoOpFailedImageReporter()
 
+
     @Provides
     @Suppress("LongParameterList")
     fun provideProcessScheduleImageUseCase(

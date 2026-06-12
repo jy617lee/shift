@@ -40,6 +40,11 @@ android {
     buildFeatures {
         compose = true
     }
+
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
+    }
+
     lint {
         lintConfig = file("$rootDir/config/lint/lint.xml")
         abortOnError = true
@@ -175,12 +180,23 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
+    implementation(libs.hilt.work)
+    ksp(libs.hilt.work.compiler)
+
+    implementation(libs.work.runtime.ktx)
+    implementation(libs.glance.appwidget)
+    implementation(libs.glance.material3)
 
     implementation(libs.mlkit.text.recognition.korean)
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
 
     testImplementation(libs.junit)
+    testImplementation(libs.mockk)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.work.testing)
+    testImplementation(libs.androidx.test.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.androidx.espresso.core)
