@@ -7,11 +7,13 @@ import com.schedule.shift.domain.repository.ScheduleRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
+@HiltViewModel(assistedFactory = ReplaceScheduleViewModel.Factory::class)
 class ReplaceScheduleViewModel @AssistedInject constructor(
     @Assisted("incoming") private val incoming: ScheduleWeek,
     @Assisted("existing") private val existing: ScheduleWeek,
