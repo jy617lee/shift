@@ -159,11 +159,11 @@ private fun WorkDaySection(state: WidgetState.WorkDay, now: LocalTime, nextWorkD
         modifier = GlanceModifier.fillMaxWidth(),
     )
     Spacer(GlanceModifier.height(8.dp))
-    val totalMinutes = ChronoUnit.MINUTES.between(state.startTime, state.endTime).coerceAtLeast(1)
+    val totalSeconds = ChronoUnit.SECONDS.between(state.startTime, state.endTime).coerceAtLeast(1)
     when {
         now.isBefore(state.startTime) -> {
             Text(
-                text = "근무까지 ${formatDuration(ChronoUnit.MINUTES.between(now, state.startTime))}",
+                text = "근무까지 ${formatDuration(ChronoUnit.SECONDS.between(now, state.startTime))}",
                 style = TextDefaults.defaultTextStyle.copy(
                     color = WidgetPrimary,
                     fontSize = 15.sp,
@@ -193,10 +193,10 @@ private fun WorkDaySection(state: WidgetState.WorkDay, now: LocalTime, nextWorkD
             )
         }
         else -> {
-            val elapsed = ChronoUnit.MINUTES.between(state.startTime, now)
-            val fraction = (elapsed.toFloat() / totalMinutes).coerceIn(0f, 1f)
+            val elapsed = ChronoUnit.SECONDS.between(state.startTime, now)
+            val fraction = (elapsed.toFloat() / totalSeconds).coerceIn(0f, 1f)
             Text(
-                text = "퇴근까지 ${formatDuration(ChronoUnit.MINUTES.between(now, state.endTime))}",
+                text = "퇴근까지 ${formatDuration(ChronoUnit.SECONDS.between(now, state.endTime))}",
                 style = TextDefaults.defaultTextStyle.copy(
                     color = WidgetPrimary,
                     fontSize = 15.sp,
@@ -218,56 +218,62 @@ private fun WorkDaySection(state: WidgetState.WorkDay, now: LocalTime, nextWorkD
 @Suppress("MagicNumber")
 private val ProgressBackgroundColor = Color(0xFFE0E0E0)
 
-internal fun formatDuration(totalMinutes: Long): String {
-    val h = totalMinutes / MINUTES_PER_HOUR
-    val m = totalMinutes % MINUTES_PER_HOUR
-    return if (h > 0) "${h}시간 ${m}분" else "${m}분"
+internal fun formatDuration(totalSeconds: Long): String {
+    val h = totalSeconds / SECONDS_PER_HOUR
+    val m = (totalSeconds % SECONDS_PER_HOUR) / SECONDS_PER_MINUTE
+    val s = totalSeconds % SECONDS_PER_MINUTE
+    return when {
+        h > 0 -> "${h}시간 ${m}분 ${s}초"
+        m > 0 -> "${m}분 ${s}초"
+        else -> "${s}초"
+    }
 }
 
-private const val MINUTES_PER_HOUR = 60L
+private const val SECONDS_PER_MINUTE = 60L
+private const val SECONDS_PER_HOUR = 3_600L
 
 class ShiftWidget4x2CountdownReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = ShiftWidget4x2Countdown()
 
     override fun onEnabled(context: Context) {
         super.onEnabled(context)
-        scheduleMinuteUpdate(context)
+        scheduleSecondUpdate(context)
     }
 
     override fun onDisabled(context: Context) {
         super.onDisabled(context)
         context.getSystemService(AlarmManager::class.java)
-            .cancel(minuteUpdatePendingIntent(context))
+            .cancel(secondUpdatePendingIntent(context))
     }
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
-        if (intent.action == ACTION_MINUTE_UPDATE) {
+        if (intent.action == ACTION_SECOND_UPDATE) {
             MainScope().launch { glanceAppWidget.updateAll(context) }
-            scheduleMinuteUpdate(context)
+            scheduleSecondUpdate(context)
         }
     }
 
-    private fun scheduleMinuteUpdate(context: Context) {
+    private fun scheduleSecondUpdate(context: Context) {
         context.getSystemService(AlarmManager::class.java).set(
             AlarmManager.RTC,
-            System.currentTimeMillis() + MINUTE_MS,
-            minuteUpdatePendingIntent(context),
+            System.currentTimeMillis() + SECOND_MS,
+            secondUpdatePendingIntent(context),
         )
     }
 
-    private fun minuteUpdatePendingIntent(context: Context): PendingIntent =
+    private fun secondUpdatePendingIntent(context: Context): PendingIntent =
         PendingIntent.getBroadcast(
             context,
-            REQUEST_CODE_MINUTE,
+            REQUEST_CODE_SECOND,
             Intent(context, ShiftWidget4x2CountdownReceiver::class.java)
-                .apply { action = ACTION_MINUTE_UPDATE },
+                .apply { action = ACTION_SECOND_UPDATE },
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
 
     companion object {
-        const val ACTION_MINUTE_UPDATE = "com.schedule.shift.widget.ACTION_MINUTE_UPDATE"
-        private const val REQUEST_CODE_MINUTE = 1001
-        private const val MINUTE_MS = 60_000L
+        const val ACTION_SECOND_UPDATE = "com.schedule.shift.widget.ACTION_SECOND_UPDATE"
+        private const val REQUEST_CODE_SECOND = 1001
+        private const val SECOND_MS = 1_000L
     }
 }
