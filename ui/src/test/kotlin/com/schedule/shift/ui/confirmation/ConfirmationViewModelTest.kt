@@ -43,7 +43,7 @@ class ConfirmationViewModelTest {
     @Test
     fun `initial state shows weeks from constructor`() = runTest {
         val weeks = listOf(buildTestWeek())
-        val viewModel = ConfirmationViewModel(weeks, repository)
+        val viewModel = ConfirmationViewModel(weeks, null, repository)
 
         viewModel.uiState.test {
             val state = awaitItem() as ConfirmationUiState.Reviewing
@@ -56,7 +56,7 @@ class ConfirmationViewModelTest {
     fun `confirm saves all weeks and emits Saved`() = runTest {
         val weeks = listOf(buildTestWeek())
         coEvery { repository.saveWeek(any()) } returns Unit
-        val viewModel = ConfirmationViewModel(weeks, repository)
+        val viewModel = ConfirmationViewModel(weeks, null, repository)
 
         viewModel.uiState.test {
             skipItems(1)
@@ -70,7 +70,7 @@ class ConfirmationViewModelTest {
 
     @Test
     fun `confirm with empty weeks list emits Saved without saving`() = runTest {
-        val viewModel = ConfirmationViewModel(emptyList(), repository)
+        val viewModel = ConfirmationViewModel(emptyList(), null, repository)
 
         viewModel.uiState.test {
             skipItems(1)
@@ -84,12 +84,44 @@ class ConfirmationViewModelTest {
 
     @Test
     fun `cancel emits Cancelled`() = runTest {
-        val viewModel = ConfirmationViewModel(listOf(buildTestWeek()), repository)
+        val viewModel = ConfirmationViewModel(listOf(buildTestWeek()), null, repository)
 
         viewModel.uiState.test {
             skipItems(1)
             viewModel.cancel()
             assertTrue(awaitItem() is ConfirmationUiState.Cancelled)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `startEdit opens editing state for correct day`() = runTest {
+        val week = buildTestWeek()
+        val viewModel = ConfirmationViewModel(listOf(week), null, repository)
+
+        viewModel.startEdit(weekIndex = 0, dayIndex = 2)
+
+        viewModel.uiState.test {
+            val state = awaitItem() as ConfirmationUiState.Reviewing
+            assertEquals(2, state.editing?.dayIndex)
+            assertEquals(week.days[2], state.editing?.draft)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `commitEdit updates day and clears editing`() = runTest {
+        val week = buildTestWeek()
+        val viewModel = ConfirmationViewModel(listOf(week), null, repository)
+        viewModel.startEdit(weekIndex = 0, dayIndex = 0)
+        val updatedDay = week.days[0].copy(codeLabel = "수정됨")
+        viewModel.updateDraft(updatedDay)
+        viewModel.commitEdit()
+
+        viewModel.uiState.test {
+            val state = awaitItem() as ConfirmationUiState.Reviewing
+            assertEquals("수정됨", state.weeks[0].days[0].codeLabel)
+            assertEquals(null, state.editing)
             cancelAndIgnoreRemainingEvents()
         }
     }

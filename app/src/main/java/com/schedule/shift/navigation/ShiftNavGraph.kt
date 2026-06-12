@@ -28,10 +28,12 @@ fun ShiftNavGraph(navController: NavHostController = rememberNavController()) {
             val homeEntry = remember(backStackEntry) { navController.getBackStackEntry(Routes.HOME) }
             val flowHolder: RegistrationFlowStateHolder = hiltViewModel(homeEntry)
             RegistrationScreen(
-                onParsed = { weeks ->
+                onParsed = { weeks, imageUri ->
                     flowHolder.setPendingWeeks(weeks)
+                    flowHolder.setPendingImageUri(imageUri)
                     navController.navigate(Routes.CONFIRMATION)
                 },
+                onBack = { navController.popBackStack() },
             )
         }
         composable(Routes.CONFIRMATION) { backStackEntry ->
@@ -48,6 +50,7 @@ private fun ConfirmationDestination(
     val homeEntry = remember(backStackEntry) { navController.getBackStackEntry(Routes.HOME) }
     val flowHolder: RegistrationFlowStateHolder = hiltViewModel(homeEntry)
     val weeks = flowHolder.pendingWeeks
+    val imageUri = flowHolder.pendingImageUri
 
     if (weeks.isEmpty()) {
         navController.popBackStack()
@@ -55,13 +58,19 @@ private fun ConfirmationDestination(
     }
 
     val viewModel: ConfirmationViewModel = hiltViewModel(
-        creationCallback = { factory: ConfirmationViewModel.Factory -> factory.create(weeks) },
+        creationCallback = { factory: ConfirmationViewModel.Factory ->
+            factory.create(weeks, imageUri)
+        },
     )
     ConfirmationScreen(
         viewModel = viewModel,
         onSaved = {
+            flowHolder.clear()
             navController.navigate(Routes.HOME) { popUpTo(Routes.HOME) { inclusive = true } }
         },
-        onCancelled = { navController.popBackStack() },
+        onCancelled = {
+            flowHolder.clear()
+            navController.popBackStack()
+        },
     )
 }

@@ -2,6 +2,7 @@ package com.schedule.shift.ui.confirmation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.schedule.shift.domain.model.ScheduleDay
 import com.schedule.shift.domain.model.ScheduleWeek
 import com.schedule.shift.domain.repository.ScheduleRepository
 import dagger.assisted.Assisted
@@ -15,16 +16,20 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel(assistedFactory = ConfirmationViewModel.Factory::class)
 class ConfirmationViewModel @AssistedInject constructor(
-    @Assisted private val weeks: List<ScheduleWeek>,
+    @Assisted private val initialWeeks: List<ScheduleWeek>,
+    @Assisted private val imageUri: String?,
     private val repository: ScheduleRepository,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<ConfirmationUiState>(ConfirmationUiState.Reviewing(weeks))
+    private val _uiState = MutableStateFlow<ConfirmationUiState>(
+        ConfirmationUiState.Reviewing(weeks = initialWeeks, imageUri = imageUri),
+    )
     val uiState: StateFlow<ConfirmationUiState> = _uiState.asStateFlow()
 
     fun confirm() {
+        val state = _uiState.value as? ConfirmationUiState.Reviewing ?: return
         viewModelScope.launch {
-            weeks.forEach { repository.saveWeek(it) }
+            state.weeks.forEach { repository.saveWeek(it) }
             _uiState.value = ConfirmationUiState.Saved
         }
     }
@@ -33,8 +38,39 @@ class ConfirmationViewModel @AssistedInject constructor(
         _uiState.value = ConfirmationUiState.Cancelled
     }
 
+    fun startEdit(weekIndex: Int, dayIndex: Int) {
+        val state = _uiState.value as? ConfirmationUiState.Reviewing ?: return
+        val day = state.weeks.getOrNull(weekIndex)?.days?.getOrNull(dayIndex) ?: return
+        _uiState.value = state.copy(editing = EditingState(weekIndex, dayIndex, day))
+    }
+
+    fun updateDraft(draft: ScheduleDay) {
+        val state = _uiState.value as? ConfirmationUiState.Reviewing ?: return
+        val editing = state.editing ?: return
+        _uiState.value = state.copy(editing = editing.copy(draft = draft))
+    }
+
+    fun commitEdit() {
+        val state = _uiState.value as? ConfirmationUiState.Reviewing ?: return
+        val editing = state.editing ?: return
+        val updatedWeeks = state.weeks.toMutableList()
+        val week = updatedWeeks[editing.weekIndex]
+        val updatedDays = week.days.toMutableList()
+        updatedDays[editing.dayIndex] = editing.draft
+        updatedWeeks[editing.weekIndex] = ScheduleWeek(
+            weekStartDate = week.weekStartDate,
+            days = updatedDays,
+        )
+        _uiState.value = state.copy(weeks = updatedWeeks, editing = null)
+    }
+
+    fun dismissEdit() {
+        val state = _uiState.value as? ConfirmationUiState.Reviewing ?: return
+        _uiState.value = state.copy(editing = null)
+    }
+
     @AssistedFactory
     interface Factory {
-        fun create(weeks: List<ScheduleWeek>): ConfirmationViewModel
+        fun create(weeks: List<ScheduleWeek>, imageUri: String?): ConfirmationViewModel
     }
 }

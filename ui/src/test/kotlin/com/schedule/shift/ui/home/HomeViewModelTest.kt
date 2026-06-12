@@ -43,6 +43,7 @@ class HomeViewModelTest {
     @Test
     fun `initial state is Loading`() = runTest {
         coEvery { repository.getWeekByDate(any()) } returns null
+        coEvery { repository.getNextWeekFrom(any()) } returns null
         val viewModel = HomeViewModel(repository, today)
 
         viewModel.uiState.test {
@@ -55,6 +56,7 @@ class HomeViewModelTest {
     @Test
     fun `emits Success with null week when no schedule exists`() = runTest {
         coEvery { repository.getWeekByDate(any()) } returns null
+        coEvery { repository.getNextWeekFrom(any()) } returns null
         val viewModel = HomeViewModel(repository, today)
 
         viewModel.uiState.test {
@@ -63,6 +65,21 @@ class HomeViewModelTest {
             assertTrue(state is HomeUiState.Success)
             assertTrue((state as HomeUiState.Success).currentWeek == null)
             assertEquals(today, state.today)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `falls back to next registered week when current week is empty`() = runTest {
+        val nextWeek = buildTestWeek(LocalDate.of(2026, 6, 22))
+        coEvery { repository.getWeekByDate(any()) } returns null
+        coEvery { repository.getNextWeekFrom(any()) } returns nextWeek
+        val viewModel = HomeViewModel(repository, today)
+
+        viewModel.uiState.test {
+            skipItems(1)
+            val state = awaitItem() as HomeUiState.Success
+            assertEquals(nextWeek, state.currentWeek)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -98,6 +115,7 @@ class HomeViewModelTest {
     fun `refresh reloads current week`() = runTest {
         val week = buildTestWeek()
         coEvery { repository.getWeekByDate(any()) } returns null andThen week
+        coEvery { repository.getNextWeekFrom(any()) } returns null
         val viewModel = HomeViewModel(repository, today)
 
         viewModel.uiState.test {
@@ -110,11 +128,11 @@ class HomeViewModelTest {
         }
     }
 
-    private fun buildTestWeek() = ScheduleWeek(
-        weekStartDate = LocalDate.of(2026, 6, 8),
+    private fun buildTestWeek(monday: LocalDate = LocalDate.of(2026, 6, 8)) = ScheduleWeek(
+        weekStartDate = monday,
         days = (0..6).map { offset ->
             ScheduleDay(
-                date = LocalDate.of(2026, 6, 8).plusDays(offset.toLong()),
+                date = monday.plusDays(offset.toLong()),
                 type = if (offset < 5) DayType.WORK else DayType.OFF,
                 startTime = if (offset < 5) LocalTime.of(9, 0) else null,
                 endTime = if (offset < 5) LocalTime.of(18, 0) else null,

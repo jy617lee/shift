@@ -76,6 +76,9 @@ glance-material3 = { group = "androidx.glance", name = "glance-material3", versi
 # Coil
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 
+# Material Icons (part of Compose BOM)
+compose-material-icons-core = { group = "androidx.compose.material", name = "material-icons-core" }
+
 # Retrofit / OkHttp
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }

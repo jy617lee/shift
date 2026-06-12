@@ -263,6 +263,27 @@ class ScheduleParserImplTest {
         assertEquals("정상", days[6].codeLabel)
     }
 
+    @Test
+    fun `parses lines where ML Kit outputs at-sign instead of P indicator`() = runTest {
+        val text = """
+            주간 스케쥴 조회
+            06/22(월) @ 14:00 @ 19:30 @ 정상
+            06/23(화) @ 15:00 @ 20:30 @ 정상
+            06/24(수) 정규휴일
+            06/25(목) @ 15:00 @ 20:30 @ 정상
+        """.trimIndent()
+
+        val result = parser.parse(text)
+        assertTrue(result is ParseResult.Success)
+        val days = (result as ParseResult.Success).weeks.first().days
+        assertEquals(DayType.WORK, days[0].type)
+        assertEquals(LocalTime.of(14, 0), days[0].startTime)
+        assertEquals(LocalTime.of(19, 30), days[0].endTime)
+        assertEquals(DayType.WORK, days[1].type)
+        assertEquals(LocalTime.of(15, 0), days[1].startTime)
+        assertEquals(DayType.OTHER, days[2].type)
+    }
+
     private fun loadSample(fileName: String): String =
         javaClass.classLoader
             ?.getResourceAsStream("ocr_samples/$fileName")

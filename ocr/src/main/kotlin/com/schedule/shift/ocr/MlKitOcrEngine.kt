@@ -1,6 +1,7 @@
 package com.schedule.shift.ocr
 
 import android.graphics.Bitmap
+import android.util.Log
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.text.TextRecognizer
 import com.schedule.shift.domain.ocr.OcrEngine
@@ -17,10 +18,16 @@ class MlKitOcrEngine(private val recognizer: TextRecognizer) : OcrEngine {
             val inlineExecutor = Executor { it.run() }
             recognizer.process(image)
                 .addOnSuccessListener(inlineExecutor) { visionText ->
+                    Log.d(TAG, "OCR result:\n${visionText.text}")
                     if (cont.isActive) cont.resume(OcrResult.Success(visionText.text))
                 }
                 .addOnFailureListener(inlineExecutor) { e ->
+                    Log.e(TAG, "OCR failed", e)
                     if (cont.isActive) cont.resume(OcrResult.Failure(e))
                 }
         }
+
+    companion object {
+        private const val TAG = "ShiftOCR"
+    }
 }

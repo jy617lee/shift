@@ -21,11 +21,11 @@ class RegistrationViewModel @Inject constructor(
     private val _uiState = MutableStateFlow<RegistrationUiState>(RegistrationUiState.Idle)
     val uiState: StateFlow<RegistrationUiState> = _uiState.asStateFlow()
 
-    fun onImageSelected(bitmap: Bitmap) {
+    fun onImageSelected(bitmap: Bitmap, imageUri: String? = null) {
         viewModelScope.launch {
             _uiState.value = RegistrationUiState.Processing
             _uiState.value = when (val result = processImage(bitmap)) {
-                is ParseResult.Success -> RegistrationUiState.ParseSuccess(result.weeks)
+                is ParseResult.Success -> RegistrationUiState.ParseSuccess(result.weeks, imageUri)
                 is ParseResult.Failure -> mapFailure(result.reason)
             }
         }

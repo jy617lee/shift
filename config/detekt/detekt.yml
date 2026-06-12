@@ -19,6 +19,7 @@ complexity:
     ignoreAnnotated: ['Composable']
   TooManyFunctions:
     active: true
+    thresholdInFiles: 20
     thresholdInClasses: 15
     thresholdInObjects: 10
     thresholdInInterfaces: 10

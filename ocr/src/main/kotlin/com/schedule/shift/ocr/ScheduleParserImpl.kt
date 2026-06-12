@@ -96,10 +96,10 @@ class ScheduleParserImpl(
     }
 
     companion object {
-        // (?:P\s+)? skips plan-indicator badges (e.g. "P 14:00"); [~\s]+ allows tilde or space between times
+        // [P@] handles plan-indicator badges that ML Kit may read as "P" or "@"; [~\s]+ allows tilde or space between times
         @Suppress("MaxLineLength")
         private val LINE_PATTERN =
-            Regex("""(\d{1,2})/(\d{1,2})\([월화수목금토일]\)\s+(?:(?:P\s+)?(\d{2}:\d{2})[~\s]+(?:P\s+)?(\d{2}:\d{2})\s+(?:P\s+)?)?(.+)""")
+            Regex("""(\d{1,2})/(\d{1,2})\([월화수목금토일]\)\s+(?:(?:[P@]\s+)?(\d{2}:\d{2})[~\s]+(?:[P@]\s+)?(\d{2}:\d{2})\s+(?:[P@]\s+)?)?(.+)""")
         private const val GROUP_MONTH = 1
         private const val GROUP_DAY = 2
         private const val GROUP_START_TIME = 3

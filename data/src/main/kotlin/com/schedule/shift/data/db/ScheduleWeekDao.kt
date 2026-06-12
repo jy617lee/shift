@@ -23,6 +23,9 @@ interface ScheduleWeekDao {
     @Query("SELECT * FROM schedule_weeks ORDER BY weekStartDate ASC")
     suspend fun getAllWeeks(): List<ScheduleWeekEntity>
 
+    @Query("SELECT * FROM schedule_weeks WHERE weekStartDate >= :from ORDER BY weekStartDate ASC LIMIT 1")
+    suspend fun getNextWeekFrom(from: LocalDate): ScheduleWeekEntity?
+
     @Query("DELETE FROM schedule_weeks WHERE weekStartDate = :weekStartDate")
     suspend fun deleteWeek(weekStartDate: LocalDate)
 }
