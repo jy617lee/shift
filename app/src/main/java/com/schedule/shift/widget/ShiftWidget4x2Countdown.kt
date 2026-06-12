@@ -209,7 +209,7 @@ private fun WorkDaySection(state: WidgetState.WorkDay, now: LocalTime, nextWorkD
 @Suppress("MagicNumber")
 private val ProgressBackgroundColor = Color(0xFFE0E0E0)
 
-private fun formatDuration(totalMinutes: Long): String {
+internal fun formatDuration(totalMinutes: Long): String {
     val h = totalMinutes / MINUTES_PER_HOUR
     val m = totalMinutes % MINUTES_PER_HOUR
     return if (h > 0) "${h}시간 ${m}분" else "${m}분"
