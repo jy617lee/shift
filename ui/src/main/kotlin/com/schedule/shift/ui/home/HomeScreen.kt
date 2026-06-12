@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.runtime.LaunchedEffect
 import com.schedule.shift.domain.model.DayType
 import com.schedule.shift.domain.model.ScheduleDay
 import com.schedule.shift.domain.model.ScheduleWeek
@@ -66,7 +67,12 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    HomeContent(uiState = uiState, onAddSchedule = onAddSchedule, onRefresh = viewModel::refresh)
+    HomeContent(
+        uiState = uiState,
+        onAddSchedule = onAddSchedule,
+        onRefresh = viewModel::refresh,
+        onWeekViewed = viewModel::onWeekViewed,
+    )
 }
 
 @Composable
@@ -74,6 +80,7 @@ internal fun HomeContent(
     uiState: HomeUiState,
     onAddSchedule: () -> Unit,
     onRefresh: () -> Unit,
+    onWeekViewed: (LocalDate) -> Unit = {},
 ) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
@@ -92,6 +99,7 @@ internal fun HomeContent(
                     weeks = uiState.weeks,
                     today = uiState.today,
                     onAddSchedule = onAddSchedule,
+                    onWeekViewed = onWeekViewed,
                 )
                 is HomeUiState.Error -> HomeErrorContent(onRefresh = onRefresh)
             }
@@ -144,7 +152,12 @@ private fun ShiftFab(onClick: () -> Unit) {
 }
 
 @Composable
-private fun HomeSuccessContent(weeks: List<ScheduleWeek>, today: LocalDate, onAddSchedule: () -> Unit) {
+private fun HomeSuccessContent(
+    weeks: List<ScheduleWeek>,
+    today: LocalDate,
+    onAddSchedule: () -> Unit,
+    onWeekViewed: (LocalDate) -> Unit,
+) {
     if (weeks.isEmpty()) {
         ShiftEmptyState(onAddSchedule = onAddSchedule)
     } else {
@@ -155,7 +168,10 @@ private fun HomeSuccessContent(weeks: List<ScheduleWeek>, today: LocalDate, onAd
                 .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 100.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            weeks.forEach { week -> WeekCard(week = week, today = today) }
+            weeks.forEach { week ->
+                LaunchedEffect(week.weekStartDate) { onWeekViewed(week.weekStartDate) }
+                WeekCard(week = week, today = today)
+            }
         }
     }
 }
