@@ -33,8 +33,7 @@ ktlint {
 dependencies {
     implementation(project(":domain"))
 
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.analytics)
+    implementation(project(":domain"))
     implementation(libs.kotlinx.coroutines.android)
 
     testImplementation(libs.junit)

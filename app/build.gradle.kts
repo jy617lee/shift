@@ -5,7 +5,6 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.detekt)
     alias(libs.plugins.ktlint)
-    alias(libs.plugins.google.services)
     jacoco
 }
 
@@ -187,9 +186,6 @@ dependencies {
     implementation(libs.work.runtime.ktx)
     implementation(libs.glance.appwidget)
     implementation(libs.glance.material3)
-
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.analytics)
 
     implementation(libs.mlkit.text.recognition.korean)
     implementation(libs.room.runtime)
