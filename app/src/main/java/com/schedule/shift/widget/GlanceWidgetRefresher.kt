@@ -14,5 +14,6 @@ class GlanceWidgetRefresher @Inject constructor(
         ShiftWidget2x1().updateAll(context)
         ShiftWidget2x2().updateAll(context)
         ShiftWidget4x1().updateAll(context)
+        ShiftWidget4x2Countdown().updateAll(context)
     }
 }
