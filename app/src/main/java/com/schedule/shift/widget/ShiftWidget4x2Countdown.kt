@@ -81,11 +81,18 @@ class ShiftWidget4x2Countdown : BaseShiftWidget() {
         Widget4x2CountdownContent(state, today, LocalTime.now(), null)
     }
 
-    private suspend fun findNextWorkDay(repo: ScheduleRepository, from: LocalDate): ScheduleDay? =
-        repo.getWeeksInRange(from.plusDays(1), from.plusDays(NEXT_WORK_SEARCH_DAYS))
-            .flatMap { it.days }
+    private suspend fun findNextWorkDay(repo: ScheduleRepository, from: LocalDate): ScheduleDay? {
+        // getWeeksInRange는 weekStartDate 기준 조회라 이번 주가 누락될 수 있으므로
+        // getWeekByDate로 이번 주 잔여 근무를 먼저 확인 후 이후 주를 탐색
+        val thisWeekDays = repo.getWeekByDate(from)?.days.orEmpty()
+        val futureWeekDays = repo.getWeeksInRange(
+            from.plusDays(1),
+            from.plusDays(NEXT_WORK_SEARCH_DAYS),
+        ).flatMap { it.days }
+        return (thisWeekDays + futureWeekDays)
             .filter { it.date.isAfter(from) && it.type == DayType.WORK }
             .minByOrNull { it.date }
+    }
 
     companion object {
         private const val NEXT_WORK_SEARCH_DAYS = 14L
