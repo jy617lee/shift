@@ -284,6 +284,50 @@ class ScheduleParserImplTest {
         assertEquals(DayType.OTHER, days[2].type)
     }
 
+    // ── 실이미지 OCR 출력 검증 (test_img/test_2.jpeg) ─────────────────────
+
+    @Test
+    fun `sample_12 parses 7 days with carry-forward for actual rows`() = runTest {
+        val text = loadSample("sample_12_real_schedule_jun08_actual.txt")
+        val result = parser.parse(text) as ParseResult.Success
+
+        assertEquals(1, result.weeks.size)
+        val days = result.weeks.first().days
+        assertEquals(ScheduleWeek.DAYS_IN_WEEK, days.size)
+        assertEquals(LocalDate.of(2026, 6, 8), result.weeks.first().weekStartDate)
+    }
+
+    @Test
+    fun `sample_12 day types are correct`() = runTest {
+        val result = parser.parse(loadSample("sample_12_real_schedule_jun08_actual.txt")) as ParseResult.Success
+        val days = result.weeks.first().days
+
+        assertEquals(DayType.OTHER, days[0].type)  // 06/08 정규휴일
+        assertEquals(DayType.WORK, days[1].type)   // 06/09 orphaned carry-forward
+        assertEquals(DayType.WORK, days[2].type)   // 06/10 orphaned carry-forward
+        assertEquals(DayType.OTHER, days[3].type)  // 06/11 정규휴일
+        assertEquals(DayType.WORK, days[4].type)   // 06/12
+        assertEquals(DayType.WORK, days[5].type)   // 06/13
+        assertEquals(DayType.WORK, days[6].type)   // 06/14
+    }
+
+    @Test
+    fun `sample_12 work days have correct times`() = runTest {
+        val result = parser.parse(loadSample("sample_12_real_schedule_jun08_actual.txt")) as ParseResult.Success
+        val days = result.weeks.first().days
+
+        assertEquals(LocalTime.of(15, 0), days[1].startTime)  // 06/09
+        assertEquals(LocalTime.of(20, 30), days[1].endTime)
+        assertEquals(LocalTime.of(15, 0), days[2].startTime)  // 06/10
+        assertEquals(LocalTime.of(20, 30), days[2].endTime)
+        assertEquals(LocalTime.of(15, 0), days[4].startTime)  // 06/12
+        assertEquals(LocalTime.of(20, 30), days[4].endTime)
+        assertEquals(LocalTime.of(17, 0), days[5].startTime)  // 06/13
+        assertEquals(LocalTime.of(22, 30), days[5].endTime)
+        assertEquals(LocalTime.of(17, 0), days[6].startTime)  // 06/14
+        assertEquals(LocalTime.of(22, 30), days[6].endTime)
+    }
+
     private fun loadSample(fileName: String): String =
         javaClass.classLoader
             ?.getResourceAsStream("ocr_samples/$fileName")

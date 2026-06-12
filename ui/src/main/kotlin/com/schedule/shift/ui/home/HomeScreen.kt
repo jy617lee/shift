@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -44,17 +45,16 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.schedule.shift.domain.model.DayType
 import com.schedule.shift.domain.model.ScheduleDay
 import com.schedule.shift.domain.model.ScheduleWeek
+import com.schedule.shift.ui.COLOR_SATURDAY
+import com.schedule.shift.ui.COLOR_SUNDAY
+import com.schedule.shift.ui.TODAY_BAR_ALPHA
+import com.schedule.shift.ui.TODAY_BAR_HEIGHT
+import com.schedule.shift.ui.TODAY_BAR_WIDTH
+import com.schedule.shift.ui.WEEK_HEADER_ALPHA
+import com.schedule.shift.ui.WEEK_LAST_DAY_OFFSET
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-
-private val COLOR_SUNDAY = Color(0xFFEF4444)
-private val COLOR_SATURDAY = Color(0xFF3B82F6)
-private const val TODAY_BAR_ALPHA = 0.06f
-private const val WEEK_HEADER_ALPHA = 0.6f
-private const val TODAY_BAR_WIDTH = 3
-private const val TODAY_BAR_HEIGHT = 48
-private const val WEEK_LAST_DAY_OFFSET = 6L
 
 private val DAY_LABEL = DateTimeFormatter.ofPattern("EE")
 private val DATE_LABEL = DateTimeFormatter.ofPattern("d")
@@ -77,25 +77,23 @@ internal fun HomeContent(
 ) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
+        topBar = { ShiftAppBar() },
         floatingActionButton = {
             if (uiState is HomeUiState.Success) ShiftFab(onClick = onAddSchedule)
         },
     ) { padding ->
-        Column(modifier = Modifier.fillMaxSize().padding(padding)) {
-            ShiftAppBar()
-            Box(modifier = Modifier.fillMaxSize()) {
-                when (uiState) {
-                    is HomeUiState.Loading -> CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.Center),
-                        color = MaterialTheme.colorScheme.primary,
-                    )
-                    is HomeUiState.Success -> HomeSuccessContent(
-                        currentWeek = uiState.currentWeek,
-                        today = uiState.today,
-                        onAddSchedule = onAddSchedule,
-                    )
-                    is HomeUiState.Error -> HomeErrorContent(onRefresh = onRefresh)
-                }
+        Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+            when (uiState) {
+                is HomeUiState.Loading -> CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center),
+                    color = MaterialTheme.colorScheme.primary,
+                )
+                is HomeUiState.Success -> HomeSuccessContent(
+                    weeks = uiState.weeks,
+                    today = uiState.today,
+                    onAddSchedule = onAddSchedule,
+                )
+                is HomeUiState.Error -> HomeErrorContent(onRefresh = onRefresh)
             }
         }
     }
@@ -107,6 +105,7 @@ private fun ShiftAppBar() {
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surface)
+            .statusBarsPadding()
             .padding(horizontal = 16.dp, vertical = 12.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -145,8 +144,8 @@ private fun ShiftFab(onClick: () -> Unit) {
 }
 
 @Composable
-private fun HomeSuccessContent(currentWeek: ScheduleWeek?, today: LocalDate, onAddSchedule: () -> Unit) {
-    if (currentWeek == null) {
+private fun HomeSuccessContent(weeks: List<ScheduleWeek>, today: LocalDate, onAddSchedule: () -> Unit) {
+    if (weeks.isEmpty()) {
         ShiftEmptyState(onAddSchedule = onAddSchedule)
     } else {
         Column(
@@ -154,8 +153,9 @@ private fun HomeSuccessContent(currentWeek: ScheduleWeek?, today: LocalDate, onA
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 100.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            WeekCard(week = currentWeek, today = today)
+            weeks.forEach { week -> WeekCard(week = week, today = today) }
         }
     }
 }

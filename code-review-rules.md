@@ -7,6 +7,8 @@
 ## 2. 중복 제거 (DRY)
 - 동일하거나 유사한 로직이 2곳 이상 존재하는가
 - 있다면 공통 함수/클래스로 추출할 것
+- **상수/변수 중복 선언 금지**: 같은 값의 상수가 2개 이상 파일에 선언되어 있으면 공통 파일(`ShiftUiConstants.kt` 등)로 이동할 것
+  - UI 공통 상수: `COLOR_SUNDAY`, `COLOR_SATURDAY`, `TODAY_BAR_ALPHA/WIDTH/HEIGHT`, `WEEK_HEADER_ALPHA`, `WEEK_LAST_DAY_OFFSET` → `ui/ShiftUiConstants.kt`
 
 ## 3. 명확한 네이밍
 - 함수명은 동사로 시작하며 역할을 설명하는가 (예: `getUserSchedule`)
