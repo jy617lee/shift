@@ -12,4 +12,8 @@
     <issue id="UnusedResources">
         <ignore path="**/generated/**" />
     </issue>
+    <!-- Room KSP 생성 코드의 RestrictedApi 오탐 제외 -->
+    <issue id="RestrictedApi">
+        <ignore path="**/generated/**" />
+    </issue>
 </lint>

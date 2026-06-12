@@ -26,6 +26,11 @@ android {
         getByName("debug").java.srcDir("build/generated/ksp/debug/kotlin")
         getByName("release").java.srcDir("build/generated/ksp/release/kotlin")
     }
+
+    lint {
+        lintConfig = file("$rootDir/config/lint/lint.xml")
+        abortOnError = true
+    }
 }
 
 detekt {
