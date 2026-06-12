@@ -66,12 +66,10 @@ class ShiftWidget4x2Weekly : BaseShiftWidget() {
     }
 }
 
-@Suppress("LongMethod")
 @Composable
 internal fun Widget4x2WeeklyContent(today: LocalDate, week: ScheduleWeek?) {
     val timeFmt = DateTimeFormatter.ofPattern("H:mm")
     val dayFmt = DateTimeFormatter.ofPattern("E")
-
     val todayDay = week?.days?.find { it.date == today }
     val todayState = todayDay?.toWidgetState() ?: WidgetState.Unregistered
 
@@ -104,9 +102,7 @@ private fun TodayHeader(
             ),
         )
         Spacer(modifier = GlanceModifier.defaultWeight())
-        Column(
-            horizontalAlignment = Alignment.End,
-        ) {
+        Column(horizontalAlignment = Alignment.End) {
             Text(
                 text = today.format(dayFmt),
                 style = TextDefaults.defaultTextStyle.copy(
@@ -114,32 +110,29 @@ private fun TodayHeader(
                     fontSize = 11.sp,
                 ),
             )
-            when (state) {
-                is WidgetState.WorkDay -> Text(
-                    text = "${state.startTime.format(timeFmt)}-${state.endTime.format(timeFmt)}",
-                    style = TextDefaults.defaultTextStyle.copy(
-                        color = WidgetOnSurface,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                    ),
-                )
-                is WidgetState.OffDay -> Text(
-                    text = state.codeLabel.ifEmpty { "휴무" },
-                    style = TextDefaults.defaultTextStyle.copy(
-                        color = WidgetOnSurfaceVariant,
-                        fontSize = 14.sp,
-                    ),
-                )
-                is WidgetState.Unregistered -> Text(
-                    text = "-",
-                    style = TextDefaults.defaultTextStyle.copy(
-                        color = WidgetOnSurfaceVariant,
-                        fontSize = 14.sp,
-                    ),
-                )
-            }
+            TodayStateText(state = state, timeFmt = timeFmt)
         }
     }
+}
+
+@Composable
+private fun TodayStateText(state: WidgetState, timeFmt: DateTimeFormatter) {
+    val (text, color) = when (state) {
+        is WidgetState.WorkDay ->
+            "${state.startTime.format(timeFmt)}-${state.endTime.format(timeFmt)}" to WidgetOnSurface
+        is WidgetState.OffDay ->
+            state.codeLabel.ifEmpty { "휴무" } to WidgetOnSurfaceVariant
+        is WidgetState.Unregistered ->
+            "-" to WidgetOnSurfaceVariant
+    }
+    Text(
+        text = text,
+        style = TextDefaults.defaultTextStyle.copy(
+            color = color,
+            fontSize = 14.sp,
+            fontWeight = if (state is WidgetState.WorkDay) FontWeight.Medium else FontWeight.Normal,
+        ),
+    )
 }
 
 @Composable
@@ -149,18 +142,14 @@ private fun WeekGrid(
     timeFmt: DateTimeFormatter,
     dayFmt: DateTimeFormatter,
 ) {
-    Row(
-        modifier = GlanceModifier.fillMaxWidth().fillMaxHeight(),
-    ) {
-        (-2..2).forEach { offset ->
+    Row(modifier = GlanceModifier.fillMaxWidth().fillMaxHeight()) {
+        for (offset in GRID_OFFSET_START..GRID_OFFSET_END) {
             val date = today.plusDays(offset.toLong())
-            val dayData = week?.days?.find { it.date == date }
-            val isToday = offset == 0
             DayCell(
                 modifier = GlanceModifier.defaultWeight().fillMaxHeight(),
                 date = date,
-                dayData = dayData,
-                isToday = isToday,
+                dayData = week?.days?.find { it.date == date },
+                isToday = offset == 0,
                 timeFmt = timeFmt,
                 dayFmt = dayFmt,
             )
@@ -168,6 +157,7 @@ private fun WeekGrid(
     }
 }
 
+@Suppress("LongMethod")
 @Composable
 private fun DayCell(
     modifier: GlanceModifier,
@@ -178,8 +168,8 @@ private fun DayCell(
     dayFmt: DateTimeFormatter,
 ) {
     val state = dayData?.toWidgetState() ?: WidgetState.Unregistered
-    val labelColor = if (isToday) WidgetPrimary else WidgetOnSurfaceVariant
-    val valueColor = if (isToday) WidgetPrimary else WidgetOnSurface
+    val accent = if (isToday) WidgetPrimary else WidgetOnSurfaceVariant
+    val weight = if (isToday) FontWeight.Bold else FontWeight.Normal
 
     Column(
         modifier = modifier,
@@ -189,57 +179,66 @@ private fun DayCell(
         Text(
             text = date.format(dayFmt),
             style = TextDefaults.defaultTextStyle.copy(
-                color = labelColor,
+                color = accent,
                 fontSize = 10.sp,
-                fontWeight = if (isToday) FontWeight.Bold else FontWeight.Normal,
+                fontWeight = weight,
                 textAlign = TextAlign.Center,
             ),
         )
         Spacer(GlanceModifier.height(4.dp))
-        when (state) {
-            is WidgetState.WorkDay -> {
-                val s = state.startTime.format(timeFmt)
-                val e = state.endTime.format(timeFmt)
-                Text(
-                    text = "$s-",
-                    style = TextDefaults.defaultTextStyle.copy(
-                        color = valueColor,
-                        fontSize = 9.sp,
-                        fontWeight = if (isToday) FontWeight.Bold else FontWeight.Normal,
-                        textAlign = TextAlign.Center,
-                    ),
-                )
-                Text(
-                    text = e,
-                    style = TextDefaults.defaultTextStyle.copy(
-                        color = valueColor,
-                        fontSize = 9.sp,
-                        fontWeight = if (isToday) FontWeight.Bold else FontWeight.Normal,
-                        textAlign = TextAlign.Center,
-                    ),
-                )
-            }
-            is WidgetState.OffDay -> Text(
-                text = state.codeLabel.ifEmpty { "휴무" }.take(MAX_CODE_CHARS),
-                style = TextDefaults.defaultTextStyle.copy(
-                    color = if (isToday) WidgetPrimary else WidgetOnSurfaceVariant,
-                    fontSize = 9.sp,
-                    textAlign = TextAlign.Center,
-                ),
-            )
-            is WidgetState.Unregistered -> Text(
-                text = "-",
-                style = TextDefaults.defaultTextStyle.copy(
-                    color = WidgetOnSurfaceVariant,
-                    fontSize = 9.sp,
-                    textAlign = TextAlign.Center,
-                ),
-            )
-        }
+        DayCellValue(state = state, isToday = isToday, timeFmt = timeFmt, weight = weight)
     }
 }
 
+@Composable
+private fun DayCellValue(
+    state: WidgetState,
+    isToday: Boolean,
+    timeFmt: DateTimeFormatter,
+    weight: FontWeight,
+) {
+    val valueColor = if (isToday) WidgetPrimary else WidgetOnSurface
+    when (state) {
+        is WidgetState.WorkDay -> WorkTimeLines(state = state, timeFmt = timeFmt, color = valueColor, weight = weight)
+        is WidgetState.OffDay -> Text(
+            text = state.codeLabel.ifEmpty { "휴무" }.take(MAX_CODE_CHARS),
+            style = TextDefaults.defaultTextStyle.copy(
+                color = if (isToday) WidgetPrimary else WidgetOnSurfaceVariant,
+                fontSize = 9.sp,
+                textAlign = TextAlign.Center,
+            ),
+        )
+        is WidgetState.Unregistered -> Text(
+            text = "-",
+            style = TextDefaults.defaultTextStyle.copy(
+                color = WidgetOnSurfaceVariant,
+                fontSize = 9.sp,
+                textAlign = TextAlign.Center,
+            ),
+        )
+    }
+}
+
+@Composable
+private fun WorkTimeLines(
+    state: WidgetState.WorkDay,
+    timeFmt: DateTimeFormatter,
+    color: androidx.glance.unit.ColorProvider,
+    weight: FontWeight,
+) {
+    val cellStyle = TextDefaults.defaultTextStyle.copy(
+        color = color,
+        fontSize = 9.sp,
+        fontWeight = weight,
+        textAlign = TextAlign.Center,
+    )
+    Text(text = "${state.startTime.format(timeFmt)}-", style = cellStyle)
+    Text(text = state.endTime.format(timeFmt), style = cellStyle)
+}
+
 private const val MAX_CODE_CHARS = 4
+private const val GRID_OFFSET_START = -2
+private const val GRID_OFFSET_END = 2
 
 class ShiftWidget4x2WeeklyReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = ShiftWidget4x2Weekly()
