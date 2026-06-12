@@ -9,8 +9,11 @@ import com.schedule.shift.domain.model.SourceType
 import com.schedule.shift.domain.parser.FailureReason
 import com.schedule.shift.domain.parser.ParseResult
 import com.schedule.shift.domain.usecase.ProcessScheduleImageUseCase
+import com.schedule.shift.domain.analytics.AnalyticsEvent
+import com.schedule.shift.domain.analytics.AnalyticsTracker
 import io.mockk.coEvery
 import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -30,6 +33,7 @@ class RegistrationViewModelTest {
 
     private val testDispatcher = StandardTestDispatcher()
     private lateinit var useCase: ProcessScheduleImageUseCase
+    private lateinit var analyticsTracker: AnalyticsTracker
     private lateinit var viewModel: RegistrationViewModel
     private lateinit var bitmap: Bitmap
 
@@ -37,8 +41,9 @@ class RegistrationViewModelTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         useCase = mockk()
+        analyticsTracker = mockk(relaxed = true)
         bitmap = mockk(relaxed = true)
-        viewModel = RegistrationViewModel(useCase)
+        viewModel = RegistrationViewModel(useCase, analyticsTracker)
     }
 
     @After
@@ -110,6 +115,38 @@ class RegistrationViewModelTest {
             assertEquals(RegistrationUiState.Idle, awaitItem())
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun `onRegisterStart tracks RegisterStart event`() {
+        viewModel.onRegisterStart()
+        verify { analyticsTracker.track(match { it is AnalyticsEvent.RegisterStart }) }
+    }
+
+    @Test
+    fun `onImageSelected tracks ImageSelected event`() = runTest {
+        coEvery { useCase(bitmap) } returns ParseResult.Success(listOf(buildTestWeek()))
+        viewModel.onRegisterStart()
+        viewModel.uiState.test {
+            skipItems(1)
+            viewModel.onImageSelected(bitmap)
+            skipItems(2)
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify { analyticsTracker.track(match { it is AnalyticsEvent.ImageSelected }) }
+    }
+
+    @Test
+    fun `reset after start tracks RegisterAbandon event`() {
+        viewModel.onRegisterStart()
+        viewModel.reset()
+        verify { analyticsTracker.track(match { it is AnalyticsEvent.RegisterAbandon }) }
+    }
+
+    @Test
+    fun `reset without start does not track RegisterAbandon`() {
+        viewModel.reset()
+        verify(exactly = 0) { analyticsTracker.track(match { it is AnalyticsEvent.RegisterAbandon }) }
     }
 
     private fun buildTestWeek() = ScheduleWeek(

@@ -47,7 +47,7 @@ import com.schedule.shift.domain.model.ScheduleWeek
 @Suppress("LongMethod")
 @Composable
 fun RegistrationScreen(
-    onParsed: (List<ScheduleWeek>, String?) -> Unit,
+    onParsed: (List<ScheduleWeek>, String?, String, Long) -> Unit,
     onBack: () -> Unit = {},
     viewModel: RegistrationViewModel = hiltViewModel(),
 ) {
@@ -64,12 +64,13 @@ fun RegistrationScreen(
     }
 
     LaunchedEffect(Unit) {
+        viewModel.onRegisterStart()
         imagePicker.launch("image/*")
     }
 
     if (uiState is RegistrationUiState.ParseSuccess) {
         val success = uiState as RegistrationUiState.ParseSuccess
-        onParsed(success.weeks, success.imageUri)
+        onParsed(success.weeks, success.imageUri, success.sessionId, success.sessionStartMs)
         return
     }
 

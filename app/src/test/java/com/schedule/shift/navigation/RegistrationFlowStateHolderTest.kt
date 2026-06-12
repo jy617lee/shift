@@ -5,6 +5,7 @@ import com.schedule.shift.domain.model.ScheduleDay
 import com.schedule.shift.domain.model.ScheduleWeek
 import com.schedule.shift.domain.model.SourceType
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -24,6 +25,46 @@ class RegistrationFlowStateHolderTest {
     fun `initial state has empty weeks and null imageUri`() {
         assertTrue(holder.pendingWeeks.isEmpty())
         assertNull(holder.pendingImageUri)
+    }
+
+    @Test
+    fun `initial session state is blank`() {
+        assertEquals("", holder.pendingSessionId)
+        assertEquals(0L, holder.pendingSessionStartMs)
+        assertFalse(holder.pendingReplace)
+    }
+
+    @Test
+    fun `setSession stores sessionId and startMs`() {
+        holder.setSession("abc-123", 1_000L)
+        assertEquals("abc-123", holder.pendingSessionId)
+        assertEquals(1_000L, holder.pendingSessionStartMs)
+    }
+
+    @Test
+    fun `setReplace stores replace flag`() {
+        holder.setReplace(true)
+        assertTrue(holder.pendingReplace)
+        holder.setReplace(false)
+        assertFalse(holder.pendingReplace)
+    }
+
+    @Test
+    fun `clear resets session fields`() {
+        holder.setSession("abc-123", 9_999L)
+        holder.setReplace(true)
+        holder.clear()
+        assertEquals("", holder.pendingSessionId)
+        assertEquals(0L, holder.pendingSessionStartMs)
+        assertFalse(holder.pendingReplace)
+    }
+
+    @Test
+    fun `setSession overwrites previous session`() {
+        holder.setSession("first", 100L)
+        holder.setSession("second", 200L)
+        assertEquals("second", holder.pendingSessionId)
+        assertEquals(200L, holder.pendingSessionStartMs)
     }
 
     @Test

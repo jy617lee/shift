@@ -7,9 +7,12 @@ import com.schedule.shift.domain.model.ScheduleWeek
 import com.schedule.shift.domain.model.SourceType
 import com.schedule.shift.domain.repository.ScheduleRepository
 import com.schedule.shift.domain.widget.WidgetRefresher
+import com.schedule.shift.domain.analytics.AnalyticsEvent
+import com.schedule.shift.domain.analytics.AnalyticsTracker
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -30,12 +33,14 @@ class ConfirmationViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
     private lateinit var repository: ScheduleRepository
     private lateinit var widgetRefresher: WidgetRefresher
+    private lateinit var analyticsTracker: AnalyticsTracker
 
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         repository = mockk(relaxed = true)
         widgetRefresher = mockk(relaxed = true)
+        analyticsTracker = mockk(relaxed = true)
     }
 
     @After
@@ -44,7 +49,16 @@ class ConfirmationViewModelTest {
     }
 
     private fun buildViewModel(weeks: List<ScheduleWeek> = listOf(buildTestWeek())) =
-        ConfirmationViewModel(weeks, null, repository, widgetRefresher)
+        ConfirmationViewModel(
+            initialWeeks = weeks,
+            imageUri = null,
+            sessionId = "",
+            sessionStartMs = 0L,
+            replace = false,
+            repository = repository,
+            widgetRefresher = widgetRefresher,
+            analyticsTracker = analyticsTracker,
+        )
 
     @Test
     fun `initial state shows weeks from constructor`() = runTest {
@@ -142,6 +156,42 @@ class ConfirmationViewModelTest {
             assertEquals(null, state.editing)
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    @Test
+    fun `init tracks ConfirmShown event`() {
+        buildViewModel()
+        verify { analyticsTracker.track(AnalyticsEvent.ConfirmShown("", skipped = false)) }
+    }
+
+    @Test
+    fun `confirm tracks RegisterComplete event`() = runTest {
+        val viewModel = buildViewModel()
+        viewModel.uiState.test {
+            skipItems(1)
+            viewModel.confirm()
+            awaitItem()
+            cancelAndIgnoreRemainingEvents()
+        }
+        verify { analyticsTracker.track(match { it is AnalyticsEvent.RegisterComplete }) }
+    }
+
+    @Test
+    fun `cancel tracks RegisterAbandon event`() {
+        val viewModel = buildViewModel()
+        viewModel.cancel()
+        verify { analyticsTracker.track(match { it is AnalyticsEvent.RegisterAbandon }) }
+    }
+
+    @Test
+    fun `commitEdit tracks UserEdit event`() {
+        val week = buildTestWeek()
+        val viewModel = buildViewModel(listOf(week))
+        viewModel.startEdit(weekIndex = 0, dayIndex = 0)
+        val updatedDay = week.days[0].copy(codeLabel = "수정됨")
+        viewModel.updateDraft(updatedDay)
+        viewModel.commitEdit()
+        verify { analyticsTracker.track(match { it is AnalyticsEvent.UserEdit }) }
     }
 
     private fun buildTestWeek() = ScheduleWeek(

@@ -28,9 +28,11 @@ fun ShiftNavGraph(navController: NavHostController = rememberNavController()) {
             val homeEntry = remember(backStackEntry) { navController.getBackStackEntry(Routes.HOME) }
             val flowHolder: RegistrationFlowStateHolder = hiltViewModel(homeEntry)
             RegistrationScreen(
-                onParsed = { weeks, imageUri ->
+                onParsed = { weeks, imageUri, sessionId, sessionStartMs ->
                     flowHolder.setPendingWeeks(weeks)
                     flowHolder.setPendingImageUri(imageUri)
+                    flowHolder.setSession(sessionId, sessionStartMs)
+                    flowHolder.setReplace(false)
                     navController.navigate(Routes.CONFIRMATION)
                 },
                 onBack = { navController.popBackStack() },
@@ -59,7 +61,13 @@ private fun ConfirmationDestination(
 
     val viewModel: ConfirmationViewModel = hiltViewModel(
         creationCallback = { factory: ConfirmationViewModel.Factory ->
-            factory.create(weeks, imageUri)
+            factory.create(
+                weeks = weeks,
+                imageUri = imageUri,
+                sessionId = flowHolder.pendingSessionId,
+                sessionStartMs = flowHolder.pendingSessionStartMs,
+                replace = flowHolder.pendingReplace,
+            )
         },
     )
     ConfirmationScreen(
