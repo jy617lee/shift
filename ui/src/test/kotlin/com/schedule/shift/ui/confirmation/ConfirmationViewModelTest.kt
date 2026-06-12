@@ -7,6 +7,7 @@ import com.schedule.shift.domain.model.ScheduleWeek
 import com.schedule.shift.domain.model.SourceType
 import com.schedule.shift.domain.repository.ScheduleRepository
 import com.schedule.shift.domain.widget.WidgetRefresher
+import com.schedule.shift.domain.analytics.AnalyticsTracker
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -30,12 +31,14 @@ class ConfirmationViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
     private lateinit var repository: ScheduleRepository
     private lateinit var widgetRefresher: WidgetRefresher
+    private lateinit var analyticsTracker: AnalyticsTracker
 
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         repository = mockk(relaxed = true)
         widgetRefresher = mockk(relaxed = true)
+        analyticsTracker = mockk(relaxed = true)
     }
 
     @After
@@ -44,7 +47,16 @@ class ConfirmationViewModelTest {
     }
 
     private fun buildViewModel(weeks: List<ScheduleWeek> = listOf(buildTestWeek())) =
-        ConfirmationViewModel(weeks, null, repository, widgetRefresher)
+        ConfirmationViewModel(
+            initialWeeks = weeks,
+            imageUri = null,
+            sessionId = "",
+            sessionStartMs = 0L,
+            replace = false,
+            repository = repository,
+            widgetRefresher = widgetRefresher,
+            analyticsTracker = analyticsTracker,
+        )
 
     @Test
     fun `initial state shows weeks from constructor`() = runTest {

@@ -9,6 +9,7 @@ import com.schedule.shift.domain.model.SourceType
 import com.schedule.shift.domain.parser.FailureReason
 import com.schedule.shift.domain.parser.ParseResult
 import com.schedule.shift.domain.usecase.ProcessScheduleImageUseCase
+import com.schedule.shift.domain.analytics.AnalyticsTracker
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
@@ -30,6 +31,7 @@ class RegistrationViewModelTest {
 
     private val testDispatcher = StandardTestDispatcher()
     private lateinit var useCase: ProcessScheduleImageUseCase
+    private lateinit var analyticsTracker: AnalyticsTracker
     private lateinit var viewModel: RegistrationViewModel
     private lateinit var bitmap: Bitmap
 
@@ -37,8 +39,9 @@ class RegistrationViewModelTest {
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         useCase = mockk()
+        analyticsTracker = mockk(relaxed = true)
         bitmap = mockk(relaxed = true)
-        viewModel = RegistrationViewModel(useCase)
+        viewModel = RegistrationViewModel(useCase, analyticsTracker)
     }
 
     @After
