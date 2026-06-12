@@ -6,6 +6,8 @@ import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.rememberTransformableState
+import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,13 +43,16 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -63,14 +68,18 @@ import com.schedule.shift.domain.model.ScheduleWeek
 import com.schedule.shift.ui.home.ShiftBadgeType
 import com.schedule.shift.ui.home.ShiftTypeBadge
 import java.time.DayOfWeek
+import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
 private val COLOR_SUNDAY = Color(0xFFEF4444)
 private val COLOR_SATURDAY = Color(0xFF3B82F6)
 private const val WEEK_HEADER_ALPHA = 0.6f
-private const val IMAGE_OVERLAY_ALPHA = 0.6f
-private const val IMAGE_PREVIEW_HEIGHT = 200
+private const val IMAGE_PREVIEW_HEIGHT = 260
+private const val IMAGE_MAX_SCALE = 5f
+private const val TODAY_BAR_ALPHA = 0.06f
+private const val TODAY_BAR_WIDTH = 3
+private const val TODAY_BAR_HEIGHT = 48
 private const val TIME_LENGTH = 5
 private const val WEEK_LAST_DAY_OFFSET = 6L
 
@@ -152,6 +161,7 @@ private fun ConfirmationBody(
     padding: androidx.compose.foundation.layout.PaddingValues,
     onEditDay: (Int, Int) -> Unit,
 ) {
+    val today = LocalDate.now()
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -161,7 +171,7 @@ private fun ConfirmationBody(
         if (reviewing.imageUri != null) ImagePreview(uri = reviewing.imageUri)
         Spacer(modifier = Modifier.height(12.dp))
         reviewing.weeks.forEachIndexed { weekIndex, week ->
-            WeekReviewCard(week = week, onEditDay = { dayIndex -> onEditDay(weekIndex, dayIndex) })
+            WeekReviewCard(week = week, today = today, onEditDay = { dayIndex -> onEditDay(weekIndex, dayIndex) })
             Spacer(modifier = Modifier.height(10.dp))
         }
         Spacer(modifier = Modifier.height(8.dp))
@@ -170,34 +180,40 @@ private fun ConfirmationBody(
 
 @Composable
 private fun ImagePreview(uri: String) {
+    var scale by remember { mutableFloatStateOf(1f) }
+    var offset by remember { mutableStateOf(Offset.Zero) }
+    val transformableState = rememberTransformableState { zoomChange, panChange, _ ->
+        scale = (scale * zoomChange).coerceIn(1f, IMAGE_MAX_SCALE)
+        offset += panChange * scale
+    }
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(IMAGE_PREVIEW_HEIGHT.dp)
-            .background(MaterialTheme.colorScheme.surfaceVariant),
+            .clip(RoundedCornerShape(0.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+            .transformable(state = transformableState),
+        contentAlignment = Alignment.Center,
     ) {
         AsyncImage(
             model = Uri.parse(uri),
             contentDescription = "스케쥴 이미지",
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .graphicsLayer {
+                    scaleX = scale
+                    scaleY = scale
+                    translationX = offset.x
+                    translationY = offset.y
+                },
             contentScale = ContentScale.Fit,
         )
-        Box(
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(8.dp)
-                .clip(RoundedCornerShape(6.dp))
-                .background(MaterialTheme.colorScheme.onSurface.copy(alpha = IMAGE_OVERLAY_ALPHA))
-                .padding(horizontal = 8.dp, vertical = 3.dp),
-        ) {
-            Text(text = "원본 이미지", fontSize = 10.sp, color = Color.White, fontWeight = FontWeight.Medium)
-        }
     }
 }
 
 @Suppress("LongMethod")
 @Composable
-private fun WeekReviewCard(week: ScheduleWeek, onEditDay: (Int) -> Unit) {
+private fun WeekReviewCard(week: ScheduleWeek, today: LocalDate, onEditDay: (Int) -> Unit) {
     val start = week.weekStartDate
     val end = start.plusDays(WEEK_LAST_DAY_OFFSET)
     val header = if (start.month == end.month) {
@@ -215,7 +231,7 @@ private fun WeekReviewCard(week: ScheduleWeek, onEditDay: (Int) -> Unit) {
         WeekReviewHeader(header = header)
         HorizontalDivider(color = MaterialTheme.colorScheme.outline)
         week.days.forEachIndexed { dayIndex, day ->
-            ReviewDayRow(day = day, onClick = { onEditDay(dayIndex) })
+            ReviewDayRow(day = day, isToday = day.date == today, onClick = { onEditDay(dayIndex) })
             if (dayIndex < week.days.size - 1) {
                 HorizontalDivider(modifier = Modifier.padding(horizontal = 14.dp), color = MaterialTheme.colorScheme.outline)
             }
@@ -230,55 +246,66 @@ private fun WeekReviewHeader(header: String) {
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = WEEK_HEADER_ALPHA))
             .padding(horizontal = 14.dp, vertical = 8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
+        horizontalArrangement = Arrangement.End,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
-            text = "OCR 결과 · 탭하여 수정",
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            letterSpacing = 1.sp,
-        )
         Text(text = header, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
 @Suppress("LongMethod")
 @Composable
-private fun ReviewDayRow(day: ScheduleDay, onClick: () -> Unit) {
+private fun ReviewDayRow(day: ScheduleDay, isToday: Boolean, onClick: () -> Unit) {
     val dayOfWeek = day.date.dayOfWeek
-    val dayColor = when (dayOfWeek) {
-        DayOfWeek.SUNDAY -> COLOR_SUNDAY
-        DayOfWeek.SATURDAY -> COLOR_SATURDAY
+    val dayColor = when {
+        isToday -> MaterialTheme.colorScheme.primary
+        dayOfWeek == DayOfWeek.SUNDAY -> COLOR_SUNDAY
+        dayOfWeek == DayOfWeek.SATURDAY -> COLOR_SATURDAY
         else -> MaterialTheme.colorScheme.onSurfaceVariant
     }
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onClick() }
-            .padding(horizontal = 14.dp, vertical = 10.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
+            .then(if (isToday) Modifier.background(MaterialTheme.colorScheme.primary.copy(alpha = TODAY_BAR_ALPHA)) else Modifier)
+            .clickable { onClick() },
     ) {
-        Column(modifier = Modifier.width(40.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                text = day.date.format(DAY_LABEL_FMT).substringAfter("(").removeSuffix(")"),
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Medium,
-                color = dayColor,
-                textAlign = TextAlign.Center,
+        if (isToday) {
+            Box(
+                modifier = Modifier
+                    .width(TODAY_BAR_WIDTH.dp)
+                    .height(TODAY_BAR_HEIGHT.dp)
+                    .background(MaterialTheme.colorScheme.primary),
             )
-            Text(
-                text = day.date.format(MONTH_DAY_FMT),
-                fontSize = 12.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.onSurface,
-                fontFamily = FontFamily.Monospace,
-                textAlign = TextAlign.Center,
-            )
+        } else {
+            Spacer(modifier = Modifier.width(TODAY_BAR_WIDTH.dp))
         }
-        ReviewDayShiftContent(day = day, modifier = Modifier.weight(1f))
-        Icon(Icons.Default.Edit, contentDescription = "수정", modifier = Modifier.size(14.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 11.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            Column(modifier = Modifier.width(40.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = day.date.format(DAY_LABEL_FMT).substringAfter("(").removeSuffix(")"),
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = dayColor,
+                    textAlign = TextAlign.Center,
+                )
+                Text(
+                    text = day.date.format(MONTH_DAY_FMT),
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = if (isToday) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                    fontFamily = FontFamily.Monospace,
+                    textAlign = TextAlign.Center,
+                )
+            }
+            ReviewDayShiftContent(day = day, modifier = Modifier.weight(1f))
+            Icon(Icons.Default.Edit, contentDescription = "수정", modifier = Modifier.size(14.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
     }
 }
 

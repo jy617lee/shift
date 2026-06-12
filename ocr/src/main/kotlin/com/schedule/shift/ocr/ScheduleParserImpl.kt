@@ -36,15 +36,16 @@ class ScheduleParserImpl(
     private fun parseLine(line: String): ScheduleDay? {
         val match = LINE_PATTERN.find(line) ?: return null
         val groups = match.groupValues
-        val date = assignYear(groups[GROUP_MONTH].toInt(), groups[GROUP_DAY].toInt())
         val startTime = groups[GROUP_START_TIME].ifEmpty { null }?.let { LocalTime.parse(it) }
         val endTime = groups[GROUP_END_TIME].ifEmpty { null }?.let { LocalTime.parse(it) }
-        return ScheduleDay(
-            date = date,
+        val code = groups[GROUP_CODE].trim()
+        return if (startTime == null && code.isEmpty()) null
+        else ScheduleDay(
+            date = assignYear(groups[GROUP_MONTH].toInt(), groups[GROUP_DAY].toInt()),
             type = if (startTime != null) DayType.WORK else DayType.OTHER,
             startTime = startTime,
             endTime = endTime,
-            codeLabel = groups[GROUP_CODE].trim(),
+            codeLabel = code,
             source = SourceType.PARSED,
         )
     }
@@ -96,10 +97,11 @@ class ScheduleParserImpl(
     }
 
     companion object {
-        // [P@] handles plan-indicator badges that ML Kit may read as "P" or "@"; [~\s]+ allows tilde or space between times
+        // P-indicator badge may be OCR'd as @, O, or 0 (zero); multiple indicators may appear before a time.
+        // Day char may be absent (→ empty parens). Code label is optional.
         @Suppress("MaxLineLength")
         private val LINE_PATTERN =
-            Regex("""(\d{1,2})/(\d{1,2})\([월화수목금토일]\)\s+(?:(?:[P@]\s+)?(\d{2}:\d{2})[~\s]+(?:[P@]\s+)?(\d{2}:\d{2})\s+(?:[P@]\s+)?)?(.+)""")
+            Regex("""(\d{1,2})/(\d{1,2})\([월화수목금토일]?\)\s*(?:(?:[P@O0]\s+)*(\d{2}:\d{2})[~\s]+(?:[P@O0]\s+)*(\d{2}:\d{2})\s*)?(?:(?:[P@O0]\s+)*(.*))?""")
         private const val GROUP_MONTH = 1
         private const val GROUP_DAY = 2
         private const val GROUP_START_TIME = 3
