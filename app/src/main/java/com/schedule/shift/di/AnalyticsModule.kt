@@ -1,7 +1,8 @@
 package com.schedule.shift.di
 
 import android.content.Context
-import com.schedule.shift.analytics.NoOpAnalyticsTracker
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.schedule.shift.analytics.FirebaseAnalyticsTracker
 import com.schedule.shift.analytics.SharedPrefsAnonymousIdProvider
 import com.schedule.shift.domain.analytics.AnonymousIdProvider
 import com.schedule.shift.domain.analytics.AnalyticsTracker
@@ -18,8 +19,15 @@ object AnalyticsModule {
 
     @Provides
     @Singleton
-    fun provideAnalyticsTracker(): AnalyticsTracker =
-        NoOpAnalyticsTracker()
+    fun provideFirebaseAnalytics(@ApplicationContext context: Context): FirebaseAnalytics =
+        FirebaseAnalytics.getInstance(context)
+
+    @Provides
+    @Singleton
+    fun provideAnalyticsTracker(
+        firebaseAnalytics: FirebaseAnalytics,
+        anonymousIdProvider: AnonymousIdProvider,
+    ): AnalyticsTracker = FirebaseAnalyticsTracker(firebaseAnalytics, anonymousIdProvider)
 
     @Provides
     @Singleton
