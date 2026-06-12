@@ -73,33 +73,14 @@ private fun Widget4x1Content(state: WidgetState, today: LocalDate) {
                 is WidgetState.WorkDay -> {
                     val start = state.startTime.format(DateTimeFormatter.ofPattern("H:mm"))
                     val end = state.endTime.format(DateTimeFormatter.ofPattern("H:mm"))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = start,
-                            style = TextDefaults.defaultTextStyle.copy(
-                                color = WidgetPrimary,
-                                fontSize = 22.sp,
-                                fontWeight = FontWeight.Bold,
-                            ),
-                        )
-                        Spacer(GlanceModifier.width(8.dp))
-                        Text(
-                            text = "→",
-                            style = TextDefaults.defaultTextStyle.copy(
-                                color = WidgetOnSurfaceVariant,
-                                fontSize = 16.sp,
-                            ),
-                        )
-                        Spacer(GlanceModifier.width(8.dp))
-                        Text(
-                            text = end,
-                            style = TextDefaults.defaultTextStyle.copy(
-                                color = WidgetPrimary,
-                                fontSize = 22.sp,
-                                fontWeight = FontWeight.Bold,
-                            ),
-                        )
-                    }
+                    Text(
+                        text = "$start-$end",
+                        style = TextDefaults.defaultTextStyle.copy(
+                            color = WidgetPrimary,
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold,
+                        ),
+                    )
                 }
                 is WidgetState.OffDay -> Text(
                     text = state.codeLabel,

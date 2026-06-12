@@ -62,11 +62,11 @@ private fun Widget2x2Content(state: WidgetState, today: LocalDate) {
                     modifier = GlanceModifier.fillMaxWidth(),
                 )
                 Text(
-                    text = "– $end",
+                    text = "- $end",
                     style = TextDefaults.defaultTextStyle.copy(
                         color = WidgetPrimary,
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Medium,
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.Bold,
                     ),
                     modifier = GlanceModifier.fillMaxWidth(),
                 )

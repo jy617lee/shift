@@ -42,51 +42,9 @@ private fun Widget2x1Content(state: WidgetState, today: LocalDate) {
         modifier = GlanceModifier.fillMaxSize().padding(horizontal = 10.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Column(
-            modifier = GlanceModifier.fillMaxHeight().defaultWeight(),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = dayLabel,
-                style = TextDefaults.defaultTextStyle.copy(
-                    color = WidgetOnSurfaceVariant,
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Medium,
-                ),
-            )
-            when (state) {
-                is WidgetState.WorkDay -> {
-                    val start = state.startTime.format(DateTimeFormatter.ofPattern("H:mm"))
-                    val end = state.endTime.format(DateTimeFormatter.ofPattern("H:mm"))
-                    Text(
-                        text = "$start–$end",
-                        style = TextDefaults.defaultTextStyle.copy(
-                            color = WidgetPrimary,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold,
-                        ),
-                    )
-                }
-                is WidgetState.OffDay -> Text(
-                    text = state.codeLabel,
-                    style = TextDefaults.defaultTextStyle.copy(
-                        color = WidgetOnSurfaceVariant,
-                        fontSize = 11.sp,
-                    ),
-                )
-                is WidgetState.Unregistered -> Text(
-                    text = "미등록",
-                    style = TextDefaults.defaultTextStyle.copy(
-                        color = WidgetOnSurfaceVariant,
-                        fontSize = 11.sp,
-                    ),
-                )
-            }
-        }
-        Spacer(GlanceModifier.width(8.dp))
         Box(
             modifier = GlanceModifier.wrapContentWidth().fillMaxHeight(),
-            contentAlignment = Alignment.CenterEnd,
+            contentAlignment = Alignment.CenterStart,
         ) {
             Text(
                 text = dateLabel,
@@ -96,6 +54,48 @@ private fun Widget2x1Content(state: WidgetState, today: LocalDate) {
                     fontWeight = FontWeight.Bold,
                 ),
             )
+        }
+        Spacer(GlanceModifier.width(8.dp))
+        Column(
+            modifier = GlanceModifier.fillMaxHeight().defaultWeight(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = dayLabel,
+                style = TextDefaults.defaultTextStyle.copy(
+                    color = WidgetOnSurfaceVariant,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Medium,
+                ),
+            )
+            when (state) {
+                is WidgetState.WorkDay -> {
+                    val start = state.startTime.format(DateTimeFormatter.ofPattern("H:mm"))
+                    val end = state.endTime.format(DateTimeFormatter.ofPattern("H:mm"))
+                    Text(
+                        text = "$start-$end",
+                        style = TextDefaults.defaultTextStyle.copy(
+                            color = WidgetPrimary,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold,
+                        ),
+                    )
+                }
+                is WidgetState.OffDay -> Text(
+                    text = state.codeLabel,
+                    style = TextDefaults.defaultTextStyle.copy(
+                        color = WidgetOnSurfaceVariant,
+                        fontSize = 13.sp,
+                    ),
+                )
+                is WidgetState.Unregistered -> Text(
+                    text = "미등록",
+                    style = TextDefaults.defaultTextStyle.copy(
+                        color = WidgetOnSurfaceVariant,
+                        fontSize = 13.sp,
+                    ),
+                )
+            }
         }
     }
 }
