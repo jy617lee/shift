@@ -15,9 +15,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Button
@@ -148,14 +149,20 @@ private fun HomeSuccessContent(weeks: List<ScheduleWeek>, today: LocalDate, onAd
     if (weeks.isEmpty()) {
         ShiftEmptyState(onAddSchedule = onAddSchedule)
     } else {
-        Column(
+        val currentWeekIndex = weeks.indexOfFirst { week ->
+            !today.isBefore(week.weekStartDate) && !today.isAfter(week.weekStartDate.plusDays(WEEK_LAST_DAY_OFFSET))
+        }.coerceAtLeast(0)
+        val listState = rememberLazyListState(initialFirstVisibleItemIndex = currentWeekIndex)
+        LazyColumn(
+            state = listState,
             modifier = Modifier
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState())
                 .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 100.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            weeks.forEach { week -> WeekCard(week = week, today = today) }
+            items(weeks, key = { it.weekStartDate }) { week ->
+                WeekCard(week = week, today = today)
+            }
         }
     }
 }
