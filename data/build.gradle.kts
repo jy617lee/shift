@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.library)
+    alias(libs.plugins.ksp)
     alias(libs.plugins.detekt)
     alias(libs.plugins.ktlint)
 }
@@ -20,6 +21,11 @@ android {
     testOptions {
         unitTests.isIncludeAndroidResources = true
     }
+
+    sourceSets {
+        getByName("debug").java.srcDir("build/generated/ksp/debug/kotlin")
+        getByName("release").java.srcDir("build/generated/ksp/release/kotlin")
+    }
 }
 
 detekt {
@@ -37,10 +43,15 @@ ktlint {
 dependencies {
     implementation(project(":domain"))
 
-    implementation(project(":domain"))
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
+
     implementation(libs.kotlinx.coroutines.android)
 
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.androidx.test.core)
     testImplementation(libs.mockk)
 }
