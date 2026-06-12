@@ -43,6 +43,14 @@ ui/ → domain/ ← data/ ocr/ analytics/
 
 ---
 
+## 데이터 로깅
+
+모든 분석 이벤트 목록·필드·발생 위치는 **`docs/analytics-events.md`** 에 관리한다.
+
+**`AnalyticsEvent.kt`를 변경(추가·수정·삭제)할 때는 반드시 `docs/analytics-events.md`도 함께 수정한다.**
+
+---
+
 ## 위젯 프리뷰 XML 규칙
 
 `android:previewLayout`에 지정하는 XML은 일부 런처가 RemoteViews로 inflate한다.  
