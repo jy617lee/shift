@@ -16,8 +16,10 @@ complexity:
     functionThreshold: 3
     constructorThreshold: 6
     ignoreDefaultParameters: true
+    ignoreAnnotated: ['Composable']
   TooManyFunctions:
     active: true
+    thresholdInFiles: 20
     thresholdInClasses: 15
     thresholdInObjects: 10
     thresholdInInterfaces: 10

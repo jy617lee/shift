@@ -7,6 +7,7 @@ import com.schedule.shift.domain.model.ScheduleWeek
 import com.schedule.shift.domain.repository.ScheduleRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.time.DayOfWeek
 import java.time.LocalDate
 
 class ScheduleRepositoryImpl(
@@ -15,8 +16,16 @@ class ScheduleRepositoryImpl(
 
     override suspend fun getWeekByDate(date: LocalDate): ScheduleWeek? =
         withContext(Dispatchers.IO) {
-            dao.getByWeekStart(date)?.toDomain()
+            dao.getByWeekStart(date.mondayOfWeek())?.toDomain()
         }
+
+    override suspend fun getNextWeekFrom(date: LocalDate): ScheduleWeek? =
+        withContext(Dispatchers.IO) {
+            dao.getNextWeekFrom(date.mondayOfWeek())?.toDomain()
+        }
+
+    private fun LocalDate.mondayOfWeek(): LocalDate =
+        with(DayOfWeek.MONDAY).let { if (it.isAfter(this)) it.minusWeeks(1) else it }
 
     override suspend fun getWeeksInRange(from: LocalDate, to: LocalDate): List<ScheduleWeek> =
         withContext(Dispatchers.IO) {

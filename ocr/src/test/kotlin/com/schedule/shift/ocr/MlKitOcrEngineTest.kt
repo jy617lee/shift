@@ -44,6 +44,7 @@ class MlKitOcrEngineTest {
         val bitmap = mockk<Bitmap>(relaxed = true)
         val visionText = mockk<Text>()
         every { visionText.text } returns "06/08(월) 09:00~18:00 정상"
+        every { visionText.textBlocks } returns emptyList()
         every { InputImage.fromBitmap(any(), any()) } returns mockk()
         every { recognizer.process(any<InputImage>()) } returns Tasks.forResult(visionText)
 
@@ -71,6 +72,7 @@ class MlKitOcrEngineTest {
         val bitmap = mockk<Bitmap>(relaxed = true)
         val visionText = mockk<Text>()
         every { visionText.text } returns "텍스트"
+        every { visionText.textBlocks } returns emptyList()
         every { InputImage.fromBitmap(any(), any()) } returns mockk()
         every { recognizer.process(any<InputImage>()) } returns Tasks.forResult(visionText)
 
