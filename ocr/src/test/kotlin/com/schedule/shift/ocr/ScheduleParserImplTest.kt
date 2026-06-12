@@ -328,6 +328,76 @@ class ScheduleParserImplTest {
         assertEquals(LocalTime.of(22, 30), days[6].endTime)
     }
 
+    // ── 실이미지 OCR 출력 검증 (test_img/test_3.png) — 4월27~5월3 스케쥴 ──
+
+    @Test
+    fun `sample_13 parses 7 days correctly for apr27 schedule 46 days in past`() = runTest {
+        val text = loadSample("sample_13_real_schedule_apr27.txt")
+        val result = parser.parse(text) as ParseResult.Success
+
+        assertEquals(1, result.weeks.size)
+        val days = result.weeks.first().days
+        assertEquals(ScheduleWeek.DAYS_IN_WEEK, days.size)
+        assertEquals(LocalDate.of(2026, 4, 27), result.weeks.first().weekStartDate)
+    }
+
+    @Test
+    fun `sample_13 year is 2026 not 2027 for dates 46 days before today`() = runTest {
+        val days = (parser.parse(loadSample("sample_13_real_schedule_apr27.txt")) as ParseResult.Success)
+            .weeks.first().days
+        assertEquals(2026, days[0].date.year)
+        assertEquals(2026, days[6].date.year)
+    }
+
+    @Test
+    fun `sample_13 day types are correct`() = runTest {
+        val days = (parser.parse(loadSample("sample_13_real_schedule_apr27.txt")) as ParseResult.Success)
+            .weeks.first().days
+
+        assertEquals(DayType.OTHER, days[0].type)  // 04/27 정규휴일
+        assertEquals(DayType.WORK, days[1].type)   // 04/28 08:00~17:00
+        assertEquals(DayType.WORK, days[2].type)   // 04/29 08:30~18:30
+        assertEquals(DayType.WORK, days[3].type)   // 04/30 06:30~15:30
+        assertEquals(DayType.OTHER, days[4].type)  // 05/01 법정휴일
+        assertEquals(DayType.OTHER, days[5].type)  // 05/02 연차휴가
+        assertEquals(DayType.OTHER, days[6].type)  // 05/03 정규휴일
+    }
+
+    @Test
+    fun `sample_13 work day times are correct`() = runTest {
+        val days = (parser.parse(loadSample("sample_13_real_schedule_apr27.txt")) as ParseResult.Success)
+            .weeks.first().days
+
+        assertEquals(LocalTime.of(8, 0), days[1].startTime)
+        assertEquals(LocalTime.of(17, 0), days[1].endTime)
+        assertEquals(LocalTime.of(8, 30), days[2].startTime)
+        assertEquals(LocalTime.of(18, 30), days[2].endTime)
+        assertEquals(LocalTime.of(6, 30), days[3].startTime)
+        assertEquals(LocalTime.of(15, 30), days[3].endTime)
+    }
+
+    @Test
+    fun `sample_13 code labels are correct`() = runTest {
+        val days = (parser.parse(loadSample("sample_13_real_schedule_apr27.txt")) as ParseResult.Success)
+            .weeks.first().days
+
+        assertEquals("정규휴일", days[0].codeLabel)
+        assertEquals("정상", days[1].codeLabel)
+        assertEquals("법정휴일", days[4].codeLabel)
+        assertEquals("연차휴가", days[5].codeLabel)
+        assertEquals("정규휴일", days[6].codeLabel)
+    }
+
+    @Test
+    fun `assignYear handles schedule 46 days in past with threshold 90`() = runTest {
+        val text = """
+            주간 스케줄 조회
+            04/28(화) 08:00 17:00 정상
+        """.trimIndent()
+        val result = parser.parse(text) as ParseResult.Success
+        assertEquals(2026, result.weeks.first().days.first { it.type == DayType.WORK }.date.year)
+    }
+
     private fun loadSample(fileName: String): String =
         javaClass.classLoader
             ?.getResourceAsStream("ocr_samples/$fileName")
