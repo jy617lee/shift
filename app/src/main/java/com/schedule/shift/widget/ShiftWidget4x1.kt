@@ -185,7 +185,7 @@ private fun WorkDayCountdown(state: WidgetState.WorkDay, now: LocalTime) {
 }
 
 private const val LEFT_COL_WIDTH_DP = 52
-private const val DIVIDER_HEIGHT_DP = 24
+private const val DIVIDER_HEIGHT_DP = 42
 
 class ShiftWidget4x1Receiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = ShiftWidget4x1()

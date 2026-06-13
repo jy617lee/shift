@@ -17,7 +17,6 @@ import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.width
-import androidx.glance.layout.wrapContentWidth
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextDefaults
@@ -67,7 +66,7 @@ private fun Widget2x1Content(state: WidgetState, today: LocalDate) {
 @Composable
 private fun DateColumn(dayLabel: String, dateLabel: String) {
     Column(
-        modifier = GlanceModifier.wrapContentWidth().fillMaxHeight(),
+        modifier = GlanceModifier.width(LEFT_COL_WIDTH_DP.dp).fillMaxHeight(),
         verticalAlignment = Alignment.CenterVertically,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -123,7 +122,8 @@ private fun Widget2x1StateText(state: WidgetState) {
     }
 }
 
-private const val DIVIDER_HEIGHT_DP = 24
+private const val LEFT_COL_WIDTH_DP = 30
+private const val DIVIDER_HEIGHT_DP = 42
 
 class ShiftWidget2x1Receiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = ShiftWidget2x1()
