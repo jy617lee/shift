@@ -2,13 +2,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#1E3932"
+    android:background="#FFFFFF"
     android:orientation="vertical">
 
     <!-- Header: reduced for preview scale -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="62dp"
+        android:background="#1E3932"
         android:gravity="top|center_horizontal"
         android:orientation="horizontal"
         android:paddingLeft="14dp"

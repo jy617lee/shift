@@ -63,7 +63,7 @@ class ShiftWidget4x2Weekly : BaseShiftWidget() {
                 Box(
                     modifier = GlanceModifier
                         .fillMaxSize()
-                        .background(HeaderBackground)
+                        .background(WidgetSurface)
                         .clickable(actionStartActivity(widgetIntent(context, widgetSource))),
                     contentAlignment = Alignment.TopStart,
                 ) {
