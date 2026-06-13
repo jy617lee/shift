@@ -191,6 +191,7 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.analytics)
 
+    implementation(libs.datastore.preferences)
     implementation(libs.mlkit.text.recognition.korean)
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)

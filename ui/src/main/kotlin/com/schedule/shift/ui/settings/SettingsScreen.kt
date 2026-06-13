@@ -17,14 +17,23 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 @Composable
-fun SettingsScreen(onBack: () -> Unit) {
+fun SettingsScreen(
+    onBack: () -> Unit,
+    viewModel: SettingsViewModel = hiltViewModel(),
+) {
+    val skipConfirm by viewModel.skipConfirm.collectAsStateWithLifecycle()
+
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = { SettingsTopBar(onBack = onBack) },
@@ -37,6 +46,19 @@ fun SettingsScreen(onBack: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(0.dp),
         ) {
             Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "등록",
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = 4.dp, vertical = 6.dp),
+            )
+            SettingsSwitchRow(
+                label = "OCR 결과 확인 건너뛰기",
+                description = "활성화하면 이미지 파싱 후 확인 없이 바로 저장합니다",
+                checked = skipConfirm,
+                onCheckedChange = viewModel::setSkipConfirm,
+            )
+            Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = "앱 정보",
                 style = MaterialTheme.typography.labelSmall,
@@ -73,6 +95,29 @@ private fun SettingsTopBar(onBack: () -> Unit) {
             )
         }
         HorizontalDivider(color = MaterialTheme.colorScheme.outline)
+    }
+}
+
+@Composable
+private fun SettingsSwitchRow(
+    label: String,
+    description: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Column(modifier = Modifier.weight(1f).padding(end = 12.dp)) {
+            Text(text = label, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
+            Text(text = description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
+        Switch(checked = checked, onCheckedChange = onCheckedChange)
     }
 }
 
