@@ -68,10 +68,10 @@
 
     </LinearLayout>
 
-    <!-- Wave divider: reduced height for preview -->
+    <!-- Wave divider: 20dp keeps the curve distinct at preview scale -->
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="16dp"
+        android:layout_height="20dp"
         android:background="#1E3932">
 
         <ImageView
