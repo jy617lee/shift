@@ -68,10 +68,9 @@ fun RegistrationScreen(
     }
 
     LaunchedEffect(uiState) {
-        if (uiState is RegistrationUiState.ParseSuccess) {
-            onParsed(uiState.weeks, uiState.imageUri)
-            viewModel.reset()
-        }
+        val success = uiState as? RegistrationUiState.ParseSuccess ?: return@LaunchedEffect
+        onParsed(success.weeks, success.imageUri)
+        viewModel.reset()
     }
 
     Scaffold(
