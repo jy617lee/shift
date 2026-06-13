@@ -35,6 +35,8 @@ dependencies {
 
     implementation(project(":domain"))
     implementation(libs.kotlinx.coroutines.android)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.analytics)
 
     testImplementation(libs.junit)
     testImplementation(libs.mockk)
