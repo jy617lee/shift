@@ -7,7 +7,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceId
@@ -27,6 +26,7 @@ import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxHeight
 import androidx.glance.layout.fillMaxSize
+import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.width
 import androidx.glance.text.FontWeight
@@ -95,10 +95,11 @@ private fun Widget4x1Content(state: WidgetState, today: LocalDate, now: LocalTim
                     text = dayLabel,
                     style = TextDefaults.defaultTextStyle.copy(
                         color = WidgetOnSurfaceVariant,
-                        fontSize = 11.sp,
+                        fontSize = 13.sp,
                         fontWeight = FontWeight.Medium,
                     ),
                 )
+                Spacer(GlanceModifier.height(1.dp))
                 Text(
                     text = dateLabel,
                     style = TextDefaults.defaultTextStyle.copy(
@@ -112,7 +113,7 @@ private fun Widget4x1Content(state: WidgetState, today: LocalDate, now: LocalTim
         Spacer(GlanceModifier.width(10.dp))
         Box(
             modifier = GlanceModifier.width(1.dp).fillMaxHeight().padding(vertical = 6.dp)
-                .background(ColorProvider(DividerColor)),
+                .background(WidgetDivider),
         ) {}
         Spacer(GlanceModifier.width(10.dp))
         Box(
@@ -178,8 +179,6 @@ private fun WorkDayCountdown(state: WidgetState.WorkDay, now: LocalTime) {
     }
 }
 
-@Suppress("MagicNumber")
-private val DividerColor = Color(0xFFDDDDDD)
 private const val LEFT_COL_WIDTH_DP = 52
 
 class ShiftWidget4x1Receiver : GlanceAppWidgetReceiver() {
@@ -204,7 +203,14 @@ class ShiftWidget4x1Receiver : GlanceAppWidgetReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
         if (intent.action == ACTION_SECOND_UPDATE_4X1) {
-            MainScope().launch { glanceAppWidget.updateAll(context) }
+            val pendingResult = goAsync()
+            MainScope().launch {
+                try {
+                    glanceAppWidget.updateAll(context)
+                } finally {
+                    pendingResult.finish()
+                }
+            }
             scheduleSecondUpdate(context)
         }
     }

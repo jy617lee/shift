@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceModifier
+import androidx.glance.background
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.layout.Alignment
@@ -42,10 +43,15 @@ private fun Widget2x1Content(state: WidgetState, today: LocalDate) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         DateColumn(dayLabel = dayLabel, dateLabel = dateLabel)
-        Spacer(GlanceModifier.width(10.dp))
+        Spacer(GlanceModifier.width(8.dp))
+        Box(
+            modifier = GlanceModifier.width(1.dp).fillMaxHeight().padding(vertical = 4.dp)
+                .background(WidgetDivider),
+        ) {}
+        Spacer(GlanceModifier.width(8.dp))
         Box(
             modifier = GlanceModifier.defaultWeight().fillMaxHeight(),
-            contentAlignment = Alignment.CenterStart,
+            contentAlignment = Alignment.Center,
         ) {
             Widget2x1StateText(state = state)
         }

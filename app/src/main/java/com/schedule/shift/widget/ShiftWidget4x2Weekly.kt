@@ -96,9 +96,9 @@ internal fun Widget4x2WeeklyContent(
             timeFmt = timeFmt,
             modifier = GlanceModifier
                 .fillMaxWidth()
-                .padding(horizontal = 14.dp, vertical = 10.dp),
+                .padding(horizontal = 14.dp, vertical = 8.dp),
         )
-        Box(
+        Column(
             modifier = GlanceModifier
                 .fillMaxWidth()
                 .defaultWeight()
@@ -125,7 +125,7 @@ private fun TodayHeader(
     ) {
         Box(
             modifier = GlanceModifier.width(HEADER_LEFT_WIDTH_DP.dp).fillMaxHeight(),
-            contentAlignment = Alignment.CenterStart,
+            contentAlignment = Alignment.Center,
         ) {
             Text(
                 text = dateDayLabel,
@@ -239,7 +239,16 @@ private fun DayCell(
                 ),
             )
         }
-        Spacer(GlanceModifier.height(4.dp))
+        Text(
+            text = date.dayOfMonth.toString(),
+            style = TextDefaults.defaultTextStyle.copy(
+                color = if (isToday) WidgetPrimary else WidgetOnSurface,
+                fontSize = 13.sp,
+                fontWeight = weight,
+                textAlign = TextAlign.Center,
+            ),
+        )
+        Spacer(GlanceModifier.height(2.dp))
         DayCellValue(state = state, isToday = isToday, timeFmt = timeFmt, weight = weight)
     }
 }
@@ -258,7 +267,7 @@ private fun DayCellValue(
             text = state.codeLabel.ifEmpty { "휴무" }.take(MAX_CODE_CHARS),
             style = TextDefaults.defaultTextStyle.copy(
                 color = if (isToday) WidgetPrimary else WidgetOnSurfaceVariant,
-                fontSize = 11.sp,
+                fontSize = 12.sp,
                 textAlign = TextAlign.Center,
             ),
         )
@@ -266,7 +275,7 @@ private fun DayCellValue(
             text = "-",
             style = TextDefaults.defaultTextStyle.copy(
                 color = WidgetOnSurfaceVariant,
-                fontSize = 11.sp,
+                fontSize = 12.sp,
                 textAlign = TextAlign.Center,
             ),
         )
@@ -282,7 +291,7 @@ private fun WorkTimeLines(
 ) {
     val cellStyle = TextDefaults.defaultTextStyle.copy(
         color = color,
-        fontSize = 11.sp,
+        fontSize = 12.sp,
         fontWeight = weight,
         textAlign = TextAlign.Center,
     )
@@ -297,7 +306,7 @@ private const val ALPHA_UNREGISTERED = 0.5f
 private const val MAX_CODE_CHARS = 4
 private const val GRID_OFFSET_START = -2
 private const val GRID_OFFSET_END = 2
-private const val HEADER_LEFT_WIDTH_DP = 88
+private const val HEADER_LEFT_WIDTH_DP = 72
 
 class ShiftWidget4x2WeeklyReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = ShiftWidget4x2Weekly()
