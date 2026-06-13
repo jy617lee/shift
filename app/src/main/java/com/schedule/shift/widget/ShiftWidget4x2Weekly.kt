@@ -228,11 +228,15 @@ private fun DayCell(
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         if (isToday) {
             Box(
-                modifier = GlanceModifier
-                    .width(28.dp).height(28.dp)
-                    .background(ImageProvider(R.drawable.widget_today_badge_circle)),
+                modifier = GlanceModifier.width(28.dp).height(28.dp),
                 contentAlignment = Alignment.Center,
             ) {
+                Image(
+                    provider = ImageProvider(R.drawable.widget_today_badge_circle),
+                    contentDescription = null,
+                    modifier = GlanceModifier.fillMaxSize(),
+                    contentScale = ContentScale.FillBounds,
+                )
                 Text(
                     text = dateDowText,
                     style = TextDefaults.defaultTextStyle.copy(
@@ -245,7 +249,7 @@ private fun DayCell(
             }
         } else {
             Box(
-                modifier = GlanceModifier.padding(vertical = 2.dp),
+                modifier = GlanceModifier.width(28.dp).height(28.dp),
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
@@ -267,7 +271,7 @@ private fun DayCell(
 @Composable
 private fun DayCellValue(state: WidgetState, isToday: Boolean, timeFmt: DateTimeFormatter) {
     val textColor = if (isToday) WidgetPrimary else GridMutedColor
-    val weight = if (isToday) FontWeight.Bold else FontWeight.Normal
+    val weight = FontWeight.Normal
     val cellStyle = TextDefaults.defaultTextStyle.copy(
         color = textColor,
         fontSize = 15.sp,
@@ -290,7 +294,7 @@ private fun DayCellValue(state: WidgetState, isToday: Boolean, timeFmt: DateTime
 @Suppress("MagicNumber")
 private val HeaderBackground = ColorProvider(Color(0xFF1E3932))
 @Suppress("MagicNumber")
-private val DividerColor = ColorProvider(Color(0x26FFFFFF))
+private val DividerColor = ColorProvider(Color.Transparent)
 @Suppress("MagicNumber")
 private val GridDateColor = ColorProvider(Color(0xFF1E3932))
 @Suppress("MagicNumber")
@@ -302,7 +306,7 @@ private const val MAX_CODE_CHARS = 4
 private const val GRID_OFFSET_START = -2
 private const val GRID_OFFSET_END = 2
 private const val HEADER_LEFT_WIDTH_DP = 88
-private const val HEADER_HEIGHT_DP = 62
+private const val HEADER_HEIGHT_DP = 75
 private const val HEADER_DIVIDER_HEIGHT_DP = 32
 private const val WAVE_HEIGHT_DP = 24
 
