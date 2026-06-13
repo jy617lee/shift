@@ -68,19 +68,13 @@
 
     </LinearLayout>
 
-    <!-- Wave divider: 20dp keeps the curve distinct at preview scale -->
-    <FrameLayout
+    <!-- Wave divider -->
+    <ImageView
         android:layout_width="match_parent"
         android:layout_height="20dp"
-        android:background="#1E3932">
-
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:scaleType="fitXY"
-            android:src="@drawable/widget_wave_divider" />
-
-    </FrameLayout>
+        android:background="#1E3932"
+        android:scaleType="fitXY"
+        android:src="@drawable/widget_wave_divider" />
 
     <!-- White grid section: gravity top so badges align at same height -->
     <LinearLayout

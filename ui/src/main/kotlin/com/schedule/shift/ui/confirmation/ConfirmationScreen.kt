@@ -39,6 +39,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -115,15 +116,13 @@ fun ConfirmationScreen(
     val reviewing = uiState as? ConfirmationUiState.Reviewing ?: return
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    Scaffold(
-        containerColor = MaterialTheme.colorScheme.background,
-        topBar = { ConfirmationTopBar(onBack = viewModel::cancel) },
-        bottomBar = { ConfirmationBottomBar(onCancel = viewModel::cancel, onConfirm = viewModel::confirm) },
-    ) { padding ->
-        ConfirmationBody(
-            reviewing = reviewing,
-            padding = padding,
-            onEditDay = { weekIndex, dayIndex -> viewModel.startEdit(weekIndex, dayIndex) },
+    ConfirmationScaffold(viewModel = viewModel, reviewing = reviewing)
+
+    if (reviewing.conflictCount > 0) {
+        ReplaceConfirmDialog(
+            conflictCount = reviewing.conflictCount,
+            onConfirm = viewModel::proceedWithReplace,
+            onDismiss = viewModel::dismissConflict,
         )
     }
 
@@ -142,6 +141,37 @@ fun ConfirmationScreen(
             )
         }
     }
+}
+
+@Composable
+private fun ConfirmationScaffold(viewModel: ConfirmationViewModel, reviewing: ConfirmationUiState.Reviewing) {
+    Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
+        topBar = { ConfirmationTopBar(onBack = viewModel::cancel) },
+        bottomBar = { ConfirmationBottomBar(onCancel = viewModel::cancel, onConfirm = viewModel::confirm) },
+    ) { padding ->
+        ConfirmationBody(
+            reviewing = reviewing,
+            padding = padding,
+            onEditDay = { weekIndex, dayIndex -> viewModel.startEdit(weekIndex, dayIndex) },
+        )
+    }
+}
+
+@Composable
+private fun ReplaceConfirmDialog(conflictCount: Int, onConfirm: () -> Unit, onDismiss: () -> Unit) {
+    val weekLabel = if (conflictCount == 1) "1개 주" else "${conflictCount}개 주"
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("스케쥴 교체") },
+        text = { Text("${weekLabel} 스케쥴이 이미 등록되어 있습니다.\n기존 스케쥴을 새 스케쥴로 교체하시겠습니까?") },
+        confirmButton = {
+            Button(onClick = onConfirm) { Text("교체하기") }
+        },
+        dismissButton = {
+            OutlinedButton(onClick = onDismiss) { Text("취소") }
+        },
+    )
 }
 
 @Composable

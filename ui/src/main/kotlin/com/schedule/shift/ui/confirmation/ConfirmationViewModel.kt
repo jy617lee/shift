@@ -31,10 +31,39 @@ class ConfirmationViewModel @AssistedInject constructor(
     fun confirm() {
         val state = _uiState.value as? ConfirmationUiState.Reviewing ?: return
         viewModelScope.launch {
-            state.weeks.forEach { repository.saveWeek(it) }
+            val conflicts = state.weeks.count { repository.getWeekByDate(it.weekStartDate) != null }
+            if (conflicts > 0) {
+                _uiState.value = state.copy(conflictCount = conflicts)
+                return@launch
+            }
+            saveAllAndFinish(state.weeks)
+        }
+    }
+
+    fun proceedWithReplace() {
+        val state = _uiState.value as? ConfirmationUiState.Reviewing ?: return
+        viewModelScope.launch {
+            state.weeks.forEach { week ->
+                if (repository.getWeekByDate(week.weekStartDate) != null) {
+                    repository.replaceWeek(week)
+                } else {
+                    repository.saveWeek(week)
+                }
+            }
             widgetRefresher.refreshAll()
             _uiState.value = ConfirmationUiState.Saved
         }
+    }
+
+    fun dismissConflict() {
+        val state = _uiState.value as? ConfirmationUiState.Reviewing ?: return
+        _uiState.value = state.copy(conflictCount = 0)
+    }
+
+    private suspend fun saveAllAndFinish(weeks: List<ScheduleWeek>) {
+        weeks.forEach { repository.saveWeek(it) }
+        widgetRefresher.refreshAll()
+        _uiState.value = ConfirmationUiState.Saved
     }
 
     fun cancel() {

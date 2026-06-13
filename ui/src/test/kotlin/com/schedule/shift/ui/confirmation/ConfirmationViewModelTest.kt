@@ -59,8 +59,9 @@ class ConfirmationViewModelTest {
     }
 
     @Test
-    fun `confirm saves all weeks and emits Saved`() = runTest {
+    fun `confirm saves all weeks and emits Saved when no conflict`() = runTest {
         val weeks = listOf(buildTestWeek())
+        coEvery { repository.getWeekByDate(any()) } returns null
         coEvery { repository.saveWeek(any()) } returns Unit
         val viewModel = buildViewModel(weeks)
 
@@ -75,7 +76,24 @@ class ConfirmationViewModelTest {
     }
 
     @Test
-    fun `confirm refreshes widget after saving`() = runTest {
+    fun `confirm sets conflictCount when week already exists`() = runTest {
+        val weeks = listOf(buildTestWeek())
+        coEvery { repository.getWeekByDate(any()) } returns buildTestWeek()
+        val viewModel = buildViewModel(weeks)
+
+        viewModel.uiState.test {
+            skipItems(1)
+            viewModel.confirm()
+            val state = awaitItem() as ConfirmationUiState.Reviewing
+            assertEquals(1, state.conflictCount)
+            cancelAndIgnoreRemainingEvents()
+        }
+        coVerify(exactly = 0) { repository.saveWeek(any()) }
+    }
+
+    @Test
+    fun `confirm refreshes widget after saving when no conflict`() = runTest {
+        coEvery { repository.getWeekByDate(any()) } returns null
         val viewModel = buildViewModel()
         viewModel.uiState.test {
             skipItems(1)
@@ -88,6 +106,7 @@ class ConfirmationViewModelTest {
 
     @Test
     fun `confirm with empty weeks list emits Saved without saving`() = runTest {
+        coEvery { repository.getWeekByDate(any()) } returns null
         val viewModel = buildViewModel(emptyList())
 
         viewModel.uiState.test {
