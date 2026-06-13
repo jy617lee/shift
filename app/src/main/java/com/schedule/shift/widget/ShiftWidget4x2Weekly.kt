@@ -125,7 +125,7 @@ internal fun Widget4x2WeeklyContent(
                 allDays = allDays,
                 timeFmt = timeFmt,
                 modifier = GlanceModifier.fillMaxWidth()
-                    .padding(start = 10.dp, top = 0.dp, end = 10.dp, bottom = 44.dp),
+                    .padding(start = 9.dp, top = 0.dp, end = 9.dp, bottom = 37.dp),
             )
         }
     }
@@ -142,7 +142,7 @@ private fun TodayHeader(
 ) {
     val context = LocalContext.current
     Row(
-        modifier = modifier.padding(start = 14.dp, top = 16.dp, end = 14.dp),
+        modifier = modifier.padding(start = 14.dp, top = 18.dp, end = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         AndroidRemoteViews(
@@ -181,7 +181,7 @@ private fun TodayStateText(state: WidgetState, timeFmt: DateTimeFormatter) {
         text = text,
         style = TextDefaults.defaultTextStyle.copy(
             color = color,
-            fontSize = if (state is WidgetState.WorkDay) 26.sp else 14.sp,
+            fontSize = if (state is WidgetState.WorkDay) 29.sp else 14.sp,
             fontWeight = if (state is WidgetState.WorkDay) FontWeight.Bold else FontWeight.Normal,
             textAlign = TextAlign.Center,
         ),
@@ -222,7 +222,7 @@ private fun DayCell(
     dayFmt: DateTimeFormatter,
 ) {
     val state = dayData?.toWidgetState() ?: WidgetState.Unregistered
-    val dateDowText = "${date.dayOfMonth} (${date.format(dayFmt)})"
+    val dateDowText = date.format(dayFmt)
 
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         if (isToday) {
@@ -258,7 +258,7 @@ private fun DayCell(
                 )
             }
         }
-        Spacer(GlanceModifier.height(4.dp))
+        Spacer(GlanceModifier.height(3.dp))
         DayCellValue(state = state, isToday = isToday, timeFmt = timeFmt)
     }
 }
@@ -269,7 +269,7 @@ private fun DayCellValue(state: WidgetState, isToday: Boolean, timeFmt: DateTime
     val weight = if (isToday) FontWeight.Bold else FontWeight.Normal
     val cellStyle = TextDefaults.defaultTextStyle.copy(
         color = textColor,
-        fontSize = 13.sp,
+        fontSize = 14.sp,
         fontWeight = weight,
         textAlign = TextAlign.Center,
     )

@@ -111,7 +111,7 @@ private fun Widget4x1Content(
     val context = LocalContext.current
 
     Row(
-        modifier = GlanceModifier.fillMaxSize().padding(start = 14.dp, top = 8.dp, end = 14.dp, bottom = 18.dp),
+        modifier = GlanceModifier.fillMaxSize().padding(horizontal = 14.dp, vertical = 18.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(

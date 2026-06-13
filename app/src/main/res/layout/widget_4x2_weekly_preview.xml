@@ -13,9 +13,9 @@
         android:orientation="horizontal"
         android:paddingLeft="14dp"
         android:paddingRight="14dp"
-        android:paddingTop="16dp">
+        android:paddingTop="18dp">
 
-        <!-- Left: day label + large date, mint color -->
+        <!-- Left: day label + large date, white -->
         <LinearLayout
             android:layout_width="88dp"
             android:layout_height="match_parent"
@@ -26,7 +26,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="토"
-                android:textColor="#D4E9E2"
+                android:textColor="#FFFFFF"
                 android:textSize="12sp" />
 
             <TextView
@@ -34,7 +34,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="-2dp"
                 android:text="13"
-                android:textColor="#D4E9E2"
+                android:textColor="#FFFFFF"
                 android:textSize="28sp"
                 android:textStyle="bold" />
 
@@ -64,7 +64,7 @@
             android:gravity="center"
             android:text="17:00-22:30"
             android:textColor="#FFFFFF"
-            android:textSize="26sp"
+            android:textSize="29sp"
             android:textStyle="bold" />
 
     </LinearLayout>
@@ -91,11 +91,11 @@
         android:background="#FFFFFF"
         android:gravity="bottom|center_horizontal"
         android:orientation="horizontal"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:paddingBottom="44dp">
+        android:paddingLeft="9dp"
+        android:paddingRight="9dp"
+        android:paddingBottom="37dp">
 
-        <!-- 목 11 -->
+        <!-- 목 -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -108,13 +108,13 @@
                 android:layout_height="wrap_content"
                 android:paddingTop="2dp"
                 android:paddingBottom="2dp"
-                android:text="11 (목)"
+                android:text="목"
                 android:textColor="#1E3932"
                 android:textSize="12sp" />
 
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="4dp" />
+                android:layout_height="3dp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -122,11 +122,11 @@
                 android:gravity="center"
                 android:text="정규휴일"
                 android:textColor="#9A9488"
-                android:textSize="13sp" />
+                android:textSize="14sp" />
 
         </LinearLayout>
 
-        <!-- 금 12 -->
+        <!-- 금 -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -139,13 +139,13 @@
                 android:layout_height="wrap_content"
                 android:paddingTop="2dp"
                 android:paddingBottom="2dp"
-                android:text="12 (금)"
+                android:text="금"
                 android:textColor="#1E3932"
                 android:textSize="12sp" />
 
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="4dp" />
+                android:layout_height="3dp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -153,7 +153,7 @@
                 android:gravity="center"
                 android:text="15:00"
                 android:textColor="#9A9488"
-                android:textSize="13sp" />
+                android:textSize="14sp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -161,11 +161,11 @@
                 android:gravity="center"
                 android:text="20:30"
                 android:textColor="#9A9488"
-                android:textSize="13sp" />
+                android:textSize="14sp" />
 
         </LinearLayout>
 
-        <!-- 토 13 (today) -->
+        <!-- 토 (today) -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -181,14 +181,14 @@
                 android:paddingRight="5dp"
                 android:paddingTop="2dp"
                 android:paddingBottom="2dp"
-                android:text="13 (토)"
+                android:text="토"
                 android:textColor="#FFFFFF"
                 android:textSize="12sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="4dp" />
+                android:layout_height="3dp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -196,7 +196,7 @@
                 android:gravity="center"
                 android:text="17:00"
                 android:textColor="#00704A"
-                android:textSize="13sp"
+                android:textSize="14sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -205,12 +205,12 @@
                 android:gravity="center"
                 android:text="22:30"
                 android:textColor="#00704A"
-                android:textSize="13sp"
+                android:textSize="14sp"
                 android:textStyle="bold" />
 
         </LinearLayout>
 
-        <!-- 일 14 -->
+        <!-- 일 -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -223,13 +223,13 @@
                 android:layout_height="wrap_content"
                 android:paddingTop="2dp"
                 android:paddingBottom="2dp"
-                android:text="14 (일)"
+                android:text="일"
                 android:textColor="#1E3932"
                 android:textSize="12sp" />
 
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="4dp" />
+                android:layout_height="3dp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -237,7 +237,7 @@
                 android:gravity="center"
                 android:text="17:00"
                 android:textColor="#9A9488"
-                android:textSize="13sp" />
+                android:textSize="14sp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -245,11 +245,11 @@
                 android:gravity="center"
                 android:text="22:30"
                 android:textColor="#9A9488"
-                android:textSize="13sp" />
+                android:textSize="14sp" />
 
         </LinearLayout>
 
-        <!-- 월 15 -->
+        <!-- 월 -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -262,13 +262,13 @@
                 android:layout_height="wrap_content"
                 android:paddingTop="2dp"
                 android:paddingBottom="2dp"
-                android:text="15 (월)"
+                android:text="월"
                 android:textColor="#1E3932"
                 android:textSize="12sp" />
 
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="4dp" />
+                android:layout_height="3dp" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -276,7 +276,7 @@
                 android:gravity="center"
                 android:text="연차휴가"
                 android:textColor="#9A9488"
-                android:textSize="13sp" />
+                android:textSize="14sp" />
 
         </LinearLayout>
 
