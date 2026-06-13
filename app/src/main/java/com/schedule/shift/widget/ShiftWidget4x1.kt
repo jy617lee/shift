@@ -123,7 +123,7 @@ private fun Widget4x1Content(
                     text = dayLabel,
                     style = TextDefaults.defaultTextStyle.copy(
                         color = WidgetOnSurfaceVariant,
-                        fontSize = 13.sp,
+                        fontSize = 11.sp,
                         fontWeight = FontWeight.Medium,
                     ),
                 )
