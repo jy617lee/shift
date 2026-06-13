@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -39,6 +40,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -83,7 +85,7 @@ internal fun HomeContent(
             if (uiState is HomeUiState.Success) ShiftFab(onClick = onAddSchedule)
         },
     ) { padding ->
-        Box(modifier = Modifier.fillMaxSize().padding(padding)) {
+        Box(modifier = Modifier.fillMaxSize().padding(top = padding.calculateTopPadding())) {
             when (uiState) {
                 is HomeUiState.Loading -> CircularProgressIndicator(
                     modifier = Modifier.align(Alignment.Center),
@@ -93,6 +95,7 @@ internal fun HomeContent(
                     weeks = uiState.weeks,
                     today = uiState.today,
                     onAddSchedule = onAddSchedule,
+                    fabBottomPadding = padding.calculateBottomPadding(),
                 )
                 is HomeUiState.Error -> HomeErrorContent(onRefresh = onRefresh)
             }
@@ -145,7 +148,12 @@ private fun ShiftFab(onClick: () -> Unit) {
 }
 
 @Composable
-private fun HomeSuccessContent(weeks: List<ScheduleWeek>, today: LocalDate, onAddSchedule: () -> Unit) {
+private fun HomeSuccessContent(
+    weeks: List<ScheduleWeek>,
+    today: LocalDate,
+    onAddSchedule: () -> Unit,
+    fabBottomPadding: Dp = 0.dp,
+) {
     if (weeks.isEmpty()) {
         ShiftEmptyState(onAddSchedule = onAddSchedule)
     } else {
@@ -155,9 +163,8 @@ private fun HomeSuccessContent(weeks: List<ScheduleWeek>, today: LocalDate, onAd
         val listState = rememberLazyListState(initialFirstVisibleItemIndex = currentWeekIndex)
         LazyColumn(
             state = listState,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 100.dp),
+            modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
+            contentPadding = PaddingValues(top = 12.dp, bottom = fabBottomPadding + 16.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             items(weeks, key = { it.weekStartDate }) { week ->
