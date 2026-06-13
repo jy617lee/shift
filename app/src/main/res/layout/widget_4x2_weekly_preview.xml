@@ -92,7 +92,7 @@
         android:orientation="horizontal"
         android:paddingLeft="9dp"
         android:paddingRight="9dp"
-        android:paddingBottom="22dp">
+        android:paddingBottom="20dp">
 
         <!-- 목 -->
         <LinearLayout

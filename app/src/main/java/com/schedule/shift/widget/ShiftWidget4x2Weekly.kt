@@ -125,7 +125,7 @@ internal fun Widget4x2WeeklyContent(
                 allDays = allDays,
                 timeFmt = timeFmt,
                 modifier = GlanceModifier.fillMaxWidth()
-                    .padding(start = 9.dp, top = 0.dp, end = 9.dp, bottom = 22.dp),
+                    .padding(start = 9.dp, top = 0.dp, end = 9.dp, bottom = 20.dp),
             )
         }
     }
