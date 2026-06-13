@@ -236,7 +236,7 @@ private fun DayCell(
                 Image(
                     provider = ImageProvider(R.drawable.widget_today_badge_circle),
                     contentDescription = null,
-                    modifier = GlanceModifier.fillMaxSize(),
+                    modifier = GlanceModifier.width(28.dp).height(28.dp),
                     contentScale = ContentScale.FillBounds,
                 )
                 Text(
