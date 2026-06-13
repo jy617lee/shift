@@ -14,6 +14,7 @@ import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxHeight
 import androidx.glance.layout.fillMaxSize
+import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.width
 import androidx.glance.layout.wrapContentWidth
@@ -45,9 +46,14 @@ private fun Widget2x1Content(state: WidgetState, today: LocalDate) {
         DateColumn(dayLabel = dayLabel, dateLabel = dateLabel)
         Spacer(GlanceModifier.width(8.dp))
         Box(
-            modifier = GlanceModifier.width(1.dp).fillMaxHeight().padding(vertical = 4.dp)
-                .background(WidgetDivider),
-        ) {}
+            modifier = GlanceModifier.fillMaxHeight(),
+            contentAlignment = Alignment.Center,
+        ) {
+            Box(
+                modifier = GlanceModifier.width(1.dp).height(DIVIDER_HEIGHT_DP.dp)
+                    .background(WidgetDivider),
+            ) {}
+        }
         Spacer(GlanceModifier.width(8.dp))
         Box(
             modifier = GlanceModifier.defaultWeight().fillMaxHeight(),
@@ -116,6 +122,8 @@ private fun Widget2x1StateText(state: WidgetState) {
         )
     }
 }
+
+private const val DIVIDER_HEIGHT_DP = 24
 
 class ShiftWidget2x1Receiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = ShiftWidget2x1()
