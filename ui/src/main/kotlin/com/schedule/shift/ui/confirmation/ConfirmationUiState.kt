@@ -14,6 +14,7 @@ sealed class ConfirmationUiState {
         val weeks: List<ScheduleWeek>,
         val imageUri: String? = null,
         val editing: EditingState? = null,
+        val conflictCount: Int = 0,
     ) : ConfirmationUiState()
 
     data object Saved : ConfirmationUiState()
