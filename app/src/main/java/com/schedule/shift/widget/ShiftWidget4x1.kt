@@ -201,10 +201,7 @@ private fun WorkDayContent(
     val timeFmt = DateTimeFormatter.ofPattern("H:mm")
     val workTimeText = "${state.startTime.format(timeFmt)}-${state.endTime.format(timeFmt)}"
 
-    Column(
-        modifier = GlanceModifier.fillMaxHeight(),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
+    Column(modifier = GlanceModifier) {
         Text(
             text = workTimeText,
             style = TextDefaults.defaultTextStyle.copy(

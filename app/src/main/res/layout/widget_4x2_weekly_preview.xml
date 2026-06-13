@@ -5,44 +5,64 @@
     android:background="#00704A"
     android:orientation="vertical">
 
-    <!-- Dark green header -->
+    <!-- Header: explicit 64dp height -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="64dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingLeft="14dp"
-        android:paddingRight="14dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp">
+        android:paddingRight="14dp">
 
-        <!-- Left: date+day, 72dp, centered -->
-        <TextView
+        <!-- Left: day label + date number (two lines) -->
+        <LinearLayout
             android:layout_width="72dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:gravity="center"
-            android:text="6/13(토)"
-            android:textColor="#FFFFFF"
-            android:textSize="16sp"
-            android:textStyle="bold" />
+            android:orientation="vertical">
 
-        <!-- Header divider (semi-transparent white) -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="토"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="13"
+                android:textColor="#FFFFFF"
+                android:textSize="26sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <!-- Spacer 8dp -->
+        <TextView
+            android:layout_width="8dp"
+            android:layout_height="0dp" />
+
+        <!-- Header divider -->
         <TextView
             android:layout_width="1dp"
-            android:layout_height="22dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
+            android:layout_height="30dp"
             android:background="#55FFFFFF" />
+
+        <!-- Spacer 8dp -->
+        <TextView
+            android:layout_width="8dp"
+            android:layout_height="0dp" />
 
         <!-- Right: work time -->
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:gravity="end"
+            android:gravity="end|center_vertical"
             android:text="17:00-22:30"
             android:textColor="#FFFFFF"
-            android:textSize="18sp"
+            android:textSize="20sp"
             android:textStyle="bold" />
 
     </LinearLayout>
