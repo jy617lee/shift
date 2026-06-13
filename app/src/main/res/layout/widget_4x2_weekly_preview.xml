@@ -35,8 +35,7 @@
                 android:layout_marginTop="-2dp"
                 android:text="13"
                 android:textColor="#FFFFFF"
-                android:textSize="28sp"
-                android:textStyle="bold" />
+                android:textSize="28sp" />
 
         </LinearLayout>
 
@@ -56,11 +55,12 @@
             android:layout_width="8dp"
             android:layout_height="0dp" />
 
-        <!-- Right: work time, centered, white -->
+        <!-- Right: work time, top-offset white -->
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:layout_marginTop="11dp"
             android:gravity="center"
             android:text="17:00-22:30"
             android:textColor="#FFFFFF"
@@ -93,7 +93,7 @@
         android:orientation="horizontal"
         android:paddingLeft="9dp"
         android:paddingRight="9dp"
-        android:paddingBottom="37dp">
+        android:paddingBottom="31dp">
 
         <!-- 목 -->
         <LinearLayout
@@ -121,8 +121,8 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="정규휴일"
-                android:textColor="#9A9488"
-                android:textSize="14sp" />
+                android:textColor="#6B6760"
+                android:textSize="15sp" />
 
         </LinearLayout>
 
@@ -152,16 +152,16 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="15:00"
-                android:textColor="#9A9488"
-                android:textSize="14sp" />
+                android:textColor="#6B6760"
+                android:textSize="15sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="20:30"
-                android:textColor="#9A9488"
-                android:textSize="14sp" />
+                android:textColor="#6B6760"
+                android:textSize="15sp" />
 
         </LinearLayout>
 
@@ -176,11 +176,8 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/widget_today_badge"
-                android:paddingLeft="5dp"
-                android:paddingRight="5dp"
-                android:paddingTop="2dp"
-                android:paddingBottom="2dp"
+                android:background="@drawable/widget_today_badge_circle"
+                android:padding="4dp"
                 android:text="토"
                 android:textColor="#FFFFFF"
                 android:textSize="12sp"
@@ -196,7 +193,7 @@
                 android:gravity="center"
                 android:text="17:00"
                 android:textColor="#00704A"
-                android:textSize="14sp"
+                android:textSize="15sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -205,7 +202,7 @@
                 android:gravity="center"
                 android:text="22:30"
                 android:textColor="#00704A"
-                android:textSize="14sp"
+                android:textSize="15sp"
                 android:textStyle="bold" />
 
         </LinearLayout>
@@ -236,16 +233,16 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="17:00"
-                android:textColor="#9A9488"
-                android:textSize="14sp" />
+                android:textColor="#6B6760"
+                android:textSize="15sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="22:30"
-                android:textColor="#9A9488"
-                android:textSize="14sp" />
+                android:textColor="#6B6760"
+                android:textSize="15sp" />
 
         </LinearLayout>
 
@@ -275,8 +272,8 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="연차휴가"
-                android:textColor="#9A9488"
-                android:textSize="14sp" />
+                android:textColor="#6B6760"
+                android:textSize="15sp" />
 
         </LinearLayout>
 

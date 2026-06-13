@@ -125,7 +125,7 @@ internal fun Widget4x2WeeklyContent(
                 allDays = allDays,
                 timeFmt = timeFmt,
                 modifier = GlanceModifier.fillMaxWidth()
-                    .padding(start = 9.dp, top = 0.dp, end = 9.dp, bottom = 37.dp),
+                    .padding(start = 9.dp, top = 0.dp, end = 9.dp, bottom = 31.dp),
             )
         }
     }
@@ -158,10 +158,11 @@ private fun TodayHeader(
                 .background(DividerColor),
         ) {}
         Spacer(GlanceModifier.width(8.dp))
-        Box(
+        Column(
             modifier = GlanceModifier.defaultWeight().fillMaxHeight(),
-            contentAlignment = Alignment.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
+            Spacer(GlanceModifier.height(11.dp))
             TodayStateText(state = state, timeFmt = timeFmt)
         }
     }
@@ -228,8 +229,8 @@ private fun DayCell(
         if (isToday) {
             Box(
                 modifier = GlanceModifier
-                    .background(ImageProvider(R.drawable.widget_today_badge))
-                    .padding(horizontal = 5.dp, vertical = 2.dp),
+                    .background(ImageProvider(R.drawable.widget_today_badge_circle))
+                    .padding(4.dp),
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
@@ -269,7 +270,7 @@ private fun DayCellValue(state: WidgetState, isToday: Boolean, timeFmt: DateTime
     val weight = if (isToday) FontWeight.Bold else FontWeight.Normal
     val cellStyle = TextDefaults.defaultTextStyle.copy(
         color = textColor,
-        fontSize = 14.sp,
+        fontSize = 15.sp,
         fontWeight = weight,
         textAlign = TextAlign.Center,
     )
@@ -293,7 +294,7 @@ private val DividerColor = ColorProvider(Color(0x26FFFFFF))
 @Suppress("MagicNumber")
 private val GridDateColor = ColorProvider(Color(0xFF1E3932))
 @Suppress("MagicNumber")
-private val GridMutedColor = ColorProvider(Color(0xFF9A9488))
+private val GridMutedColor = ColorProvider(Color(0xFF6B6760))
 
 private const val ALPHA_OFF_DAY = 0.7f
 private const val ALPHA_UNREGISTERED = 0.5f
