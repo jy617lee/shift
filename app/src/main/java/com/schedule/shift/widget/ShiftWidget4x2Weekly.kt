@@ -63,7 +63,7 @@ class ShiftWidget4x2Weekly : BaseShiftWidget() {
                 Box(
                     modifier = GlanceModifier
                         .fillMaxSize()
-                        .background(WidgetSurface)
+                        .background(HeaderBackground)
                         .clickable(actionStartActivity(widgetIntent(context, widgetSource))),
                     contentAlignment = Alignment.TopStart,
                 ) {
@@ -98,21 +98,23 @@ internal fun Widget4x2WeeklyContent(
     val todayState = todayDay?.toWidgetState() ?: WidgetState.Unregistered
 
     Column(modifier = GlanceModifier.fillMaxSize()) {
-        TodayHeader(
-            dayLabel = dayLabel,
-            dateLabel = dateLabel,
-            state = todayState,
-            timeFmt = timeFmt,
-            modifier = GlanceModifier.fillMaxWidth().height(HEADER_HEIGHT_DP.dp),
-        )
-        Box(
-            modifier = GlanceModifier.fillMaxWidth().height(WAVE_HEIGHT_DP.dp)
+        Column(
+            modifier = GlanceModifier
+                .fillMaxWidth()
+                .height((HEADER_HEIGHT_DP + WAVE_HEIGHT_DP).dp)
                 .background(HeaderBackground),
         ) {
+            TodayHeader(
+                dayLabel = dayLabel,
+                dateLabel = dateLabel,
+                state = todayState,
+                timeFmt = timeFmt,
+                modifier = GlanceModifier.fillMaxWidth().height(HEADER_HEIGHT_DP.dp),
+            )
             Image(
                 provider = ImageProvider(R.drawable.widget_wave_divider),
                 contentDescription = null,
-                modifier = GlanceModifier.fillMaxSize(),
+                modifier = GlanceModifier.fillMaxWidth().height(WAVE_HEIGHT_DP.dp),
                 contentScale = ContentScale.FillBounds,
             )
         }
@@ -142,7 +144,7 @@ private fun TodayHeader(
 ) {
     val context = LocalContext.current
     Row(
-        modifier = modifier.background(HeaderBackground).padding(start = 14.dp, top = 18.dp, end = 14.dp),
+        modifier = modifier.padding(start = 14.dp, top = 18.dp, end = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         AndroidRemoteViews(
@@ -183,7 +185,7 @@ private fun TodayStateText(state: WidgetState, timeFmt: DateTimeFormatter) {
         style = TextDefaults.defaultTextStyle.copy(
             color = color,
             fontSize = if (state is WidgetState.WorkDay) 29.sp else 14.sp,
-            fontWeight = if (state is WidgetState.WorkDay) FontWeight.Bold else FontWeight.Normal,
+            fontWeight = FontWeight.Normal,
             textAlign = TextAlign.Center,
         ),
     )
@@ -274,7 +276,7 @@ private fun DayCellValue(state: WidgetState, isToday: Boolean, timeFmt: DateTime
     val weight = FontWeight.Normal
     val cellStyle = TextDefaults.defaultTextStyle.copy(
         color = textColor,
-        fontSize = 15.sp,
+        fontSize = 14.sp,
         fontWeight = weight,
         textAlign = TextAlign.Center,
     )
