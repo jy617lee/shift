@@ -88,7 +88,7 @@ private fun Widget2x1StateText(state: WidgetState) {
                 text = "$start-$end",
                 style = TextDefaults.defaultTextStyle.copy(
                     color = WidgetPrimary,
-                    fontSize = 16.sp,
+                    fontSize = 19.sp,
                     fontWeight = FontWeight.Bold,
                 ),
             )
@@ -97,7 +97,7 @@ private fun Widget2x1StateText(state: WidgetState) {
             text = state.codeLabel.ifEmpty { "휴무" },
             style = TextDefaults.defaultTextStyle.copy(
                 color = WidgetOnSurfaceVariant,
-                fontSize = 14.sp,
+                fontSize = 17.sp,
                 fontWeight = FontWeight.Medium,
             ),
         )
@@ -105,7 +105,7 @@ private fun Widget2x1StateText(state: WidgetState) {
             text = "미등록",
             style = TextDefaults.defaultTextStyle.copy(
                 color = WidgetOnSurfaceVariant,
-                fontSize = 14.sp,
+                fontSize = 17.sp,
             ),
         )
     }

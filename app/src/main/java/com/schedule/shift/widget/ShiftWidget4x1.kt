@@ -5,7 +5,9 @@ import android.appwidget.AppWidgetManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceId
@@ -27,10 +29,10 @@ import androidx.glance.layout.fillMaxHeight
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.padding
 import androidx.glance.layout.width
-import androidx.glance.layout.wrapContentWidth
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextDefaults
+import androidx.glance.unit.ColorProvider
 import com.schedule.shift.domain.model.WidgetState
 import com.schedule.shift.domain.model.toWidgetState
 import dagger.hilt.android.EntryPointAccessors
@@ -84,29 +86,35 @@ private fun Widget4x1Content(state: WidgetState, today: LocalDate, now: LocalTim
         modifier = GlanceModifier.fillMaxSize().padding(horizontal = 14.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Column(
-            modifier = GlanceModifier.wrapContentWidth().fillMaxHeight(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalAlignment = Alignment.CenterHorizontally,
+        Box(
+            modifier = GlanceModifier.width(LEFT_COL_WIDTH_DP.dp).fillMaxHeight(),
+            contentAlignment = Alignment.Center,
         ) {
-            Text(
-                text = dayLabel,
-                style = TextDefaults.defaultTextStyle.copy(
-                    color = WidgetOnSurfaceVariant,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Medium,
-                ),
-            )
-            Text(
-                text = dateLabel,
-                style = TextDefaults.defaultTextStyle.copy(
-                    color = WidgetOnSurface,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                ),
-            )
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = dayLabel,
+                    style = TextDefaults.defaultTextStyle.copy(
+                        color = WidgetOnSurfaceVariant,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Medium,
+                    ),
+                )
+                Text(
+                    text = dateLabel,
+                    style = TextDefaults.defaultTextStyle.copy(
+                        color = WidgetOnSurface,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                    ),
+                )
+            }
         }
-        Spacer(GlanceModifier.width(16.dp))
+        Spacer(GlanceModifier.width(10.dp))
+        Box(
+            modifier = GlanceModifier.width(1.dp).fillMaxHeight().padding(vertical = 6.dp)
+                .background(ColorProvider(DividerColor)),
+        ) {}
+        Spacer(GlanceModifier.width(10.dp))
         Box(
             modifier = GlanceModifier.defaultWeight().fillMaxHeight(),
             contentAlignment = Alignment.CenterStart,
@@ -170,6 +178,10 @@ private fun WorkDayCountdown(state: WidgetState.WorkDay, now: LocalTime) {
     }
 }
 
+@Suppress("MagicNumber")
+private val DividerColor = Color(0xFFDDDDDD)
+private const val LEFT_COL_WIDTH_DP = 52
+
 class ShiftWidget4x1Receiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = ShiftWidget4x1()
 
@@ -198,11 +210,14 @@ class ShiftWidget4x1Receiver : GlanceAppWidgetReceiver() {
     }
 
     private fun scheduleSecondUpdate(context: Context) {
-        context.getSystemService(AlarmManager::class.java).setExactAndAllowWhileIdle(
-            AlarmManager.RTC,
-            System.currentTimeMillis() + SECOND_MS,
-            secondUpdatePendingIntent(context),
-        )
+        val am = context.getSystemService(AlarmManager::class.java)
+        val pi = secondUpdatePendingIntent(context)
+        val triggerAt = System.currentTimeMillis() + SECOND_MS
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !am.canScheduleExactAlarms()) {
+            am.set(AlarmManager.RTC, triggerAt, pi)
+        } else {
+            am.setExactAndAllowWhileIdle(AlarmManager.RTC, triggerAt, pi)
+        }
     }
 
     private fun secondUpdatePendingIntent(context: Context): PendingIntent =
