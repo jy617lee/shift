@@ -63,7 +63,7 @@ class ShiftWidget4x2Weekly : BaseShiftWidget() {
                 Box(
                     modifier = GlanceModifier
                         .fillMaxSize()
-                        .background(HeaderBackground)
+                        .background(WidgetSurface)
                         .clickable(actionStartActivity(widgetIntent(context, widgetSource))),
                     contentAlignment = Alignment.TopStart,
                 ) {
@@ -142,7 +142,7 @@ private fun TodayHeader(
 ) {
     val context = LocalContext.current
     Row(
-        modifier = modifier.padding(start = 14.dp, top = 18.dp, end = 14.dp),
+        modifier = modifier.background(HeaderBackground).padding(start = 14.dp, top = 18.dp, end = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         AndroidRemoteViews(
