@@ -93,7 +93,7 @@
         android:orientation="horizontal"
         android:paddingLeft="9dp"
         android:paddingRight="9dp"
-        android:paddingBottom="26dp">
+        android:paddingBottom="22dp">
 
         <!-- 목 -->
         <LinearLayout
@@ -174,14 +174,13 @@
             android:orientation="vertical">
 
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
                 android:background="@drawable/widget_today_badge_circle"
-                android:padding="4dp"
+                android:gravity="center"
                 android:text="토"
                 android:textColor="#FFFFFF"
-                android:textSize="12sp"
-                android:textStyle="bold" />
+                android:textSize="12sp" />
 
             <TextView
                 android:layout_width="wrap_content"

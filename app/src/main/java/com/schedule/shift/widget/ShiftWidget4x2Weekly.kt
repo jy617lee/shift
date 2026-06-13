@@ -125,7 +125,7 @@ internal fun Widget4x2WeeklyContent(
                 allDays = allDays,
                 timeFmt = timeFmt,
                 modifier = GlanceModifier.fillMaxWidth()
-                    .padding(start = 9.dp, top = 0.dp, end = 9.dp, bottom = 26.dp),
+                    .padding(start = 9.dp, top = 0.dp, end = 9.dp, bottom = 22.dp),
             )
         }
     }
@@ -229,8 +229,8 @@ private fun DayCell(
         if (isToday) {
             Box(
                 modifier = GlanceModifier
-                    .background(ImageProvider(R.drawable.widget_today_badge_circle))
-                    .padding(4.dp),
+                    .width(28.dp).height(28.dp)
+                    .background(ImageProvider(R.drawable.widget_today_badge_circle)),
                 contentAlignment = Alignment.Center,
             ) {
                 Text(
@@ -238,7 +238,7 @@ private fun DayCell(
                     style = TextDefaults.defaultTextStyle.copy(
                         color = ColorProvider(Color.White),
                         fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.Normal,
                         textAlign = TextAlign.Center,
                     ),
                 )
