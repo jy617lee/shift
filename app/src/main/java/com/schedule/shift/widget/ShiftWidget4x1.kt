@@ -120,7 +120,7 @@ private fun Widget4x1Content(state: WidgetState, today: LocalDate, now: LocalTim
                     .background(WidgetDivider),
             ) {}
         }
-        Spacer(GlanceModifier.width(10.dp))
+        Spacer(GlanceModifier.width(DIVIDER_RIGHT_MARGIN_DP.dp))
         Box(
             modifier = GlanceModifier.defaultWeight().fillMaxHeight(),
             contentAlignment = Alignment.CenterStart,
@@ -186,6 +186,7 @@ private fun WorkDayCountdown(state: WidgetState.WorkDay, now: LocalTime) {
 
 private const val LEFT_COL_WIDTH_DP = 52
 private const val DIVIDER_HEIGHT_DP = 42
+private const val DIVIDER_RIGHT_MARGIN_DP = 12
 
 class ShiftWidget4x1Receiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = ShiftWidget4x1()
