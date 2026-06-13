@@ -1,21 +1,16 @@
 package com.schedule.shift.di
 
 import android.content.Context
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.preferencesDataStore
 import androidx.room.Room
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.TextRecognizer
 import com.google.mlkit.vision.text.korean.KoreanTextRecognizerOptions
 import com.schedule.shift.data.db.ScheduleWeekDao
 import com.schedule.shift.data.db.ShiftDatabase
-import com.schedule.shift.data.preferences.DataStoreUserPreferencesRepository
 import com.schedule.shift.data.reporter.NoOpFailedImageReporter
 import com.schedule.shift.data.repository.ScheduleRepositoryImpl
 import com.schedule.shift.domain.ocr.OcrEngine
 import com.schedule.shift.domain.parser.ScheduleParser
-import com.schedule.shift.domain.preferences.UserPreferencesRepository
 import com.schedule.shift.domain.reporter.FailedImageReporter
 import com.schedule.shift.domain.repository.ScheduleRepository
 import com.schedule.shift.domain.usecase.ProcessScheduleImageUseCase
@@ -30,8 +25,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import java.time.LocalDate
 import javax.inject.Singleton
-
-private val Context.userPrefsDataStore: DataStore<Preferences> by preferencesDataStore(name = "user_preferences")
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -73,18 +66,6 @@ object AppModule {
     @Singleton
     fun provideFailedImageReporter(): FailedImageReporter =
         NoOpFailedImageReporter()
-
-    @Provides
-    @Singleton
-    fun provideUserPrefsDataStore(@ApplicationContext context: Context): DataStore<Preferences> =
-        context.userPrefsDataStore
-
-    @Provides
-    @Singleton
-    fun provideUserPreferencesRepository(
-        dataStore: DataStore<Preferences>,
-    ): UserPreferencesRepository =
-        DataStoreUserPreferencesRepository(dataStore)
 
     @Provides
     @Suppress("LongParameterList")
