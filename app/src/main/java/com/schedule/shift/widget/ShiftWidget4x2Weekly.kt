@@ -1,6 +1,7 @@
 package com.schedule.shift.widget
 
 import android.content.Context
+import android.widget.RemoteViews
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -10,8 +11,10 @@ import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
 import androidx.glance.Image
 import androidx.glance.ImageProvider
+import androidx.glance.LocalContext
 import androidx.glance.layout.ContentScale
 import androidx.glance.action.clickable
+import androidx.glance.appwidget.AndroidRemoteViews
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.action.actionStartActivity
@@ -137,32 +140,18 @@ private fun TodayHeader(
     timeFmt: DateTimeFormatter,
     modifier: GlanceModifier,
 ) {
+    val context = LocalContext.current
     Row(
-        modifier = modifier.padding(horizontal = 14.dp),
+        modifier = modifier.padding(start = 14.dp, top = 16.dp, end = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Column(
+        AndroidRemoteViews(
+            remoteViews = RemoteViews(context.packageName, R.layout.widget_4x2_header_left).also {
+                it.setTextViewText(R.id.txt_header_day, dayLabel)
+                it.setTextViewText(R.id.txt_header_date, dateLabel)
+            },
             modifier = GlanceModifier.width(HEADER_LEFT_WIDTH_DP.dp).fillMaxHeight(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = dayLabel,
-                style = TextDefaults.defaultTextStyle.copy(
-                    color = ColorProvider(Color.White.copy(alpha = DAY_LABEL_ALPHA)),
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Medium,
-                ),
-            )
-            Text(
-                text = dateLabel,
-                style = TextDefaults.defaultTextStyle.copy(
-                    color = ColorProvider(Color.White),
-                    fontSize = 29.sp,
-                    fontWeight = FontWeight.Bold,
-                ),
-            )
-        }
+        )
         Spacer(GlanceModifier.width(8.dp))
         Box(
             modifier = GlanceModifier.width(1.dp).height(HEADER_DIVIDER_HEIGHT_DP.dp)
@@ -182,7 +171,7 @@ private fun TodayHeader(
 private fun TodayStateText(state: WidgetState, timeFmt: DateTimeFormatter) {
     val (text, color) = when (state) {
         is WidgetState.WorkDay ->
-            "${state.startTime.format(timeFmt)}-${state.endTime.format(timeFmt)}" to WorkTimeColor
+            "${state.startTime.format(timeFmt)}-${state.endTime.format(timeFmt)}" to ColorProvider(Color.White)
         is WidgetState.OffDay ->
             state.codeLabel.ifEmpty { "휴무" } to ColorProvider(Color.White.copy(alpha = ALPHA_OFF_DAY))
         is WidgetState.Unregistered ->
@@ -192,7 +181,7 @@ private fun TodayStateText(state: WidgetState, timeFmt: DateTimeFormatter) {
         text = text,
         style = TextDefaults.defaultTextStyle.copy(
             color = color,
-            fontSize = if (state is WidgetState.WorkDay) 25.sp else 14.sp,
+            fontSize = if (state is WidgetState.WorkDay) 26.sp else 14.sp,
             fontWeight = if (state is WidgetState.WorkDay) FontWeight.Bold else FontWeight.Normal,
             textAlign = TextAlign.Center,
         ),
@@ -302,15 +291,12 @@ private val HeaderBackground = ColorProvider(Color(0xFF1E3932))
 @Suppress("MagicNumber")
 private val DividerColor = ColorProvider(Color(0x26FFFFFF))
 @Suppress("MagicNumber")
-private val WorkTimeColor = ColorProvider(Color(0xFFD4E9E2))
-@Suppress("MagicNumber")
 private val GridDateColor = ColorProvider(Color(0xFF1E3932))
 @Suppress("MagicNumber")
 private val GridMutedColor = ColorProvider(Color(0xFF9A9488))
 
 private const val ALPHA_OFF_DAY = 0.7f
 private const val ALPHA_UNREGISTERED = 0.5f
-private const val DAY_LABEL_ALPHA = 0.5f
 private const val MAX_CODE_CHARS = 4
 private const val GRID_OFFSET_START = -2
 private const val GRID_OFFSET_END = 2

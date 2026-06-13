@@ -9,31 +9,33 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="62dp"
-        android:gravity="center_vertical"
+        android:gravity="top|center_horizontal"
         android:orientation="horizontal"
         android:paddingLeft="14dp"
-        android:paddingRight="14dp">
+        android:paddingRight="14dp"
+        android:paddingTop="16dp">
 
-        <!-- Left: day label (50% white) + large date -->
+        <!-- Left: day label + large date, mint color -->
         <LinearLayout
             android:layout_width="88dp"
             android:layout_height="match_parent"
-            android:gravity="center"
+            android:gravity="top|center_horizontal"
             android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="토"
-                android:textColor="#80FFFFFF"
+                android:textColor="#D4E9E2"
                 android:textSize="12sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="-2dp"
                 android:text="13"
-                android:textColor="#FFFFFF"
-                android:textSize="29sp"
+                android:textColor="#D4E9E2"
+                android:textSize="28sp"
                 android:textStyle="bold" />
 
         </LinearLayout>
@@ -54,15 +56,15 @@
             android:layout_width="8dp"
             android:layout_height="0dp" />
 
-        <!-- Right: work time, centered, mint color -->
+        <!-- Right: work time, centered, white -->
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center"
             android:text="17:00-22:30"
-            android:textColor="#D4E9E2"
-            android:textSize="25sp"
+            android:textColor="#FFFFFF"
+            android:textSize="26sp"
             android:textStyle="bold" />
 
     </LinearLayout>
