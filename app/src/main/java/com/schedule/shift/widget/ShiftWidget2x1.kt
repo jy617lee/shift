@@ -14,6 +14,7 @@ import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
+import androidx.glance.text.TextAlign
 import androidx.glance.text.TextDefaults
 import com.schedule.shift.domain.model.WidgetState
 import java.time.LocalDate
@@ -35,13 +36,15 @@ private fun Widget2x1Content(state: WidgetState, today: LocalDate) {
     Column(
         modifier = GlanceModifier.fillMaxSize().padding(horizontal = 12.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
             text = dateLabel,
             style = TextDefaults.defaultTextStyle.copy(
                 color = WidgetOnSurfaceVariant,
-                fontSize = 12.sp,
+                fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
+                textAlign = TextAlign.Center,
             ),
         )
         Spacer(GlanceModifier.height(2.dp))
@@ -60,8 +63,9 @@ private fun Widget2x1StateText(state: WidgetState) {
                 text = "$start-$end",
                 style = TextDefaults.defaultTextStyle.copy(
                     color = WidgetPrimary,
-                    fontSize = 19.sp,
+                    fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
                 ),
             )
         }
@@ -69,15 +73,17 @@ private fun Widget2x1StateText(state: WidgetState) {
             text = state.codeLabel.ifEmpty { "휴무" },
             style = TextDefaults.defaultTextStyle.copy(
                 color = WidgetOnSurfaceVariant,
-                fontSize = 17.sp,
+                fontSize = 20.sp,
                 fontWeight = FontWeight.Medium,
+                textAlign = TextAlign.Center,
             ),
         )
         is WidgetState.Unregistered -> Text(
             text = "미등록",
             style = TextDefaults.defaultTextStyle.copy(
                 color = WidgetOnSurfaceVariant,
-                fontSize = 17.sp,
+                fontSize = 20.sp,
+                textAlign = TextAlign.Center,
             ),
         )
     }
