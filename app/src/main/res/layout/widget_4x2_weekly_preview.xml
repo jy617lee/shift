@@ -2,21 +2,21 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#00704A"
+    android:background="#1E3932"
     android:orientation="vertical">
 
-    <!-- Header: explicit 64dp height -->
+    <!-- Header: 62dp, dark forest green -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="64dp"
+        android:layout_height="62dp"
         android:gravity="center_vertical"
         android:orientation="horizontal"
         android:paddingLeft="14dp"
         android:paddingRight="14dp">
 
-        <!-- Left: day label + date number (two lines) -->
+        <!-- Left: day label (50% white) + large date -->
         <LinearLayout
-            android:layout_width="72dp"
+            android:layout_width="88dp"
             android:layout_height="match_parent"
             android:gravity="center"
             android:orientation="vertical">
@@ -25,15 +25,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="토"
-                android:textColor="#FFFFFF"
-                android:textSize="12sp" />
+                android:textColor="#80FFFFFF"
+                android:textSize="11sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="13"
                 android:textColor="#FFFFFF"
-                android:textSize="26sp"
+                android:textSize="34sp"
                 android:textStyle="bold" />
 
         </LinearLayout>
@@ -43,46 +43,60 @@
             android:layout_width="8dp"
             android:layout_height="0dp" />
 
-        <!-- Header divider -->
+        <!-- Divider: rgba(255,255,255,0.15) -->
         <TextView
             android:layout_width="1dp"
-            android:layout_height="30dp"
-            android:background="#55FFFFFF" />
+            android:layout_height="32dp"
+            android:background="#26FFFFFF" />
 
         <!-- Spacer 8dp -->
         <TextView
             android:layout_width="8dp"
             android:layout_height="0dp" />
 
-        <!-- Right: work time -->
+        <!-- Right: work time, centered, mint color -->
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:gravity="end|center_vertical"
+            android:gravity="center"
             android:text="17:00-22:30"
-            android:textColor="#FFFFFF"
-            android:textSize="20sp"
+            android:textColor="#D4E9E2"
+            android:textSize="21sp"
             android:textStyle="bold" />
 
     </LinearLayout>
 
-    <!-- White grid with rounded top corners -->
+    <!-- Wave divider: 24dp, dark green bg + white wave -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="24dp"
+        android:background="#1E3932">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitXY"
+            android:src="@drawable/widget_wave_divider" />
+
+    </FrameLayout>
+
+    <!-- White grid section -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="@drawable/widget_weekly_grid_bg"
+        android:background="#FFFFFF"
+        android:gravity="bottom|center_horizontal"
         android:orientation="horizontal"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
-        android:paddingTop="6dp"
-        android:paddingBottom="6dp">
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingBottom="12dp">
 
-        <!-- 목 / 11 -->
+        <!-- 목 11 -->
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center_horizontal"
             android:orientation="vertical">
@@ -90,32 +104,30 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="목"
-                android:textColor="#49454F"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:text="11(목)"
+                android:textColor="#1E3932"
                 android:textSize="10sp" />
 
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="11"
-                android:textColor="#1C1B1F"
-                android:textSize="13sp" />
+                android:layout_height="4dp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
                 android:gravity="center"
                 android:text="정규휴일"
-                android:textColor="#49454F"
-                android:textSize="12sp" />
+                android:textColor="#9A9488"
+                android:textSize="11sp" />
 
         </LinearLayout>
 
-        <!-- 금 / 12 -->
+        <!-- 금 12 -->
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center_horizontal"
             android:orientation="vertical">
@@ -123,40 +135,38 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="금"
-                android:textColor="#49454F"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:text="12(금)"
+                android:textColor="#1E3932"
                 android:textSize="10sp" />
 
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="12"
-                android:textColor="#1C1B1F"
-                android:textSize="13sp" />
+                android:layout_height="4dp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
                 android:gravity="center"
-                android:text="15:00-"
-                android:textColor="#1C1B1F"
-                android:textSize="12sp" />
+                android:text="15:00"
+                android:textColor="#9A9488"
+                android:textSize="11sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="20:30"
-                android:textColor="#1C1B1F"
-                android:textSize="12sp" />
+                android:textColor="#9A9488"
+                android:textSize="11sp" />
 
         </LinearLayout>
 
-        <!-- 토 / 13 (today) -->
+        <!-- 토 13 (today) -->
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center_horizontal"
             android:orientation="vertical">
@@ -164,32 +174,27 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/widget_today_circle"
-                android:paddingLeft="6dp"
-                android:paddingRight="6dp"
+                android:background="@drawable/widget_today_badge"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
                 android:paddingTop="2dp"
                 android:paddingBottom="2dp"
-                android:text="토"
+                android:text="13(토)"
                 android:textColor="#FFFFFF"
                 android:textSize="10sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="13"
-                android:textColor="#00704A"
-                android:textSize="13sp"
-                android:textStyle="bold" />
+                android:layout_height="4dp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
                 android:gravity="center"
-                android:text="17:00-"
+                android:text="17:00"
                 android:textColor="#00704A"
-                android:textSize="12sp"
+                android:textSize="11sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -198,15 +203,15 @@
                 android:gravity="center"
                 android:text="22:30"
                 android:textColor="#00704A"
-                android:textSize="12sp"
+                android:textSize="11sp"
                 android:textStyle="bold" />
 
         </LinearLayout>
 
-        <!-- 일 / 14 -->
+        <!-- 일 14 -->
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center_horizontal"
             android:orientation="vertical">
@@ -214,40 +219,38 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="일"
-                android:textColor="#49454F"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:text="14(일)"
+                android:textColor="#1E3932"
                 android:textSize="10sp" />
 
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="14"
-                android:textColor="#1C1B1F"
-                android:textSize="13sp" />
+                android:layout_height="4dp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
                 android:gravity="center"
-                android:text="17:00-"
-                android:textColor="#1C1B1F"
-                android:textSize="12sp" />
+                android:text="17:00"
+                android:textColor="#9A9488"
+                android:textSize="11sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="22:30"
-                android:textColor="#1C1B1F"
-                android:textSize="12sp" />
+                android:textColor="#9A9488"
+                android:textSize="11sp" />
 
         </LinearLayout>
 
-        <!-- 월 / 15 -->
+        <!-- 월 15 -->
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
             android:gravity="center_horizontal"
             android:orientation="vertical">
@@ -255,25 +258,23 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="월"
-                android:textColor="#49454F"
+                android:paddingTop="2dp"
+                android:paddingBottom="2dp"
+                android:text="15(월)"
+                android:textColor="#1E3932"
                 android:textSize="10sp" />
 
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="15"
-                android:textColor="#1C1B1F"
-                android:textSize="13sp" />
+                android:layout_height="4dp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
                 android:gravity="center"
                 android:text="연차휴가"
-                android:textColor="#49454F"
-                android:textSize="12sp" />
+                android:textColor="#9A9488"
+                android:textSize="11sp" />
 
         </LinearLayout>
 
