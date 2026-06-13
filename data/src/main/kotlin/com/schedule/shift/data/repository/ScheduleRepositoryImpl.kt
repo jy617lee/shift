@@ -29,7 +29,7 @@ class ScheduleRepositoryImpl(
 
     override suspend fun getWeeksInRange(from: LocalDate, to: LocalDate): List<ScheduleWeek> =
         withContext(Dispatchers.IO) {
-            dao.getWeeksInRange(from, to).map { it.toDomain() }
+            dao.getWeeksInRange(from.mondayOfWeek(), to).map { it.toDomain() }
         }
 
     override suspend fun getAllWeeks(): List<ScheduleWeek> =

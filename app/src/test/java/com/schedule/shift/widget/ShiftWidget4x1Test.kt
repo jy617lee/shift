@@ -25,11 +25,6 @@ class ShiftWidget4x1Test {
     }
 
     @Test
-    fun `SOURCE_WIDGET_4X1 is distinct from SOURCE_WIDGET_2X2`() {
-        assertTrue(SOURCE_WIDGET_4X1 != SOURCE_WIDGET_2X2)
-    }
-
-    @Test
     fun `ShiftWidget4x1 can be instantiated`() {
         assertNotNull(ShiftWidget4x1())
     }
@@ -42,9 +37,8 @@ class ShiftWidget4x1Test {
     }
 
     @Test
-    fun `all three widget source constants are distinct`() {
-        val sources = setOf(SOURCE_WIDGET_2X1, SOURCE_WIDGET_2X2, SOURCE_WIDGET_4X1)
-        assertEquals(3, sources.size)
+    fun `SOURCE_WIDGET_4X1 starts with widget prefix`() {
+        assertTrue(SOURCE_WIDGET_4X1.startsWith("widget_"))
     }
 
     @Test
@@ -66,21 +60,9 @@ class ShiftWidget4x1Test {
     }
 
     @Test
-    fun `SOURCE_WIDGET_4X1 starts with widget prefix`() {
-        assertTrue(SOURCE_WIDGET_4X1.startsWith("widget_"))
-    }
-
-    @Test
     fun `widgetIntent for 4x1 returns non-null intent`() {
         val intent = widgetIntent(context, SOURCE_WIDGET_4X1)
         assertNotNull(intent)
-    }
-
-    @Test
-    fun `all widget source constants start with widget prefix`() {
-        listOf(SOURCE_WIDGET_2X1, SOURCE_WIDGET_2X2, SOURCE_WIDGET_4X1).forEach { source ->
-            assertTrue("$source should start with widget_", source.startsWith("widget_"))
-        }
     }
 
     @Test
@@ -91,5 +73,87 @@ class ShiftWidget4x1Test {
     @Test
     fun `ShiftWidget4x1Receiver is non-null`() {
         assertNotNull(ShiftWidget4x1Receiver())
+    }
+
+    @Test
+    fun `ACTION_STATE_UPDATE_4X1 contains package name prefix`() {
+        assertTrue(
+            ShiftWidget4x1Receiver.ACTION_STATE_UPDATE_4X1.startsWith("com.schedule.shift.widget"),
+        )
+    }
+
+    @Test
+    fun `ACTION_STATE_UPDATE_4X1 ends with correct suffix`() {
+        assertTrue(
+            ShiftWidget4x1Receiver.ACTION_STATE_UPDATE_4X1.endsWith("ACTION_STATE_UPDATE_4X1"),
+        )
+    }
+
+    @Test
+    fun `addScheduleIntent has EXTRA_OPEN_REGISTRATION true`() {
+        val intent = addScheduleIntent(context)
+        assertTrue(intent.getBooleanExtra(EXTRA_OPEN_REGISTRATION, false))
+    }
+
+    @Test
+    fun `addScheduleIntent has FLAG_ACTIVITY_NEW_TASK`() {
+        val intent = addScheduleIntent(context)
+        assertTrue(intent.flags and android.content.Intent.FLAG_ACTIVITY_NEW_TASK != 0)
+    }
+
+    @Test
+    fun `addScheduleIntent has FLAG_ACTIVITY_CLEAR_TOP`() {
+        val intent = addScheduleIntent(context)
+        assertTrue(intent.flags and android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP != 0)
+    }
+
+    @Test
+    fun `EXTRA_OPEN_REGISTRATION constant value`() {
+        assertEquals("open_registration", EXTRA_OPEN_REGISTRATION)
+    }
+
+    // ── formatDuration (seconds) ──────────────────────────────────────────────
+
+    @Test
+    fun `formatDuration 0 seconds returns 0초`() {
+        assertEquals("0초", formatDuration(0))
+    }
+
+    @Test
+    fun `formatDuration 59 seconds returns 59초`() {
+        assertEquals("59초", formatDuration(59))
+    }
+
+    @Test
+    fun `formatDuration 60 seconds returns 1분 0초`() {
+        assertEquals("1분 0초", formatDuration(60))
+    }
+
+    @Test
+    fun `formatDuration 90 seconds returns 1분 30초`() {
+        assertEquals("1분 30초", formatDuration(90))
+    }
+
+    @Test
+    fun `formatDuration 3600 seconds returns 1시간 0분 0초`() {
+        assertEquals("1시간 0분 0초", formatDuration(3_600))
+    }
+
+    @Test
+    fun `formatDuration 3661 seconds returns 1시간 1분 1초`() {
+        assertEquals("1시간 1분 1초", formatDuration(3_661))
+    }
+
+    @Test
+    fun `formatDuration omits hours when under 3600 seconds`() {
+        val result = formatDuration(3_599)
+        assertTrue("Should not contain 시간 for sub-hour duration", !result.contains("시간"))
+    }
+
+    @Test
+    fun `formatDuration omits minutes and hours when under 60 seconds`() {
+        val result = formatDuration(45)
+        assertTrue("Should not contain 분 for sub-minute duration", !result.contains("분"))
+        assertTrue("Should not contain 시간 for sub-minute duration", !result.contains("시간"))
     }
 }

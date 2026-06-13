@@ -12,8 +12,6 @@ class GlanceWidgetRefresher @Inject constructor(
 
     override suspend fun refreshAll() {
         ShiftWidget2x1().updateAll(context)
-        ShiftWidget2x2().updateAll(context)
         ShiftWidget4x1().updateAll(context)
-        ShiftWidget4x2Countdown().updateAll(context)
     }
 }

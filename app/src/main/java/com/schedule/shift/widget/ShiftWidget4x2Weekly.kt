@@ -1,13 +1,20 @@
 package com.schedule.shift.widget
 
 import android.content.Context
+import android.widget.RemoteViews
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
+import androidx.glance.Image
+import androidx.glance.ImageProvider
+import androidx.glance.LocalContext
+import androidx.glance.layout.ContentScale
 import androidx.glance.action.clickable
+import androidx.glance.appwidget.AndroidRemoteViews
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.action.actionStartActivity
@@ -23,10 +30,13 @@ import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
+import androidx.glance.layout.width
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextAlign
 import androidx.glance.text.TextDefaults
+import androidx.glance.unit.ColorProvider
+import com.schedule.shift.R
 import com.schedule.shift.domain.model.ScheduleDay
 import com.schedule.shift.domain.model.ScheduleWeek
 import com.schedule.shift.domain.model.WidgetState
@@ -43,7 +53,10 @@ class ShiftWidget4x2Weekly : BaseShiftWidget() {
             .fromApplication<ShiftWidgetEntryPoint>(context.applicationContext)
             .scheduleRepository()
         val today = LocalDate.now()
-        val week = repo.getWeekByDate(today)
+        val from = today.minusDays(GRID_RADIUS.toLong())
+        val to = today.plusDays(GRID_RADIUS.toLong())
+        val allDays = repo.getWeeksInRange(from, to).flatMap { it.days }
+        val todayWeek = repo.getWeekByDate(today)
 
         provideContent {
             GlanceTheme {
@@ -52,9 +65,9 @@ class ShiftWidget4x2Weekly : BaseShiftWidget() {
                         .fillMaxSize()
                         .background(WidgetSurface)
                         .clickable(actionStartActivity(widgetIntent(context, widgetSource))),
-                    contentAlignment = Alignment.Center,
+                    contentAlignment = Alignment.TopStart,
                 ) {
-                    Widget4x2WeeklyContent(today = today, week = week)
+                    Widget4x2WeeklyContent(today = today, allDays = allDays, todayWeek = todayWeek)
                 }
             }
         }
@@ -62,54 +75,96 @@ class ShiftWidget4x2Weekly : BaseShiftWidget() {
 
     @Composable
     override fun WidgetBody(state: WidgetState, today: LocalDate) {
-        Widget4x2WeeklyContent(today = today, week = null)
+        Widget4x2WeeklyContent(today = today, allDays = emptyList(), todayWeek = null)
+    }
+
+    companion object {
+        private const val GRID_RADIUS = 2
     }
 }
 
+@Suppress("LongMethod")
 @Composable
-internal fun Widget4x2WeeklyContent(today: LocalDate, week: ScheduleWeek?) {
+internal fun Widget4x2WeeklyContent(
+    today: LocalDate,
+    allDays: List<ScheduleDay>,
+    todayWeek: ScheduleWeek?,
+) {
     val timeFmt = DateTimeFormatter.ofPattern("H:mm")
-    val dayFmt = DateTimeFormatter.ofPattern("E")
-    val todayDay = week?.days?.find { it.date == today }
+    val dayLabel = today.format(DateTimeFormatter.ofPattern("EEE"))
+    val dateLabel = today.dayOfMonth.toString()
+    val todayDay = allDays.find { it.date == today }
+        ?: todayWeek?.days?.find { it.date == today }
     val todayState = todayDay?.toWidgetState() ?: WidgetState.Unregistered
 
-    Column(
-        modifier = GlanceModifier.fillMaxSize().padding(horizontal = 12.dp, vertical = 8.dp),
-    ) {
-        TodayHeader(today = today, state = todayState, timeFmt = timeFmt, dayFmt = dayFmt)
-        Spacer(GlanceModifier.height(8.dp))
-        WeekGrid(today = today, week = week, timeFmt = timeFmt, dayFmt = dayFmt)
+    Column(modifier = GlanceModifier.fillMaxSize()) {
+        Column(
+            modifier = GlanceModifier
+                .fillMaxWidth()
+                .height((HEADER_HEIGHT_DP + WAVE_HEIGHT_DP).dp)
+                .background(HeaderBackground),
+        ) {
+            TodayHeader(
+                dayLabel = dayLabel,
+                dateLabel = dateLabel,
+                state = todayState,
+                timeFmt = timeFmt,
+                modifier = GlanceModifier.fillMaxWidth().height(HEADER_HEIGHT_DP.dp),
+            )
+            Image(
+                provider = ImageProvider(R.drawable.widget_wave_divider),
+                contentDescription = null,
+                modifier = GlanceModifier.fillMaxWidth().height(WAVE_HEIGHT_DP.dp),
+                contentScale = ContentScale.FillBounds,
+            )
+        }
+        Box(
+            modifier = GlanceModifier.fillMaxWidth().defaultWeight().background(WidgetSurface),
+            contentAlignment = Alignment.BottomCenter,
+        ) {
+            WeekGrid(
+                today = today,
+                allDays = allDays,
+                timeFmt = timeFmt,
+                modifier = GlanceModifier.fillMaxWidth()
+                    .padding(start = 9.dp, top = 0.dp, end = 9.dp, bottom = 20.dp),
+            )
+        }
     }
 }
 
+@Suppress("LongParameterList", "LongMethod")
 @Composable
 private fun TodayHeader(
-    today: LocalDate,
+    dayLabel: String,
+    dateLabel: String,
     state: WidgetState,
     timeFmt: DateTimeFormatter,
-    dayFmt: DateTimeFormatter,
+    modifier: GlanceModifier,
 ) {
+    val context = LocalContext.current
     Row(
-        modifier = GlanceModifier.fillMaxWidth(),
+        modifier = modifier.padding(start = 14.dp, top = 18.dp, end = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
-            text = today.dayOfMonth.toString(),
-            style = TextDefaults.defaultTextStyle.copy(
-                color = WidgetPrimary,
-                fontSize = 26.sp,
-                fontWeight = FontWeight.Bold,
-            ),
+        AndroidRemoteViews(
+            remoteViews = RemoteViews(context.packageName, R.layout.widget_4x2_header_left).also {
+                it.setTextViewText(R.id.txt_header_day, dayLabel)
+                it.setTextViewText(R.id.txt_header_date, dateLabel)
+            },
+            modifier = GlanceModifier.width(HEADER_LEFT_WIDTH_DP.dp).fillMaxHeight(),
         )
-        Spacer(modifier = GlanceModifier.defaultWeight())
-        Column(horizontalAlignment = Alignment.End) {
-            Text(
-                text = today.format(dayFmt),
-                style = TextDefaults.defaultTextStyle.copy(
-                    color = WidgetOnSurfaceVariant,
-                    fontSize = 11.sp,
-                ),
-            )
+        Spacer(GlanceModifier.width(8.dp))
+        Box(
+            modifier = GlanceModifier.width(1.dp).height(HEADER_DIVIDER_HEIGHT_DP.dp)
+                .background(DividerColor),
+        ) {}
+        Spacer(GlanceModifier.width(8.dp))
+        Column(
+            modifier = GlanceModifier.defaultWeight().fillMaxHeight(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Spacer(GlanceModifier.height(11.dp))
             TodayStateText(state = state, timeFmt = timeFmt)
         }
     }
@@ -119,18 +174,19 @@ private fun TodayHeader(
 private fun TodayStateText(state: WidgetState, timeFmt: DateTimeFormatter) {
     val (text, color) = when (state) {
         is WidgetState.WorkDay ->
-            "${state.startTime.format(timeFmt)}-${state.endTime.format(timeFmt)}" to WidgetOnSurface
+            "${state.startTime.format(timeFmt)}-${state.endTime.format(timeFmt)}" to ColorProvider(Color.White)
         is WidgetState.OffDay ->
-            state.codeLabel.ifEmpty { "휴무" } to WidgetOnSurfaceVariant
+            state.codeLabel.ifEmpty { "휴무" } to ColorProvider(Color.White.copy(alpha = ALPHA_OFF_DAY))
         is WidgetState.Unregistered ->
-            "-" to WidgetOnSurfaceVariant
+            "-" to ColorProvider(Color.White.copy(alpha = ALPHA_UNREGISTERED))
     }
     Text(
         text = text,
         style = TextDefaults.defaultTextStyle.copy(
             color = color,
-            fontSize = 14.sp,
-            fontWeight = if (state is WidgetState.WorkDay) FontWeight.Medium else FontWeight.Normal,
+            fontSize = if (state is WidgetState.WorkDay) 29.sp else 14.sp,
+            fontWeight = FontWeight.Normal,
+            textAlign = TextAlign.Center,
         ),
     )
 }
@@ -138,17 +194,18 @@ private fun TodayStateText(state: WidgetState, timeFmt: DateTimeFormatter) {
 @Composable
 private fun WeekGrid(
     today: LocalDate,
-    week: ScheduleWeek?,
+    allDays: List<ScheduleDay>,
     timeFmt: DateTimeFormatter,
-    dayFmt: DateTimeFormatter,
+    modifier: GlanceModifier,
 ) {
-    Row(modifier = GlanceModifier.fillMaxWidth().fillMaxHeight()) {
+    val dayFmt = DateTimeFormatter.ofPattern("E")
+    Row(modifier = modifier) {
         for (offset in GRID_OFFSET_START..GRID_OFFSET_END) {
             val date = today.plusDays(offset.toLong())
             DayCell(
-                modifier = GlanceModifier.defaultWeight().fillMaxHeight(),
+                modifier = GlanceModifier.defaultWeight(),
                 date = date,
-                dayData = week?.days?.find { it.date == date },
+                dayData = allDays.find { it.date == date },
                 isToday = offset == 0,
                 timeFmt = timeFmt,
                 dayFmt = dayFmt,
@@ -157,7 +214,7 @@ private fun WeekGrid(
     }
 }
 
-@Suppress("LongMethod")
+@Suppress("LongParameterList", "LongMethod")
 @Composable
 private fun DayCell(
     modifier: GlanceModifier,
@@ -168,77 +225,92 @@ private fun DayCell(
     dayFmt: DateTimeFormatter,
 ) {
     val state = dayData?.toWidgetState() ?: WidgetState.Unregistered
-    val accent = if (isToday) WidgetPrimary else WidgetOnSurfaceVariant
-    val weight = if (isToday) FontWeight.Bold else FontWeight.Normal
+    val dateDowText = date.format(dayFmt)
 
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Text(
-            text = date.format(dayFmt),
-            style = TextDefaults.defaultTextStyle.copy(
-                color = accent,
-                fontSize = 10.sp,
-                fontWeight = weight,
-                textAlign = TextAlign.Center,
-            ),
-        )
-        Spacer(GlanceModifier.height(4.dp))
-        DayCellValue(state = state, isToday = isToday, timeFmt = timeFmt, weight = weight)
+    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+        if (isToday) {
+            Box(
+                modifier = GlanceModifier.width(28.dp).height(28.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Image(
+                    provider = ImageProvider(R.drawable.widget_today_badge_circle),
+                    contentDescription = null,
+                    modifier = GlanceModifier.width(28.dp).height(28.dp),
+                    contentScale = ContentScale.FillBounds,
+                )
+                Text(
+                    text = dateDowText,
+                    style = TextDefaults.defaultTextStyle.copy(
+                        color = ColorProvider(Color.White),
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Normal,
+                        textAlign = TextAlign.Center,
+                    ),
+                )
+            }
+        } else {
+            Box(
+                modifier = GlanceModifier.width(28.dp).height(28.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(
+                    text = dateDowText,
+                    style = TextDefaults.defaultTextStyle.copy(
+                        color = GridDateColor,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Medium,
+                        textAlign = TextAlign.Center,
+                    ),
+                )
+            }
+        }
+        Spacer(GlanceModifier.height(3.dp))
+        DayCellValue(state = state, isToday = isToday, timeFmt = timeFmt)
     }
 }
 
 @Composable
-private fun DayCellValue(
-    state: WidgetState,
-    isToday: Boolean,
-    timeFmt: DateTimeFormatter,
-    weight: FontWeight,
-) {
-    val valueColor = if (isToday) WidgetPrimary else WidgetOnSurface
-    when (state) {
-        is WidgetState.WorkDay -> WorkTimeLines(state = state, timeFmt = timeFmt, color = valueColor, weight = weight)
-        is WidgetState.OffDay -> Text(
-            text = state.codeLabel.ifEmpty { "휴무" }.take(MAX_CODE_CHARS),
-            style = TextDefaults.defaultTextStyle.copy(
-                color = if (isToday) WidgetPrimary else WidgetOnSurfaceVariant,
-                fontSize = 9.sp,
-                textAlign = TextAlign.Center,
-            ),
-        )
-        is WidgetState.Unregistered -> Text(
-            text = "-",
-            style = TextDefaults.defaultTextStyle.copy(
-                color = WidgetOnSurfaceVariant,
-                fontSize = 9.sp,
-                textAlign = TextAlign.Center,
-            ),
-        )
-    }
-}
-
-@Composable
-private fun WorkTimeLines(
-    state: WidgetState.WorkDay,
-    timeFmt: DateTimeFormatter,
-    color: androidx.glance.unit.ColorProvider,
-    weight: FontWeight,
-) {
+private fun DayCellValue(state: WidgetState, isToday: Boolean, timeFmt: DateTimeFormatter) {
+    val textColor = if (isToday) WidgetPrimary else GridMutedColor
+    val weight = FontWeight.Normal
     val cellStyle = TextDefaults.defaultTextStyle.copy(
-        color = color,
-        fontSize = 9.sp,
+        color = textColor,
+        fontSize = 14.sp,
         fontWeight = weight,
         textAlign = TextAlign.Center,
     )
-    Text(text = "${state.startTime.format(timeFmt)}-", style = cellStyle)
-    Text(text = state.endTime.format(timeFmt), style = cellStyle)
+    when (state) {
+        is WidgetState.WorkDay -> {
+            Text(text = state.startTime.format(timeFmt), style = cellStyle)
+            Text(text = state.endTime.format(timeFmt), style = cellStyle)
+        }
+        is WidgetState.OffDay -> Text(
+            text = state.codeLabel.ifEmpty { "휴무" }.take(MAX_CODE_CHARS),
+            style = cellStyle,
+        )
+        is WidgetState.Unregistered -> Text(text = "-", style = cellStyle)
+    }
 }
 
+@Suppress("MagicNumber")
+private val HeaderBackground = ColorProvider(Color(0xFF1E3932))
+@Suppress("MagicNumber")
+private val DividerColor = ColorProvider(Color.Transparent)
+@Suppress("MagicNumber")
+private val GridDateColor = ColorProvider(Color(0xFF1E3932))
+@Suppress("MagicNumber")
+private val GridMutedColor = ColorProvider(Color(0xFF6B6760))
+
+private const val ALPHA_OFF_DAY = 0.7f
+private const val ALPHA_UNREGISTERED = 0.5f
 private const val MAX_CODE_CHARS = 4
 private const val GRID_OFFSET_START = -2
 private const val GRID_OFFSET_END = 2
+private const val HEADER_LEFT_WIDTH_DP = 88
+private const val HEADER_HEIGHT_DP = 75
+private const val HEADER_DIVIDER_HEIGHT_DP = 32
+private const val WAVE_HEIGHT_DP = 24
 
 class ShiftWidget4x2WeeklyReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = ShiftWidget4x2Weekly()

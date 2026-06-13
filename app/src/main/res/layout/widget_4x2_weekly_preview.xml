@@ -3,195 +3,285 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
-    android:orientation="vertical"
-    android:padding="12dp">
+    android:orientation="vertical">
 
+    <!-- Header: reduced for preview scale -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_height="62dp"
+        android:background="#1E3932"
+        android:gravity="top|center_horizontal"
+        android:orientation="horizontal"
+        android:paddingLeft="14dp"
+        android:paddingRight="14dp"
+        android:paddingTop="14dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="12"
-            android:textColor="#00704A"
-            android:textSize="26sp"
-            android:textStyle="bold" />
-
+        <!-- Left: day label + large date, white -->
         <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="end"
+            android:layout_width="70dp"
+            android:layout_height="match_parent"
+            android:gravity="top|center_horizontal"
             android:orientation="vertical">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="토"
+                android:textColor="#FFFFFF"
+                android:textSize="10sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="-2dp"
+                android:text="13"
+                android:textColor="#FFFFFF"
+                android:textSize="22sp" />
+
+        </LinearLayout>
+
+        <!-- Spacer 8dp -->
+        <TextView
+            android:layout_width="8dp"
+            android:layout_height="0dp" />
+
+        <!-- Divider: transparent -->
+        <TextView
+            android:layout_width="1dp"
+            android:layout_height="26dp" />
+
+        <!-- Spacer 8dp -->
+        <TextView
+            android:layout_width="8dp"
+            android:layout_height="0dp" />
+
+        <!-- Right: work time, top-offset white -->
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginTop="9dp"
+            android:gravity="center"
+            android:text="17:00-22:30"
+            android:textColor="#FFFFFF"
+            android:textSize="23sp" />
+
+    </LinearLayout>
+
+    <!-- Wave divider: 20dp keeps the curve distinct at preview scale -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:background="#1E3932">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitXY"
+            android:src="@drawable/widget_wave_divider" />
+
+    </FrameLayout>
+
+    <!-- White grid section: gravity top so badges align at same height -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#FFFFFF"
+        android:gravity="bottom|center_horizontal"
+        android:orientation="horizontal"
+        android:paddingLeft="9dp"
+        android:paddingRight="9dp"
+        android:paddingBottom="20dp">
+
+        <!-- 목 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:gravity="center"
+                android:text="목"
+                android:textColor="#1E3932"
+                android:textSize="10sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="3dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="정규휴일"
+                android:textColor="#6B6760"
+                android:textSize="11sp" />
+
+            <!-- Placeholder to match 2-line height -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" "
+                android:textSize="11sp"
+                android:visibility="invisible" />
+
+        </LinearLayout>
+
+        <!-- 금 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:gravity="center"
                 android:text="금"
-                android:textColor="#49454F"
+                android:textColor="#1E3932"
+                android:textSize="10sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="3dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="15:00"
+                android:textColor="#6B6760"
                 android:textSize="11sp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="9:00-18:00"
-                android:textColor="#1C1B1F"
-                android:textSize="14sp" />
+                android:gravity="center"
+                android:text="20:30"
+                android:textColor="#6B6760"
+                android:textSize="11sp" />
 
         </LinearLayout>
 
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="8dp"
-        android:layout_weight="1"
-        android:orientation="horizontal">
-
+        <!-- 토 (today) -->
         <LinearLayout
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:gravity="center"
+            android:gravity="center_horizontal"
             android:orientation="vertical">
+
+            <TextView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:background="@drawable/widget_today_badge_circle"
+                android:gravity="center"
+                android:text="토"
+                android:textColor="#FFFFFF"
+                android:textSize="10sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="3dp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="17:00"
+                android:textColor="#00704A"
+                android:textSize="11sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="22:30"
+                android:textColor="#00704A"
+                android:textSize="11sp" />
+
+        </LinearLayout>
+
+        <!-- 일 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:gravity="center"
+                android:text="일"
+                android:textColor="#1E3932"
+                android:textSize="10sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="3dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="17:00"
+                android:textColor="#6B6760"
+                android:textSize="11sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="22:30"
+                android:textColor="#6B6760"
+                android:textSize="11sp" />
+
+        </LinearLayout>
+
+        <!-- 월 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:gravity="center"
                 android:text="월"
-                android:textColor="#49454F"
+                android:textColor="#1E3932"
                 android:textSize="10sp" />
 
             <TextView
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="9:00-"
-                android:textColor="#1C1B1F"
-                android:textSize="9sp" />
+                android:layout_height="3dp" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="18:00"
-                android:textColor="#1C1B1F"
-                android:textSize="9sp" />
+                android:gravity="center"
+                android:text="연차휴가"
+                android:textColor="#6B6760"
+                android:textSize="11sp" />
 
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
-
+            <!-- Placeholder to match 2-line height -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="화"
-                android:textColor="#49454F"
-                android:textSize="10sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="휴일"
-                android:textColor="#49454F"
-                android:textSize="9sp" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="수"
-                android:textColor="#00704A"
-                android:textSize="10sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="9:00-"
-                android:textColor="#00704A"
-                android:textSize="9sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="18:00"
-                android:textColor="#00704A"
-                android:textSize="9sp"
-                android:textStyle="bold" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="목"
-                android:textColor="#49454F"
-                android:textSize="10sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="9:00-"
-                android:textColor="#1C1B1F"
-                android:textSize="9sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="18:00"
-                android:textColor="#1C1B1F"
-                android:textSize="9sp" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="금"
-                android:textColor="#49454F"
-                android:textSize="10sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="휴일"
-                android:textColor="#49454F"
-                android:textSize="9sp" />
+                android:text=" "
+                android:textSize="11sp"
+                android:visibility="invisible" />
 
         </LinearLayout>
 

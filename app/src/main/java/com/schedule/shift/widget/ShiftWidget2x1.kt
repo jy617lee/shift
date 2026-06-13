@@ -7,17 +7,14 @@ import androidx.glance.GlanceModifier
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.layout.Alignment
-import androidx.glance.layout.Box
 import androidx.glance.layout.Column
-import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
-import androidx.glance.layout.fillMaxHeight
 import androidx.glance.layout.fillMaxSize
+import androidx.glance.layout.height
 import androidx.glance.layout.padding
-import androidx.glance.layout.width
-import androidx.glance.layout.wrapContentWidth
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
+import androidx.glance.text.TextAlign
 import androidx.glance.text.TextDefaults
 import com.schedule.shift.domain.model.WidgetState
 import java.time.LocalDate
@@ -32,71 +29,63 @@ class ShiftWidget2x1 : BaseShiftWidget() {
     }
 }
 
-@Suppress("LongMethod")
 @Composable
 private fun Widget2x1Content(state: WidgetState, today: LocalDate) {
-    val dayLabel = today.format(DateTimeFormatter.ofPattern("EE"))
-    val dateLabel = today.format(DateTimeFormatter.ofPattern("d"))
+    val dateLabel = today.format(DateTimeFormatter.ofPattern("M/d(E)"))
 
-    Row(
-        modifier = GlanceModifier.fillMaxSize().padding(horizontal = 10.dp, vertical = 6.dp),
+    Column(
+        modifier = GlanceModifier.fillMaxSize().padding(horizontal = 12.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Box(
-            modifier = GlanceModifier.wrapContentWidth().fillMaxHeight(),
-            contentAlignment = Alignment.CenterStart,
-        ) {
+        Text(
+            text = dateLabel,
+            style = TextDefaults.defaultTextStyle.copy(
+                color = WidgetOnSurfaceVariant,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
+                textAlign = TextAlign.Center,
+            ),
+        )
+        Spacer(GlanceModifier.height(2.dp))
+        Widget2x1StateText(state = state)
+    }
+}
+
+@Composable
+private fun Widget2x1StateText(state: WidgetState) {
+    when (state) {
+        is WidgetState.WorkDay -> {
+            val timeFmt = DateTimeFormatter.ofPattern("H:mm")
+            val start = state.startTime.format(timeFmt)
+            val end = state.endTime.format(timeFmt)
             Text(
-                text = dateLabel,
+                text = "$start-$end",
                 style = TextDefaults.defaultTextStyle.copy(
-                    color = WidgetOnSurface,
+                    color = WidgetPrimary,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
                 ),
             )
         }
-        Spacer(GlanceModifier.width(8.dp))
-        Column(
-            modifier = GlanceModifier.fillMaxHeight().defaultWeight(),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Text(
-                text = dayLabel,
-                style = TextDefaults.defaultTextStyle.copy(
-                    color = WidgetOnSurfaceVariant,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Medium,
-                ),
-            )
-            when (state) {
-                is WidgetState.WorkDay -> {
-                    val start = state.startTime.format(DateTimeFormatter.ofPattern("H:mm"))
-                    val end = state.endTime.format(DateTimeFormatter.ofPattern("H:mm"))
-                    Text(
-                        text = "$start-$end",
-                        style = TextDefaults.defaultTextStyle.copy(
-                            color = WidgetPrimary,
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold,
-                        ),
-                    )
-                }
-                is WidgetState.OffDay -> Text(
-                    text = state.codeLabel,
-                    style = TextDefaults.defaultTextStyle.copy(
-                        color = WidgetOnSurfaceVariant,
-                        fontSize = 13.sp,
-                    ),
-                )
-                is WidgetState.Unregistered -> Text(
-                    text = "미등록",
-                    style = TextDefaults.defaultTextStyle.copy(
-                        color = WidgetOnSurfaceVariant,
-                        fontSize = 13.sp,
-                    ),
-                )
-            }
-        }
+        is WidgetState.OffDay -> Text(
+            text = state.codeLabel.ifEmpty { "휴무" },
+            style = TextDefaults.defaultTextStyle.copy(
+                color = WidgetOnSurfaceVariant,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Medium,
+                textAlign = TextAlign.Center,
+            ),
+        )
+        is WidgetState.Unregistered -> Text(
+            text = "미등록",
+            style = TextDefaults.defaultTextStyle.copy(
+                color = WidgetOnSurfaceVariant,
+                fontSize = 20.sp,
+                textAlign = TextAlign.Center,
+            ),
+        )
     }
 }
 
