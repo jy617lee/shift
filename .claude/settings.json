@@ -2,6 +2,7 @@
   "permissions": {
     "defaultMode": "bypassPermissions",
     "allow": [
+      "Bash(*)",
       "Bash(./gradlew *)",
       "Bash(chmod *)",
       "Bash(find *)",

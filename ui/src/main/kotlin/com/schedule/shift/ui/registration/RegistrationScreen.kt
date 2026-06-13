@@ -67,10 +67,10 @@ fun RegistrationScreen(
         imagePicker.launch("image/*")
     }
 
-    if (uiState is RegistrationUiState.ParseSuccess) {
-        val success = uiState as RegistrationUiState.ParseSuccess
+    LaunchedEffect(uiState) {
+        val success = uiState as? RegistrationUiState.ParseSuccess ?: return@LaunchedEffect
         onParsed(success.weeks, success.imageUri)
-        return
+        viewModel.reset()
     }
 
     Scaffold(
@@ -110,7 +110,10 @@ fun RegistrationScreen(
             RegistrationContent(
                 uiState = uiState,
                 onPickImage = { imagePicker.launch("image/*") },
-                onRetry = viewModel::reset,
+                onRetry = {
+                    viewModel.reset()
+                    imagePicker.launch("image/*")
+                },
             )
         }
     }
@@ -130,14 +133,14 @@ internal fun RegistrationContent(
             icon = "🤔",
             title = "스케쥴 이미지가 아닌 것 같아요",
             description = "주간 스케쥴표 이미지인지 확인하고 다시 시도해주세요",
-            buttonLabel = "다시 시도",
+            buttonLabel = "다른 이미지 선택",
             onAction = onRetry,
         )
         is RegistrationUiState.ParseError -> ErrorContent(
             icon = "⚠️",
             title = "이미지 처리 중 오류가 발생했습니다",
             description = "이미지를 불러오지 못했습니다. 다시 시도해주세요",
-            buttonLabel = "다시 시도",
+            buttonLabel = "다른 이미지 선택",
             onAction = onRetry,
         )
     }
