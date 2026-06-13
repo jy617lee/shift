@@ -122,7 +122,7 @@ internal fun Widget4x2WeeklyContent(
                 allDays = allDays,
                 timeFmt = timeFmt,
                 modifier = GlanceModifier.fillMaxWidth()
-                    .padding(start = 10.dp, top = 0.dp, end = 10.dp, bottom = 12.dp),
+                    .padding(start = 10.dp, top = 0.dp, end = 10.dp, bottom = 44.dp),
             )
         }
     }
@@ -150,7 +150,7 @@ private fun TodayHeader(
                 text = dayLabel,
                 style = TextDefaults.defaultTextStyle.copy(
                     color = ColorProvider(Color.White.copy(alpha = DAY_LABEL_ALPHA)),
-                    fontSize = 11.sp,
+                    fontSize = 12.sp,
                     fontWeight = FontWeight.Medium,
                 ),
             )
@@ -158,7 +158,7 @@ private fun TodayHeader(
                 text = dateLabel,
                 style = TextDefaults.defaultTextStyle.copy(
                     color = ColorProvider(Color.White),
-                    fontSize = 34.sp,
+                    fontSize = 29.sp,
                     fontWeight = FontWeight.Bold,
                 ),
             )
@@ -192,7 +192,7 @@ private fun TodayStateText(state: WidgetState, timeFmt: DateTimeFormatter) {
         text = text,
         style = TextDefaults.defaultTextStyle.copy(
             color = color,
-            fontSize = if (state is WidgetState.WorkDay) 21.sp else 14.sp,
+            fontSize = if (state is WidgetState.WorkDay) 25.sp else 14.sp,
             fontWeight = if (state is WidgetState.WorkDay) FontWeight.Bold else FontWeight.Normal,
             textAlign = TextAlign.Center,
         ),
@@ -233,7 +233,7 @@ private fun DayCell(
     dayFmt: DateTimeFormatter,
 ) {
     val state = dayData?.toWidgetState() ?: WidgetState.Unregistered
-    val dateDowText = "${date.dayOfMonth}(${date.format(dayFmt)})"
+    val dateDowText = "${date.dayOfMonth} (${date.format(dayFmt)})"
 
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         if (isToday) {
@@ -247,7 +247,7 @@ private fun DayCell(
                     text = dateDowText,
                     style = TextDefaults.defaultTextStyle.copy(
                         color = ColorProvider(Color.White),
-                        fontSize = 10.sp,
+                        fontSize = 12.sp,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center,
                     ),
@@ -262,7 +262,7 @@ private fun DayCell(
                     text = dateDowText,
                     style = TextDefaults.defaultTextStyle.copy(
                         color = GridDateColor,
-                        fontSize = 10.sp,
+                        fontSize = 12.sp,
                         fontWeight = FontWeight.Medium,
                         textAlign = TextAlign.Center,
                     ),
@@ -280,7 +280,7 @@ private fun DayCellValue(state: WidgetState, isToday: Boolean, timeFmt: DateTime
     val weight = if (isToday) FontWeight.Bold else FontWeight.Normal
     val cellStyle = TextDefaults.defaultTextStyle.copy(
         color = textColor,
-        fontSize = 11.sp,
+        fontSize = 13.sp,
         fontWeight = weight,
         textAlign = TextAlign.Center,
     )

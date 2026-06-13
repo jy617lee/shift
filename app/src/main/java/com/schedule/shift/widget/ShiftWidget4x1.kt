@@ -118,24 +118,12 @@ private fun Widget4x1Content(
             modifier = GlanceModifier.width(LEFT_COL_WIDTH_DP.dp).fillMaxHeight(),
             contentAlignment = Alignment.Center,
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = dayLabel,
-                    style = TextDefaults.defaultTextStyle.copy(
-                        color = WidgetOnSurfaceVariant,
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Medium,
-                    ),
-                )
-                Text(
-                    text = dateLabel,
-                    style = TextDefaults.defaultTextStyle.copy(
-                        color = WidgetOnSurface,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                    ),
-                )
-            }
+            AndroidRemoteViews(
+                remoteViews = RemoteViews(context.packageName, R.layout.widget_4x1_left_col).also {
+                    it.setTextViewText(R.id.txt_day_label, dayLabel)
+                    it.setTextViewText(R.id.txt_date_label, dateLabel)
+                },
+            )
         }
         Spacer(GlanceModifier.width(10.dp))
         Box(
