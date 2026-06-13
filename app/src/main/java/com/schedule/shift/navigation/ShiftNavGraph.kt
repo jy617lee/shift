@@ -1,6 +1,7 @@
 package com.schedule.shift.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -19,7 +20,13 @@ private object Routes {
 }
 
 @Composable
-fun ShiftNavGraph(navController: NavHostController = rememberNavController()) {
+fun ShiftNavGraph(
+    navController: NavHostController = rememberNavController(),
+    openRegistration: Boolean = false,
+) {
+    LaunchedEffect(Unit) {
+        if (openRegistration) navController.navigate(Routes.REGISTRATION)
+    }
     NavHost(navController = navController, startDestination = Routes.HOME) {
         composable(Routes.HOME) {
             HomeScreen(onAddSchedule = { navController.navigate(Routes.REGISTRATION) })

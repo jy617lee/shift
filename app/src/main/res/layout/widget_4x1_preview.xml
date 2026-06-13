@@ -10,7 +10,7 @@
     android:paddingTop="8dp"
     android:paddingBottom="8dp">
 
-    <!-- Left: day label + date -->
+    <!-- Left: day label + date (no spacer between — matches code) -->
     <LinearLayout
         android:layout_width="52dp"
         android:layout_height="match_parent"
@@ -20,6 +20,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:includeFontPadding="false"
             android:text="금"
             android:textColor="#49454F"
             android:textSize="13sp" />
@@ -27,7 +28,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="12"
+            android:includeFontPadding="false"
+            android:text="13"
             android:textColor="#1C1B1F"
             android:textSize="24sp"
             android:textStyle="bold" />
@@ -53,6 +55,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:includeFontPadding="false"
             android:text="9:00-18:00"
             android:textColor="#1C1B1F"
             android:textSize="23sp"
@@ -61,10 +64,19 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:includeFontPadding="false"
             android:text="근무까지 1시간 24분 15초"
             android:textColor="#00704A"
             android:textSize="15sp" />
 
     </LinearLayout>
+
+    <!-- Add schedule button -->
+    <ImageView
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_marginLeft="8dp"
+        android:layout_gravity="center_vertical"
+        android:src="@drawable/ic_widget_add" />
 
 </LinearLayout>

@@ -12,6 +12,9 @@ import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
+import androidx.glance.Image
+import androidx.glance.ImageProvider
+import androidx.glance.LocalContext
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
@@ -22,6 +25,7 @@ import androidx.glance.background
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Box
 import androidx.glance.layout.Column
+import androidx.glance.layout.ContentScale
 import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
 import androidx.glance.layout.fillMaxHeight
@@ -32,7 +36,7 @@ import androidx.glance.layout.width
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextDefaults
-import androidx.glance.unit.ColorProvider
+import com.schedule.shift.R
 import com.schedule.shift.domain.model.WidgetState
 import com.schedule.shift.domain.model.toWidgetState
 import dagger.hilt.android.EntryPointAccessors
@@ -47,6 +51,8 @@ class ShiftWidget4x1 : BaseShiftWidget() {
     override val widgetSource = SOURCE_WIDGET_4X1
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
+        ShiftWidget4x1Receiver.scheduleSecondUpdate(context)
+
         val repo = EntryPointAccessors
             .fromApplication<ShiftWidgetEntryPoint>(context.applicationContext)
             .scheduleRepository()
@@ -81,6 +87,7 @@ class ShiftWidget4x1 : BaseShiftWidget() {
 private fun Widget4x1Content(state: WidgetState, today: LocalDate, now: LocalTime) {
     val dayLabel = today.format(DateTimeFormatter.ofPattern("EEE"))
     val dateLabel = today.format(DateTimeFormatter.ofPattern("d"))
+    val context = LocalContext.current
 
     Row(
         modifier = GlanceModifier.fillMaxSize().padding(horizontal = 14.dp, vertical = 8.dp),
@@ -99,7 +106,6 @@ private fun Widget4x1Content(state: WidgetState, today: LocalDate, now: LocalTim
                         fontWeight = FontWeight.Medium,
                     ),
                 )
-                Spacer(GlanceModifier.height(1.dp))
                 Text(
                     text = dateLabel,
                     style = TextDefaults.defaultTextStyle.copy(
@@ -144,6 +150,21 @@ private fun Widget4x1Content(state: WidgetState, today: LocalDate, now: LocalTim
                 )
             }
         }
+        Spacer(GlanceModifier.width(ADD_BUTTON_MARGIN_DP.dp))
+        Box(
+            modifier = GlanceModifier.width(ADD_BUTTON_SIZE_DP.dp).fillMaxHeight(),
+            contentAlignment = Alignment.Center,
+        ) {
+            Image(
+                provider = ImageProvider(R.drawable.ic_widget_add),
+                contentDescription = "스케쥴 추가",
+                modifier = GlanceModifier
+                    .width(ADD_ICON_SIZE_DP.dp)
+                    .height(ADD_ICON_SIZE_DP.dp)
+                    .clickable(actionStartActivity(addScheduleIntent(context))),
+                contentScale = ContentScale.Fit,
+            )
+        }
     }
 }
 
@@ -187,6 +208,9 @@ private fun WorkDayCountdown(state: WidgetState.WorkDay, now: LocalTime) {
 private const val LEFT_COL_WIDTH_DP = 52
 private const val DIVIDER_HEIGHT_DP = 42
 private const val DIVIDER_RIGHT_MARGIN_DP = 18
+private const val ADD_BUTTON_MARGIN_DP = 8
+private const val ADD_BUTTON_SIZE_DP = 32
+private const val ADD_ICON_SIZE_DP = 20
 
 class ShiftWidget4x1Receiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = ShiftWidget4x1()
@@ -209,42 +233,47 @@ class ShiftWidget4x1Receiver : GlanceAppWidgetReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
-        if (intent.action == ACTION_SECOND_UPDATE_4X1) {
-            val pendingResult = goAsync()
-            MainScope().launch {
-                try {
-                    glanceAppWidget.updateAll(context)
-                } finally {
-                    pendingResult.finish()
+        when (intent.action) {
+            ACTION_SECOND_UPDATE_4X1 -> {
+                val pendingResult = goAsync()
+                MainScope().launch {
+                    try {
+                        glanceAppWidget.updateAll(context)
+                    } finally {
+                        pendingResult.finish()
+                    }
                 }
+                scheduleSecondUpdate(context)
             }
-            scheduleSecondUpdate(context)
+            AlarmManager.ACTION_SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED -> {
+                scheduleSecondUpdate(context)
+            }
         }
     }
-
-    private fun scheduleSecondUpdate(context: Context) {
-        val am = context.getSystemService(AlarmManager::class.java)
-        val pi = secondUpdatePendingIntent(context)
-        val triggerAt = System.currentTimeMillis() + SECOND_MS
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !am.canScheduleExactAlarms()) {
-            am.set(AlarmManager.RTC, triggerAt, pi)
-        } else {
-            am.setExact(AlarmManager.RTC, triggerAt, pi)
-        }
-    }
-
-    private fun secondUpdatePendingIntent(context: Context): PendingIntent =
-        PendingIntent.getBroadcast(
-            context,
-            REQUEST_CODE_SECOND,
-            Intent(context, ShiftWidget4x1Receiver::class.java)
-                .apply { action = ACTION_SECOND_UPDATE_4X1 },
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
-        )
 
     companion object {
         const val ACTION_SECOND_UPDATE_4X1 = "com.schedule.shift.widget.ACTION_SECOND_UPDATE_4X1"
         private const val REQUEST_CODE_SECOND = 1002
         private const val SECOND_MS = 1_000L
+
+        fun scheduleSecondUpdate(context: Context) {
+            val am = context.getSystemService(AlarmManager::class.java)
+            val pi = secondUpdatePendingIntent(context)
+            val triggerAt = System.currentTimeMillis() + SECOND_MS
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !am.canScheduleExactAlarms()) {
+                am.set(AlarmManager.RTC, triggerAt, pi)
+            } else {
+                am.setExact(AlarmManager.RTC, triggerAt, pi)
+            }
+        }
+
+        private fun secondUpdatePendingIntent(context: Context): PendingIntent =
+            PendingIntent.getBroadcast(
+                context,
+                REQUEST_CODE_SECOND,
+                Intent(context, ShiftWidget4x1Receiver::class.java)
+                    .apply { action = ACTION_SECOND_UPDATE_4X1 },
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
     }
 }
