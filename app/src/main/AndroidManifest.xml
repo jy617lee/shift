@@ -57,7 +57,7 @@
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <intent-filter>
-                <action android:name="com.schedule.shift.widget.ACTION_SECOND_UPDATE_4X1" />
+                <action android:name="com.schedule.shift.widget.ACTION_STATE_UPDATE_4X1" />
             </intent-filter>
             <intent-filter>
                 <action android:name="android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED" />
