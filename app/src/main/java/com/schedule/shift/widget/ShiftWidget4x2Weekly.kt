@@ -8,7 +8,9 @@ import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.GlanceTheme
+import androidx.glance.Image
 import androidx.glance.ImageProvider
+import androidx.glance.layout.ContentScale
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
@@ -98,14 +100,23 @@ internal fun Widget4x2WeeklyContent(
                 .fillMaxWidth()
                 .padding(horizontal = 14.dp, vertical = 8.dp),
         )
-        Column(
-            modifier = GlanceModifier
-                .fillMaxWidth()
-                .defaultWeight()
-                .background(ImageProvider(R.drawable.widget_weekly_grid_bg))
-                .padding(horizontal = 8.dp, vertical = 6.dp),
+        Box(
+            modifier = GlanceModifier.fillMaxWidth().defaultWeight(),
+            contentAlignment = Alignment.TopStart,
         ) {
-            WeekGrid(today = today, allDays = allDays, timeFmt = timeFmt)
+            Image(
+                provider = ImageProvider(R.drawable.widget_weekly_grid_bg),
+                contentDescription = null,
+                modifier = GlanceModifier.fillMaxSize(),
+                contentScale = ContentScale.FillBounds,
+            )
+            Box(
+                modifier = GlanceModifier.fillMaxSize()
+                    .padding(horizontal = 8.dp, vertical = 6.dp),
+                contentAlignment = Alignment.TopStart,
+            ) {
+                WeekGrid(today = today, allDays = allDays, timeFmt = timeFmt)
+            }
         }
     }
 }

@@ -229,7 +229,7 @@ class ShiftWidget4x1Receiver : GlanceAppWidgetReceiver() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !am.canScheduleExactAlarms()) {
             am.set(AlarmManager.RTC, triggerAt, pi)
         } else {
-            am.setExactAndAllowWhileIdle(AlarmManager.RTC, triggerAt, pi)
+            am.setExact(AlarmManager.RTC, triggerAt, pi)
         }
     }
 

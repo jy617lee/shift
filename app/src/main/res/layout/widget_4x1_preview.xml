@@ -61,7 +61,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="퇴근까지 3시간 24분 15초"
+            android:text="근무까지 1시간 24분 15초"
             android:textColor="#00704A"
             android:textSize="15sp" />
 
