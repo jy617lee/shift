@@ -4,19 +4,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceModifier
-import androidx.glance.background
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.layout.Alignment
-import androidx.glance.layout.Box
 import androidx.glance.layout.Column
-import androidx.glance.layout.Row
 import androidx.glance.layout.Spacer
-import androidx.glance.layout.fillMaxHeight
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
-import androidx.glance.layout.width
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextDefaults
@@ -35,57 +30,22 @@ class ShiftWidget2x1 : BaseShiftWidget() {
 
 @Composable
 private fun Widget2x1Content(state: WidgetState, today: LocalDate) {
-    val dayLabel = today.format(DateTimeFormatter.ofPattern("EEE"))
-    val dateLabel = today.format(DateTimeFormatter.ofPattern("d"))
+    val dateLabel = today.format(DateTimeFormatter.ofPattern("M/d(E)"))
 
-    Row(
-        modifier = GlanceModifier.fillMaxSize().padding(horizontal = 10.dp, vertical = 6.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        DateColumn(dayLabel = dayLabel, dateLabel = dateLabel)
-        Spacer(GlanceModifier.width(8.dp))
-        Box(
-            modifier = GlanceModifier.fillMaxHeight(),
-            contentAlignment = Alignment.Center,
-        ) {
-            Box(
-                modifier = GlanceModifier.width(1.dp).height(DIVIDER_HEIGHT_DP.dp)
-                    .background(WidgetDivider),
-            ) {}
-        }
-        Spacer(GlanceModifier.width(8.dp))
-        Box(
-            modifier = GlanceModifier.defaultWeight().fillMaxHeight(),
-            contentAlignment = Alignment.Center,
-        ) {
-            Widget2x1StateText(state = state)
-        }
-    }
-}
-
-@Composable
-private fun DateColumn(dayLabel: String, dateLabel: String) {
     Column(
-        modifier = GlanceModifier.width(LEFT_COL_WIDTH_DP.dp).fillMaxHeight(),
+        modifier = GlanceModifier.fillMaxSize().padding(horizontal = 12.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(
-            text = dayLabel,
-            style = TextDefaults.defaultTextStyle.copy(
-                color = WidgetOnSurfaceVariant,
-                fontSize = 10.sp,
-                fontWeight = FontWeight.Medium,
-            ),
-        )
         Text(
             text = dateLabel,
             style = TextDefaults.defaultTextStyle.copy(
-                color = WidgetOnSurface,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
+                color = WidgetOnSurfaceVariant,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Medium,
             ),
         )
+        Spacer(GlanceModifier.height(2.dp))
+        Widget2x1StateText(state = state)
     }
 }
 
@@ -93,8 +53,9 @@ private fun DateColumn(dayLabel: String, dateLabel: String) {
 private fun Widget2x1StateText(state: WidgetState) {
     when (state) {
         is WidgetState.WorkDay -> {
-            val start = state.startTime.format(DateTimeFormatter.ofPattern("H:mm"))
-            val end = state.endTime.format(DateTimeFormatter.ofPattern("H:mm"))
+            val timeFmt = DateTimeFormatter.ofPattern("H:mm")
+            val start = state.startTime.format(timeFmt)
+            val end = state.endTime.format(timeFmt)
             Text(
                 text = "$start-$end",
                 style = TextDefaults.defaultTextStyle.copy(
@@ -121,9 +82,6 @@ private fun Widget2x1StateText(state: WidgetState) {
         )
     }
 }
-
-private const val LEFT_COL_WIDTH_DP = 30
-private const val DIVIDER_HEIGHT_DP = 42
 
 class ShiftWidget2x1Receiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = ShiftWidget2x1()

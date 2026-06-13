@@ -131,7 +131,7 @@ private fun Widget4x1Content(state: WidgetState, today: LocalDate, now: LocalTim
                     text = state.codeLabel.ifEmpty { "휴무" },
                     style = TextDefaults.defaultTextStyle.copy(
                         color = WidgetOnSurfaceVariant,
-                        fontSize = 24.sp,
+                        fontSize = 29.sp,
                         fontWeight = FontWeight.Medium,
                     ),
                 )
@@ -139,7 +139,7 @@ private fun Widget4x1Content(state: WidgetState, today: LocalDate, now: LocalTim
                     text = "스케쥴 없음",
                     style = TextDefaults.defaultTextStyle.copy(
                         color = WidgetOnSurfaceVariant,
-                        fontSize = 19.sp,
+                        fontSize = 23.sp,
                     ),
                 )
             }
@@ -169,7 +169,7 @@ private fun WorkDayCountdown(state: WidgetState.WorkDay, now: LocalTime) {
             text = workTimeText,
             style = TextDefaults.defaultTextStyle.copy(
                 color = WidgetOnSurface,
-                fontSize = 22.sp,
+                fontSize = 26.sp,
                 fontWeight = FontWeight.Bold,
             ),
         )
@@ -177,7 +177,7 @@ private fun WorkDayCountdown(state: WidgetState.WorkDay, now: LocalTime) {
             text = countdownText,
             style = TextDefaults.defaultTextStyle.copy(
                 color = countdownColor,
-                fontSize = 14.sp,
+                fontSize = 17.sp,
                 fontWeight = FontWeight.Medium,
             ),
         )
@@ -186,7 +186,7 @@ private fun WorkDayCountdown(state: WidgetState.WorkDay, now: LocalTime) {
 
 private const val LEFT_COL_WIDTH_DP = 52
 private const val DIVIDER_HEIGHT_DP = 42
-private const val DIVIDER_RIGHT_MARGIN_DP = 16
+private const val DIVIDER_RIGHT_MARGIN_DP = 18
 
 class ShiftWidget4x1Receiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = ShiftWidget4x1()
