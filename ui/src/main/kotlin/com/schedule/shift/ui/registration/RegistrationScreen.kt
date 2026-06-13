@@ -2,6 +2,7 @@ package com.schedule.shift.ui.registration
 
 import android.graphics.Bitmap
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -55,7 +56,7 @@ fun RegistrationScreen(
     val context = LocalContext.current
 
     val imagePicker = rememberLauncherForActivityResult(
-        ActivityResultContracts.GetContent(),
+        ActivityResultContracts.PickVisualMedia(),
     ) { uri ->
         uri?.let {
             val bitmap = loadBitmapFromUri(context, uri)
@@ -64,7 +65,7 @@ fun RegistrationScreen(
     }
 
     LaunchedEffect(Unit) {
-        imagePicker.launch("image/*")
+        imagePicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
     }
 
     LaunchedEffect(uiState) {
@@ -109,10 +110,10 @@ fun RegistrationScreen(
         ) {
             RegistrationContent(
                 uiState = uiState,
-                onPickImage = { imagePicker.launch("image/*") },
+                onPickImage = { imagePicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
                 onRetry = {
                     viewModel.reset()
-                    imagePicker.launch("image/*")
+                    imagePicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
                 },
             )
         }

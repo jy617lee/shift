@@ -201,25 +201,23 @@ private fun ConfirmationBody(
     onEditDay: (Int, Int) -> Unit,
 ) {
     val today = LocalDate.now()
-    Column(
+    LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(top = padding.calculateTopPadding(), bottom = padding.calculateBottomPadding()),
+        contentPadding = PaddingValues(top = 12.dp, bottom = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        if (reviewing.imageUri != null) ImagePreview(uri = reviewing.imageUri)
-        LazyColumn(
-            modifier = Modifier.weight(1f),
-            contentPadding = PaddingValues(top = 12.dp, bottom = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            itemsIndexed(reviewing.weeks) { weekIndex, week ->
-                WeekReviewCard(week = week, today = today, onEditDay = { dayIndex -> onEditDay(weekIndex, dayIndex) })
-            }
+        if (reviewing.imageUri != null) {
+            item { ImagePreview(uri = reviewing.imageUri) }
+        }
+        itemsIndexed(reviewing.weeks) { weekIndex, week ->
+            WeekReviewCard(week = week, today = today, onEditDay = { dayIndex -> onEditDay(weekIndex, dayIndex) })
         }
     }
 }
 
-private const val IMAGE_INITIAL_SCALE = 1.2f
+private const val IMAGE_INITIAL_SCALE = 1.56f
 private const val ZOOM_HINT_DELAY_MS = 2000L
 
 @Composable
