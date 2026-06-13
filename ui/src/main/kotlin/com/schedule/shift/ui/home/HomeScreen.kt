@@ -22,12 +22,14 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -66,21 +68,23 @@ private val WEEK_RANGE_FMT = DateTimeFormatter.ofPattern("M월 d일")
 @Composable
 fun HomeScreen(
     onAddSchedule: () -> Unit,
+    onSettings: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    HomeContent(uiState = uiState, onAddSchedule = onAddSchedule, onRefresh = viewModel::refresh)
+    HomeContent(uiState = uiState, onAddSchedule = onAddSchedule, onSettings = onSettings, onRefresh = viewModel::refresh)
 }
 
 @Composable
 internal fun HomeContent(
     uiState: HomeUiState,
     onAddSchedule: () -> Unit,
+    onSettings: () -> Unit,
     onRefresh: () -> Unit,
 ) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
-        topBar = { ShiftAppBar() },
+        topBar = { ShiftAppBar(onSettings = onSettings) },
         floatingActionButton = {
             if (uiState is HomeUiState.Success) ShiftFab(onClick = onAddSchedule)
         },
@@ -104,13 +108,13 @@ internal fun HomeContent(
 }
 
 @Composable
-private fun ShiftAppBar() {
+private fun ShiftAppBar(onSettings: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surface)
             .statusBarsPadding()
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .padding(start = 16.dp, end = 4.dp, top = 8.dp, bottom = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
@@ -123,7 +127,10 @@ private fun ShiftAppBar() {
             Text(text = "+", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold, lineHeight = 16.sp)
         }
         Spacer(modifier = Modifier.width(8.dp))
-        Text(text = "Shift", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+        Text(text = "Shift", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.weight(1f))
+        IconButton(onClick = onSettings) {
+            Icon(Icons.Default.Settings, contentDescription = "설정", tint = MaterialTheme.colorScheme.onSurfaceVariant)
+        }
     }
     HorizontalDivider(color = MaterialTheme.colorScheme.outline)
 }

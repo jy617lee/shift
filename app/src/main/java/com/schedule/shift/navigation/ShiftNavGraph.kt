@@ -12,11 +12,13 @@ import com.schedule.shift.ui.confirmation.ConfirmationScreen
 import com.schedule.shift.ui.confirmation.ConfirmationViewModel
 import com.schedule.shift.ui.home.HomeScreen
 import com.schedule.shift.ui.registration.RegistrationScreen
+import com.schedule.shift.ui.settings.SettingsScreen
 
 private object Routes {
     const val HOME = "home"
     const val REGISTRATION = "registration"
     const val CONFIRMATION = "confirmation"
+    const val SETTINGS = "settings"
 }
 
 @Composable
@@ -29,7 +31,13 @@ fun ShiftNavGraph(
     }
     NavHost(navController = navController, startDestination = Routes.HOME) {
         composable(Routes.HOME) {
-            HomeScreen(onAddSchedule = { navController.navigate(Routes.REGISTRATION) })
+            HomeScreen(
+                onAddSchedule = { navController.navigate(Routes.REGISTRATION) },
+                onSettings = { navController.navigate(Routes.SETTINGS) },
+            )
+        }
+        composable(Routes.SETTINGS) {
+            SettingsScreen(onBack = { navController.popBackStack() })
         }
         composable(Routes.REGISTRATION) { backStackEntry ->
             val homeEntry = remember(backStackEntry) { navController.getBackStackEntry(Routes.HOME) }
