@@ -3,40 +3,29 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F7F4EF"
-    android:gravity="center_vertical"
-    android:orientation="horizontal"
-    android:padding="10dp">
+    android:gravity="center"
+    android:orientation="vertical"
+    android:paddingLeft="12dp"
+    android:paddingRight="12dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="12"
-        android:textColor="#1C1B1F"
+        android:gravity="center"
+        android:text="6/13(금)"
+        android:textColor="#49454F"
+        android:textSize="14sp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:gravity="center"
+        android:text="9:00-18:00"
+        android:textColor="#00704A"
         android:textSize="22sp"
         android:textStyle="bold" />
-
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_weight="1"
-        android:orientation="vertical">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="금"
-            android:textColor="#49454F"
-            android:textSize="12sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="9:00-18:00"
-            android:textColor="#00704A"
-            android:textSize="13sp"
-            android:textStyle="bold" />
-
-    </LinearLayout>
 
 </LinearLayout>

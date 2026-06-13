@@ -5,23 +5,24 @@
     android:background="#F7F4EF"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:paddingBottom="8dp"
     android:paddingLeft="14dp"
     android:paddingRight="14dp"
-    android:paddingTop="8dp">
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp">
 
+    <!-- Left: day label + date -->
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
+        android:layout_width="52dp"
+        android:layout_height="match_parent"
+        android:gravity="center"
         android:orientation="vertical">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="금요일"
+            android:text="금"
             android:textColor="#49454F"
-            android:textSize="11sp" />
+            android:textSize="13sp" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -33,14 +34,37 @@
 
     </LinearLayout>
 
+    <!-- Divider (TextView used — View not allowed in previewLayout per widget rules) -->
     <TextView
+        android:layout_width="1dp"
+        android:layout_height="42dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="18dp"
+        android:background="#DDDDDD" />
+
+    <!-- Right: work time + countdown -->
+    <LinearLayout
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_height="match_parent"
         android:layout_weight="1"
-        android:text="9:00-18:00"
-        android:textColor="#00704A"
-        android:textSize="22sp"
-        android:textStyle="bold" />
+        android:gravity="center_vertical"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="9:00-18:00"
+            android:textColor="#1C1B1F"
+            android:textSize="23sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="퇴근까지 3시간 24분 15초"
+            android:textColor="#00704A"
+            android:textSize="15sp" />
+
+    </LinearLayout>
 
 </LinearLayout>
