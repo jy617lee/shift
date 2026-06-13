@@ -76,17 +76,40 @@ class ShiftWidget4x1Test {
     }
 
     @Test
-    fun `ACTION_SECOND_UPDATE_4X1 contains package name prefix`() {
+    fun `ACTION_STATE_UPDATE_4X1 contains package name prefix`() {
         assertTrue(
-            ShiftWidget4x1Receiver.ACTION_SECOND_UPDATE_4X1.startsWith("com.schedule.shift.widget"),
+            ShiftWidget4x1Receiver.ACTION_STATE_UPDATE_4X1.startsWith("com.schedule.shift.widget"),
         )
     }
 
     @Test
-    fun `ACTION_SECOND_UPDATE_4X1 ends with correct suffix`() {
+    fun `ACTION_STATE_UPDATE_4X1 ends with correct suffix`() {
         assertTrue(
-            ShiftWidget4x1Receiver.ACTION_SECOND_UPDATE_4X1.endsWith("ACTION_SECOND_UPDATE_4X1"),
+            ShiftWidget4x1Receiver.ACTION_STATE_UPDATE_4X1.endsWith("ACTION_STATE_UPDATE_4X1"),
         )
+    }
+
+    @Test
+    fun `addScheduleIntent has EXTRA_OPEN_REGISTRATION true`() {
+        val intent = addScheduleIntent(context)
+        assertTrue(intent.getBooleanExtra(EXTRA_OPEN_REGISTRATION, false))
+    }
+
+    @Test
+    fun `addScheduleIntent has FLAG_ACTIVITY_NEW_TASK`() {
+        val intent = addScheduleIntent(context)
+        assertTrue(intent.flags and android.content.Intent.FLAG_ACTIVITY_NEW_TASK != 0)
+    }
+
+    @Test
+    fun `addScheduleIntent has FLAG_ACTIVITY_CLEAR_TOP`() {
+        val intent = addScheduleIntent(context)
+        assertTrue(intent.flags and android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP != 0)
+    }
+
+    @Test
+    fun `EXTRA_OPEN_REGISTRATION constant value`() {
+        assertEquals("open_registration", EXTRA_OPEN_REGISTRATION)
     }
 
     // ── formatDuration (seconds) ──────────────────────────────────────────────
