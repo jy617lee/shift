@@ -77,7 +77,9 @@ private fun ConfirmationDestination(
         },
         onCancelled = {
             flowHolder.clear()
-            navController.popBackStack()
+            navController.navigate(Routes.REGISTRATION) {
+                popUpTo(Routes.REGISTRATION) { inclusive = true }
+            }
         },
     )
 }

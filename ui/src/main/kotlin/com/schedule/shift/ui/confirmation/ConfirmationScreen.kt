@@ -3,6 +3,9 @@
 package com.schedule.shift.ui.confirmation
 
 import android.net.Uri
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -11,22 +14,25 @@ import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.ZoomIn
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -48,6 +54,7 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.delay
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -167,32 +174,41 @@ private fun ConfirmationBody(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(padding)
-            .verticalScroll(rememberScrollState()),
+            .padding(top = padding.calculateTopPadding(), bottom = padding.calculateBottomPadding()),
     ) {
         if (reviewing.imageUri != null) ImagePreview(uri = reviewing.imageUri)
-        Spacer(modifier = Modifier.height(12.dp))
-        reviewing.weeks.forEachIndexed { weekIndex, week ->
-            WeekReviewCard(week = week, today = today, onEditDay = { dayIndex -> onEditDay(weekIndex, dayIndex) })
-            Spacer(modifier = Modifier.height(10.dp))
+        LazyColumn(
+            modifier = Modifier.weight(1f),
+            contentPadding = PaddingValues(top = 12.dp, bottom = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            itemsIndexed(reviewing.weeks) { weekIndex, week ->
+                WeekReviewCard(week = week, today = today, onEditDay = { dayIndex -> onEditDay(weekIndex, dayIndex) })
+            }
         }
-        Spacer(modifier = Modifier.height(8.dp))
     }
 }
 
+private const val IMAGE_INITIAL_SCALE = 1.2f
+private const val ZOOM_HINT_DELAY_MS = 2000L
+
 @Composable
 private fun ImagePreview(uri: String) {
-    var scale by remember { mutableFloatStateOf(1f) }
+    var scale by remember { mutableFloatStateOf(IMAGE_INITIAL_SCALE) }
     var offset by remember { mutableStateOf(Offset.Zero) }
     val transformableState = rememberTransformableState { zoomChange, panChange, _ ->
         scale = (scale * zoomChange).coerceIn(1f, IMAGE_MAX_SCALE)
         offset += panChange * scale
     }
+    var showZoomHint by remember { mutableStateOf(true) }
+    LaunchedEffect(Unit) {
+        delay(ZOOM_HINT_DELAY_MS)
+        showZoomHint = false
+    }
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(IMAGE_PREVIEW_HEIGHT.dp)
-            .clip(RoundedCornerShape(0.dp))
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .transformable(state = transformableState),
         contentAlignment = Alignment.Center,
@@ -210,6 +226,28 @@ private fun ImagePreview(uri: String) {
                 },
             contentScale = ContentScale.Fit,
         )
+        ZoomHintOverlay(visible = showZoomHint)
+    }
+}
+
+@Composable
+private fun ZoomHintOverlay(visible: Boolean) {
+    AnimatedVisibility(visible = visible, enter = fadeIn(), exit = fadeOut()) {
+        Box(
+            modifier = Modifier
+                .clip(RoundedCornerShape(12.dp))
+                .background(Color.Black.copy(alpha = 0.55f))
+                .padding(horizontal = 14.dp, vertical = 8.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
+                Icon(Icons.Default.ZoomIn, contentDescription = null, tint = Color.White, modifier = Modifier.size(18.dp))
+                Text(text = "핀치로 확대/축소", color = Color.White, fontSize = 12.sp)
+            }
+        }
     }
 }
 
@@ -328,7 +366,7 @@ private fun ReviewDayShiftContent(day: ScheduleDay, modifier: Modifier) {
 
 @Composable
 private fun ConfirmationBottomBar(onCancel: () -> Unit, onConfirm: () -> Unit) {
-    Column(modifier = Modifier.background(MaterialTheme.colorScheme.surface).padding(horizontal = 16.dp, vertical = 12.dp)) {
+    Column(modifier = Modifier.background(MaterialTheme.colorScheme.surface).navigationBarsPadding().padding(horizontal = 16.dp, vertical = 12.dp)) {
         HorizontalDivider(modifier = Modifier.padding(bottom = 12.dp), color = MaterialTheme.colorScheme.outline)
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             OutlinedButton(onClick = onCancel, modifier = Modifier.weight(1f), shape = RoundedCornerShape(12.dp)) {
