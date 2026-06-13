@@ -71,7 +71,7 @@
     <!-- Wave divider -->
     <ImageView
         android:layout_width="match_parent"
-        android:layout_height="20dp"
+        android:layout_height="24dp"
         android:background="#1E3932"
         android:scaleType="fitXY"
         android:src="@drawable/widget_wave_divider" />
