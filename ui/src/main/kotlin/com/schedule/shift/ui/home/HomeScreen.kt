@@ -23,6 +23,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -33,7 +34,9 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -69,10 +72,29 @@ private val WEEK_RANGE_FMT = DateTimeFormatter.ofPattern("M월 d일")
 fun HomeScreen(
     onAddSchedule: () -> Unit,
     onSettings: () -> Unit,
+    refreshTrigger: Boolean = false,
+    onRefreshConsumed: () -> Unit = {},
+    isProcessingImage: Boolean = false,
+    imageErrorMessage: String? = null,
+    onImageErrorDismiss: () -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    HomeContent(uiState = uiState, onAddSchedule = onAddSchedule, onSettings = onSettings, onRefresh = viewModel::refresh)
+    LaunchedEffect(refreshTrigger) {
+        if (refreshTrigger) {
+            viewModel.refresh()
+            onRefreshConsumed()
+        }
+    }
+    HomeContent(
+        uiState = uiState,
+        onAddSchedule = onAddSchedule,
+        onSettings = onSettings,
+        onRefresh = viewModel::refresh,
+        isProcessingImage = isProcessingImage,
+        imageErrorMessage = imageErrorMessage,
+        onImageErrorDismiss = onImageErrorDismiss,
+    )
 }
 
 @Composable
@@ -81,12 +103,15 @@ internal fun HomeContent(
     onAddSchedule: () -> Unit,
     onSettings: () -> Unit,
     onRefresh: () -> Unit,
+    isProcessingImage: Boolean = false,
+    imageErrorMessage: String? = null,
+    onImageErrorDismiss: () -> Unit = {},
 ) {
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = { ShiftAppBar(onSettings = onSettings) },
         floatingActionButton = {
-            if (uiState is HomeUiState.Success) ShiftFab(onClick = onAddSchedule)
+            if (uiState is HomeUiState.Success && !isProcessingImage) ShiftFab(onClick = onAddSchedule)
         },
     ) { padding ->
         Box(modifier = Modifier.fillMaxSize().padding(top = padding.calculateTopPadding())) {
@@ -103,8 +128,34 @@ internal fun HomeContent(
                 )
                 is HomeUiState.Error -> HomeErrorContent(onRefresh = onRefresh)
             }
+            if (isProcessingImage) ImageProcessingOverlay()
         }
     }
+    if (imageErrorMessage != null) {
+        ImageParseErrorDialog(message = imageErrorMessage, onDismiss = onImageErrorDismiss)
+    }
+}
+
+@Composable
+private fun ImageProcessingOverlay() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black.copy(alpha = 0.4f)),
+        contentAlignment = Alignment.Center,
+    ) {
+        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+    }
+}
+
+@Composable
+private fun ImageParseErrorDialog(message: String, onDismiss: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("확인 필요") },
+        text = { Text(message) },
+        confirmButton = { TextButton(onClick = onDismiss) { Text("확인") } },
+    )
 }
 
 @Composable

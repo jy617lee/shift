@@ -14,10 +14,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        val openRegistration = intent.getBooleanExtra(EXTRA_OPEN_REGISTRATION, false)
+        val openGallery = intent.getBooleanExtra(EXTRA_OPEN_REGISTRATION, false)
         setContent {
             ShiftTheme {
-                ShiftNavGraph(openRegistration = openRegistration)
+                ShiftNavGraph(openGallery = openGallery)
             }
         }
     }

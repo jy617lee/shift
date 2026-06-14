@@ -61,6 +61,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontFamily
@@ -126,6 +127,10 @@ fun ConfirmationScreen(
         )
     }
 
+    if (reviewing.showSkipPrompt) {
+        SkipConfirmPromptDialog(onAnswer = viewModel::answerSkipPrompt)
+    }
+
     if (reviewing.editing != null) {
         ModalBottomSheet(
             onDismissRequest = viewModel::dismissEdit,
@@ -159,6 +164,21 @@ private fun ConfirmationScaffold(viewModel: ConfirmationViewModel, reviewing: Co
 }
 
 @Composable
+private fun SkipConfirmPromptDialog(onAnswer: (Boolean) -> Unit) {
+    AlertDialog(
+        onDismissRequest = { onAnswer(false) },
+        title = { Text("다음부터 이 단계를 건너뛸까요?") },
+        text = { Text("저장하기를 누르면 스케쥴 확인 없이 바로 저장돼요.\n설정에서 언제든 바꿀 수 있어요.") },
+        confirmButton = {
+            Button(onClick = { onAnswer(true) }) { Text("다음부터 건너뛰기") }
+        },
+        dismissButton = {
+            OutlinedButton(onClick = { onAnswer(false) }) { Text("매번 확인할게요") }
+        },
+    )
+}
+
+@Composable
 private fun ReplaceConfirmDialog(conflictCount: Int, onConfirm: () -> Unit, onDismiss: () -> Unit) {
     val weekLabel = if (conflictCount == 1) "1개 주" else "${conflictCount}개 주"
     AlertDialog(
@@ -188,7 +208,7 @@ private fun ConfirmationTopBar(onBack: () -> Unit) {
             IconButton(onClick = onBack) {
                 Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "취소", tint = MaterialTheme.colorScheme.onSurface)
             }
-            Text(text = "OCR 결과 확인", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
+            Text(text = "스케쥴 확인", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface)
         }
         HorizontalDivider(color = MaterialTheme.colorScheme.outline)
     }
@@ -219,7 +239,7 @@ private fun ConfirmationBody(
     }
 }
 
-private const val IMAGE_INITIAL_SCALE = 1.2f
+private const val IMAGE_INITIAL_SCALE = 1.3f
 private const val ZOOM_HINT_DELAY_MS = 2000L
 
 @Composable
@@ -239,6 +259,7 @@ private fun ImagePreview(uri: String) {
         modifier = Modifier
             .fillMaxWidth()
             .height(IMAGE_PREVIEW_HEIGHT.dp)
+            .clip(RectangleShape)
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .transformable(state = transformableState),
         contentAlignment = Alignment.Center,

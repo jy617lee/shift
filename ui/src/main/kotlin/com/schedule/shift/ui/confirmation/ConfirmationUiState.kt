@@ -15,6 +15,7 @@ sealed class ConfirmationUiState {
         val imageUri: String? = null,
         val editing: EditingState? = null,
         val conflictCount: Int = 0,
+        val showSkipPrompt: Boolean = false,
     ) : ConfirmationUiState()
 
     data object Saved : ConfirmationUiState()
