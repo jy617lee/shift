@@ -239,7 +239,7 @@ private fun ConfirmationBody(
     }
 }
 
-private const val IMAGE_INITIAL_SCALE = 1f
+private const val IMAGE_INITIAL_SCALE = 1.3f
 private const val ZOOM_HINT_DELAY_MS = 2000L
 
 @Composable
