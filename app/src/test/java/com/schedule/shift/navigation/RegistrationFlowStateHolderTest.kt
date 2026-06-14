@@ -85,7 +85,7 @@ class RegistrationFlowStateHolderTest {
     }
 
     @Test
-    fun `handleImageSelected saves and sets homeRefreshNeeded on success when skip is true`() = runTest {
+    fun `handleImageSelected saves directly when skip is true and no conflict`() = runTest {
         val bitmap = mockk<Bitmap>()
         val weeks = listOf(buildTestWeek())
         coEvery { preferences.isSkipConfirm() } returns true
@@ -99,6 +99,23 @@ class RegistrationFlowStateHolderTest {
 
         assertTrue(holder.homeRefreshNeeded.value)
         assertEquals(FlowPendingAction.None, holder.pendingAction.value)
+    }
+
+    @Test
+    fun `handleImageSelected goes to confirmation when skip is true but conflict exists`() = runTest {
+        val bitmap = mockk<Bitmap>()
+        val week = buildTestWeek()
+        coEvery { preferences.isSkipConfirm() } returns true
+        coEvery { processImage(bitmap) } returns ParseResult.Success(listOf(week))
+        coEvery { scheduleRepository.getWeekByDate(week.weekStartDate) } returns week
+        holder = RegistrationFlowStateHolder(preferences, scheduleRepository, widgetRefresher, processImage)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        holder.handleImageSelected(bitmap, null)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals(FlowPendingAction.GoToConfirmation, holder.pendingAction.value)
+        assertFalse(holder.homeRefreshNeeded.value)
     }
 
     @Test

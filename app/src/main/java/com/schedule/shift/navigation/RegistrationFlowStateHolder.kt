@@ -70,15 +70,17 @@ class RegistrationFlowStateHolder @Inject constructor(
 
     private suspend fun handleSuccess(weeks: List<ScheduleWeek>, uri: String?) {
         if (_skipConfirm.value) {
-            weeks.forEach { week ->
-                if (scheduleRepository.getWeekByDate(week.weekStartDate) != null) {
-                    scheduleRepository.replaceWeek(week)
-                } else {
-                    scheduleRepository.saveWeek(week)
-                }
+            val hasConflict = weeks.any { scheduleRepository.getWeekByDate(it.weekStartDate) != null }
+            if (hasConflict) {
+                // 충돌이 있으면 확인 화면에서 사용자가 교체를 승인해야 함
+                pendingWeeks = weeks
+                pendingImageUri = uri
+                _pendingAction.value = FlowPendingAction.GoToConfirmation
+            } else {
+                weeks.forEach { scheduleRepository.saveWeek(it) }
+                widgetRefresher.refreshAll()
+                _homeRefreshNeeded.value = true
             }
-            widgetRefresher.refreshAll()
-            _homeRefreshNeeded.value = true
         } else {
             pendingWeeks = weeks
             pendingImageUri = uri
