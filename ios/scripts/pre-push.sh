@@ -32,16 +32,28 @@ echo "================================================"
 
 # ── 1. SwiftLint (정적 분석 + 린터) ──────────────────
 step "SwiftLint 정적 분석 + 린터"
-if command -v swiftlint &>/dev/null; then
-    if swiftlint --strict --config "$IOS_DIR/.swiftlint.yml" --path "$IOS_DIR/shift/shift" 2>&1; then
+run_swiftlint() {
+    swiftlint --strict --config "$IOS_DIR/.swiftlint.yml" --path "$IOS_DIR/shift/shift" 2>&1
+}
+if command -v mint &>/dev/null; then
+    if mint run --mintfile "$IOS_DIR/Mintfile" swiftlint --strict \
+           --config "$IOS_DIR/.swiftlint.yml" --path "$IOS_DIR/shift/shift" 2>&1; then
+        pass
+    else
+        fail
+        echo "    → 자동 수정: cd ios && mint run swiftlint --fix"
+    fi
+elif command -v swiftlint &>/dev/null; then
+    if run_swiftlint; then
         pass
     else
         fail
         echo "    → 자동 수정: swiftlint --fix --config ios/.swiftlint.yml"
+        echo "    ⚠️  버전 불일치 주의: brew install mint && cd ios && mint bootstrap"
     fi
 else
-    skip "swiftlint 미설치. 설치 후 정적 분석이 활성화됩니다."
-    echo "       설치: brew install swiftlint"
+    skip "mint/swiftlint 미설치."
+    echo "       설치: brew install mint && cd ios && mint bootstrap"
 fi
 
 # ── 2. 단위 테스트 + 커버리지 ─────────────────────────

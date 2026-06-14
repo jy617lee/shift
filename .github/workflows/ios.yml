@@ -21,8 +21,8 @@ jobs:
 
       - name: "[1] SwiftLint 정적 분석 + 린터"
         run: |
-          brew install swiftlint
-          swiftlint --strict
+          brew install mint
+          mint run swiftlint --strict
 
       - name: "[2] 단위 테스트 + 커버리지 수집"
         working-directory: ios/shift
