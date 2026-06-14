@@ -1,11 +1,7 @@
 package com.schedule.shift.navigation
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.net.Uri
 import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -13,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -25,6 +22,9 @@ import com.schedule.shift.ui.confirmation.ConfirmationScreen
 import com.schedule.shift.ui.confirmation.ConfirmationViewModel
 import com.schedule.shift.ui.home.HomeScreen
 import com.schedule.shift.ui.settings.SettingsScreen
+import com.schedule.shift.ui.util.loadBitmapFromUri
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 private object Routes {
     const val HOME = "home"
@@ -35,11 +35,11 @@ private object Routes {
 @Composable
 fun ShiftNavGraph(
     navController: NavHostController = rememberNavController(),
-    openRegistration: Boolean = false,
+    openGallery: Boolean = false,
 ) {
     NavHost(navController = navController, startDestination = Routes.HOME) {
         composable(Routes.HOME) { backStackEntry ->
-            HomeDestination(navController, backStackEntry, openRegistration)
+            HomeDestination(navController, backStackEntry, openGallery)
         }
         composable(Routes.SETTINGS) {
             SettingsScreen(onBack = { navController.popBackStack() })
@@ -54,9 +54,10 @@ fun ShiftNavGraph(
 private fun HomeDestination(
     navController: NavHostController,
     backStackEntry: NavBackStackEntry,
-    openRegistration: Boolean,
+    openGallery: Boolean,
 ) {
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
     val flowHolder: RegistrationFlowStateHolder = hiltViewModel(backStackEntry)
     val homeRefreshNeeded by flowHolder.homeRefreshNeeded.collectAsStateWithLifecycle()
     val pendingAction by flowHolder.pendingAction.collectAsStateWithLifecycle()
@@ -68,7 +69,8 @@ private fun HomeDestination(
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             val uri = result.data?.data ?: return@rememberLauncherForActivityResult
-            loadBitmapFromUri(context, uri)?.let { bmp ->
+            coroutineScope.launch(Dispatchers.IO) {
+                val bmp = loadBitmapFromUri(context, uri) ?: return@launch
                 flowHolder.handleImageSelected(bmp, uri.toString())
             }
         }
@@ -77,7 +79,7 @@ private fun HomeDestination(
         { galleryLauncher.launch(Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)) }
     }
 
-    LaunchedEffect(Unit) { if (openRegistration) launchGallery() }
+    LaunchedEffect(Unit) { if (openGallery) launchGallery() }
 
     LaunchedEffect(pendingAction) {
         if (pendingAction == FlowPendingAction.GoToConfirmation) {
@@ -129,7 +131,3 @@ private fun ConfirmationDestination(
         },
     )
 }
-
-private fun loadBitmapFromUri(context: Context, uri: Uri): Bitmap? = runCatching {
-    context.contentResolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it) }
-}.getOrNull()
