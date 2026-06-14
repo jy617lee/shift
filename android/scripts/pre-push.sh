@@ -5,7 +5,7 @@
 set -o pipefail
 
 REPO_ROOT="$(git rev-parse --show-toplevel)"
-cd "$REPO_ROOT" || exit 1
+cd "$REPO_ROOT/android" || exit 1
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
