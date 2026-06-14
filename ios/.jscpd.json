@@ -1,0 +1,9 @@
+{
+  "minTokens": 200,
+  "threshold": 0,
+  "path": ["shift/shift"],
+  "ignore": ["**/*Tests*.swift", "**/*UITests*.swift", "**/Preview*.swift"],
+  "reporters": ["console"],
+  "exitCode": 1,
+  "gitignore": true
+}

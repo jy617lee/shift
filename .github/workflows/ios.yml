@@ -4,18 +4,54 @@ on:
   pull_request:
     branches: [main]
 
-# TODO(#79): Xcode 프로젝트 초기화 후 이 workflow를 구현
-# 예상 단계:
-#   - xcodebuild build/test
-#   - SwiftLint
-#   - 커버리지 리포트
+defaults:
+  run:
+    working-directory: ios
 
 jobs:
-  placeholder:
-    name: iOS CI (준비 중)
+  quality:
+    name: 코드 품질 검사 (iOS)
     runs-on: macos-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Placeholder
-        run: echo "iOS CI는 Xcode 프로젝트 초기화 후 구현 예정 (ios/ 디렉터리)"
+
+      - name: "[1] SwiftLint 정적 분석 + 린터"
+        run: |
+          brew install swiftlint
+          swiftlint --strict
+
+      - name: "[2] 단위 테스트 + 커버리지 수집"
+        working-directory: ios/shift
+        run: |
+          xcodebuild test \
+            -project shift.xcodeproj \
+            -scheme shift \
+            -destination 'platform=iOS Simulator,OS=latest,name=iPhone 16' \
+            -enableCodeCoverage YES \
+            -derivedDataPath /tmp/DerivedData \
+            -quiet
+
+      - name: "[3] 커버리지 검증 (기준: 30%)"
+        run: |
+          XCRESULT=$(find /tmp/DerivedData -name "*.xcresult" | head -1)
+          bash scripts/check_coverage.sh "$XCRESULT" 30
+
+      - name: "[4] 테스트 코드 비율 검사 (기준: 50%)"
+        run: bash scripts/check_test_ratio.sh
+
+      - name: "[5] jscpd 설치"
+        working-directory: ${{ github.workspace }}
+        run: npm install -g jscpd@3
+
+      - name: "[6] 중복 코드 검사"
+        run: jscpd --config .jscpd.json
+
+      - name: 커버리지 리포트 업로드 (실패 시에도)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-reports
+          path: /tmp/DerivedData/Logs/Test/
+          retention-days: 7
