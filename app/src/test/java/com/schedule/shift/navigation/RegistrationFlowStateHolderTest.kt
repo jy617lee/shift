@@ -22,6 +22,7 @@ import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -61,51 +62,91 @@ class RegistrationFlowStateHolderTest {
     }
 
     @Test
-    fun `initial pendingAction is None`() = runTest {
+    fun `initial pendingAction is None`() {
         assertEquals(FlowPendingAction.None, holder.pendingAction.value)
     }
 
     @Test
-    fun `handleParsed stores weeks and emits GoToConfirmation`() = runTest {
+    fun `handleImageSelected emits GoToConfirmation on success when skip is false`() = runTest {
+        val bitmap = mockk<Bitmap>()
         val weeks = listOf(buildTestWeek())
-        holder.handleParsed(weeks, "content://test/image")
+        coEvery { preferences.isSkipConfirm() } returns false
+        coEvery { processImage(bitmap) } returns ParseResult.Success(weeks)
+        holder = RegistrationFlowStateHolder(preferences, scheduleRepository, widgetRefresher, processImage)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        holder.handleImageSelected(bitmap, "content://test/image")
+        testDispatcher.scheduler.advanceUntilIdle()
 
         assertEquals(FlowPendingAction.GoToConfirmation, holder.pendingAction.value)
         assertEquals(weeks, holder.pendingWeeks)
         assertEquals("content://test/image", holder.pendingImageUri)
+        assertFalse(holder.homeRefreshNeeded.value)
     }
 
     @Test
-    fun `startSkipSave sets homeRefreshNeeded on OCR success`() = runTest {
+    fun `handleImageSelected saves and sets homeRefreshNeeded on success when skip is true`() = runTest {
         val bitmap = mockk<Bitmap>()
         val weeks = listOf(buildTestWeek())
+        coEvery { preferences.isSkipConfirm() } returns true
         coEvery { processImage(bitmap) } returns ParseResult.Success(weeks)
         coEvery { scheduleRepository.getWeekByDate(any()) } returns null
+        holder = RegistrationFlowStateHolder(preferences, scheduleRepository, widgetRefresher, processImage)
+        testDispatcher.scheduler.advanceUntilIdle()
 
-        holder.startSkipSave(bitmap, null)
+        holder.handleImageSelected(bitmap, null)
         testDispatcher.scheduler.advanceUntilIdle()
 
         assertTrue(holder.homeRefreshNeeded.value)
+        assertEquals(FlowPendingAction.None, holder.pendingAction.value)
     }
 
     @Test
-    fun `startSkipSave does not set homeRefreshNeeded on OCR failure`() = runTest {
+    fun `handleImageSelected sets imageErrorMessage on NOT_A_SCHEDULE failure`() = runTest {
+        val bitmap = mockk<Bitmap>()
+        coEvery { processImage(bitmap) } returns ParseResult.Failure(FailureReason.NOT_A_SCHEDULE)
+
+        holder.handleImageSelected(bitmap, null)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertNotNull(holder.imageErrorMessage.value)
+        assertFalse(holder.homeRefreshNeeded.value)
+        assertEquals(FlowPendingAction.None, holder.pendingAction.value)
+    }
+
+    @Test
+    fun `handleImageSelected sets imageErrorMessage on PARSE_ERROR failure`() = runTest {
         val bitmap = mockk<Bitmap>()
         coEvery { processImage(bitmap) } returns ParseResult.Failure(FailureReason.PARSE_ERROR)
 
-        holder.startSkipSave(bitmap, null)
+        holder.handleImageSelected(bitmap, null)
         testDispatcher.scheduler.advanceUntilIdle()
 
-        assertFalse(holder.homeRefreshNeeded.value)
+        assertNotNull(holder.imageErrorMessage.value)
+    }
+
+    @Test
+    fun `clearImageError clears imageErrorMessage`() = runTest {
+        val bitmap = mockk<Bitmap>()
+        coEvery { processImage(bitmap) } returns ParseResult.Failure(FailureReason.PARSE_ERROR)
+        holder.handleImageSelected(bitmap, null)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        holder.clearImageError()
+
+        assertNull(holder.imageErrorMessage.value)
     }
 
     @Test
     fun `clearHomeRefresh resets homeRefreshNeeded`() = runTest {
         val bitmap = mockk<Bitmap>()
+        coEvery { preferences.isSkipConfirm() } returns true
         coEvery { processImage(bitmap) } returns ParseResult.Success(listOf(buildTestWeek()))
         coEvery { scheduleRepository.getWeekByDate(any()) } returns null
+        holder = RegistrationFlowStateHolder(preferences, scheduleRepository, widgetRefresher, processImage)
+        testDispatcher.scheduler.advanceUntilIdle()
 
-        holder.startSkipSave(bitmap, null)
+        holder.handleImageSelected(bitmap, null)
         testDispatcher.scheduler.advanceUntilIdle()
         holder.clearHomeRefresh()
 
@@ -114,20 +155,29 @@ class RegistrationFlowStateHolderTest {
 
     @Test
     fun `clear resets all state`() = runTest {
-        val weeks = listOf(buildTestWeek())
-        holder.handleParsed(weeks, "content://test/image")
+        val bitmap = mockk<Bitmap>()
+        coEvery { processImage(bitmap) } returns ParseResult.Failure(FailureReason.PARSE_ERROR)
+        holder.handleImageSelected(bitmap, null)
+        testDispatcher.scheduler.advanceUntilIdle()
+
         holder.clear()
 
         assertTrue(holder.pendingWeeks.isEmpty())
         assertNull(holder.pendingImageUri)
         assertEquals(FlowPendingAction.None, holder.pendingAction.value)
         assertFalse(holder.homeRefreshNeeded.value)
+        assertNull(holder.imageErrorMessage.value)
     }
 
     @Test
     fun `resetAction resets pendingAction to None`() = runTest {
-        holder.handleParsed(listOf(buildTestWeek()), null)
+        val bitmap = mockk<Bitmap>()
+        coEvery { processImage(bitmap) } returns ParseResult.Success(listOf(buildTestWeek()))
+        holder.handleImageSelected(bitmap, null)
+        testDispatcher.scheduler.advanceUntilIdle()
+
         holder.resetAction()
+
         assertEquals(FlowPendingAction.None, holder.pendingAction.value)
     }
 
