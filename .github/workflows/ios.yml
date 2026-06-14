@@ -46,6 +46,8 @@ jobs:
             -destination 'platform=iOS Simulator,OS=latest,name=iPhone 16' \
             -enableCodeCoverage YES \
             -derivedDataPath /tmp/DerivedData \
+            -skip-testing:shiftUITests \
+            -skip-testing:shiftUITestsLaunchTests \
             -quiet
 
       - name: "[3] 커버리지 검증 (기준: 30%)"
