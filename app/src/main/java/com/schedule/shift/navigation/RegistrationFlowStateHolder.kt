@@ -38,9 +38,6 @@ class RegistrationFlowStateHolder @Inject constructor(
     private val _pendingAction = MutableStateFlow<FlowPendingAction>(FlowPendingAction.None)
     val pendingAction: StateFlow<FlowPendingAction> = _pendingAction.asStateFlow()
 
-    private val _skipConfirm = MutableStateFlow(false)
-    val skipConfirm: StateFlow<Boolean> = _skipConfirm.asStateFlow()
-
     private val _isProcessingImage = MutableStateFlow(false)
     val isProcessingImage: StateFlow<Boolean> = _isProcessingImage.asStateFlow()
 
@@ -49,12 +46,6 @@ class RegistrationFlowStateHolder @Inject constructor(
 
     private val _homeRefreshNeeded = MutableStateFlow(false)
     val homeRefreshNeeded: StateFlow<Boolean> = _homeRefreshNeeded.asStateFlow()
-
-    init {
-        viewModelScope.launch {
-            _skipConfirm.value = preferences.isSkipConfirm()
-        }
-    }
 
     fun handleImageSelected(bitmap: Bitmap, uri: String?) {
         viewModelScope.launch {
@@ -69,7 +60,7 @@ class RegistrationFlowStateHolder @Inject constructor(
     }
 
     private suspend fun handleSuccess(weeks: List<ScheduleWeek>, uri: String?) {
-        if (_skipConfirm.value) {
+        if (preferences.isSkipConfirm()) {
             val hasConflict = weeks.any { scheduleRepository.getWeekByDate(it.weekStartDate) != null }
             if (hasConflict) {
                 // 충돌이 있으면 확인 화면에서 사용자가 교체를 승인해야 함
