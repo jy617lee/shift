@@ -1,0 +1,23 @@
+# Xcode 사용자별 설정 — 커밋하지 않음
+xcuserdata/
+*.xcuserstate
+*.xcscmblueprint
+
+# 빌드 산출물
+DerivedData/
+build/
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Swift Package Manager 캐시
+.build/
+.swiftpm/xcode/
+
+# Fastlane (추후 사용 시)
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/test_output/
+
+# Firebase (로컬 전용)
+GoogleService-Info.plist
