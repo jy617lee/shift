@@ -8,7 +8,7 @@
 import SwiftUI
 
 @main
-struct shiftApp: App {
+struct ShiftApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
