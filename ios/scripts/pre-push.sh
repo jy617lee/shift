@@ -59,10 +59,22 @@ fi
 # ── 2. 단위 테스트 + 커버리지 ─────────────────────────
 step "단위 테스트 + 커버리지 수집"
 XCRESULT_PATH="/tmp/shift_prepush.xcresult"
-rm -rf "$XCRESULT_PATH"
+XCRESULT_MAX_AGE=1800  # 30분 이내 xcresult 재사용 (반복 push 시 SSH 타임아웃 방지)
 
-# 사용 가능한 iPhone 시뮬레이터 자동 탐색 (환경마다 다름)
-SIM_ID=$(xcrun simctl list devices available -j 2>/dev/null | python3 -c "
+SKIP_TESTS=false
+if [ -e "$XCRESULT_PATH" ]; then
+    XCRESULT_AGE=$(($(date +%s) - $(stat -f %m "$XCRESULT_PATH" 2>/dev/null || echo 0)))
+    if [ "$XCRESULT_AGE" -lt "$XCRESULT_MAX_AGE" ]; then
+        echo "    (최근 xcresult 재사용 — ${XCRESULT_AGE}초 전)"
+        SKIP_TESTS=true
+    fi
+fi
+
+if ! $SKIP_TESTS; then
+    rm -rf "$XCRESULT_PATH"
+
+    # 사용 가능한 iPhone 시뮬레이터 자동 탐색 (환경마다 다름)
+    SIM_ID=$(xcrun simctl list devices available -j 2>/dev/null | python3 -c "
 import json,sys
 data=json.load(sys.stdin)
 for devs in data.get('devices',{}).values():
@@ -71,23 +83,23 @@ for devs in data.get('devices',{}).values():
             print(d['udid']); sys.exit(0)
 " 2>/dev/null)
 
-if [ -n "$SIM_ID" ]; then
-    DEST="id=$SIM_ID"
-    # 시뮬레이터 부팅 (이미 부팅된 경우 무시)
-    xcrun simctl boot "$SIM_ID" 2>/dev/null || true
-else
-    DEST="platform=iOS Simulator,name=Any iOS Simulator Device"
-fi
+    if [ -n "$SIM_ID" ]; then
+        DEST="id=$SIM_ID"
+        xcrun simctl boot "$SIM_ID" 2>/dev/null || true
+    else
+        DEST="platform=iOS Simulator,name=Any iOS Simulator Device"
+    fi
 
-xcodebuild test \
-    -project "$PROJ_DIR/shift.xcodeproj" \
-    -scheme shift \
-    -destination "$DEST" \
-    -skip-testing:shiftUITests \
-    -skip-testing:shiftUITestsLaunchTests \
-    -enableCodeCoverage YES \
-    -resultBundlePath "$XCRESULT_PATH" \
-    -quiet 2>&1 || true  # 시뮬레이터 환경 오류 무시; 커버리지로 실제 테스트 결과 판단
+    xcodebuild test \
+        -project "$PROJ_DIR/shift.xcodeproj" \
+        -scheme shift \
+        -destination "$DEST" \
+        -skip-testing:shiftUITests \
+        -skip-testing:shiftUITestsLaunchTests \
+        -enableCodeCoverage YES \
+        -resultBundlePath "$XCRESULT_PATH" \
+        -quiet 2>&1 || true  # 시뮬레이터 환경 오류 무시; 커버리지로 실제 테스트 결과 판단
+fi
 
 # xcresult가 생성됐으면 코드 빌드·테스트 실행 성공
 if [ -e "$XCRESULT_PATH" ]; then
