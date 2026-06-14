@@ -117,7 +117,7 @@ final class ConfirmationViewModelTests: XCTestCase {
         )
     }
 
-    func testCancelSetsFlag() {
+    func testCancelSetsFlag() async {
         let vm = makeVM()
         vm.cancel()
         XCTAssertTrue(vm.isCancelled)
@@ -130,20 +130,20 @@ final class ConfirmationViewModelTests: XCTestCase {
         XCTAssertEqual(vm.conflictCount, 0)
     }
 
-    func testStartEditCreatesState() {
+    func testStartEditCreatesState() async {
         let vm = makeVM(weeks: [makeTestWeek()])
         vm.startEdit(weekIndex: 0, dayIndex: 2)
         XCTAssertEqual(vm.editing?.weekIndex, 0)
         XCTAssertEqual(vm.editing?.dayIndex, 2)
     }
 
-    func testStartEditOutOfBoundsDoesNothing() {
+    func testStartEditOutOfBoundsDoesNothing() async {
         let vm = makeVM(weeks: [makeTestWeek()])
         vm.startEdit(weekIndex: 5, dayIndex: 0)
         XCTAssertNil(vm.editing)
     }
 
-    func testUpdateDraftChangesValue() {
+    func testUpdateDraftChangesValue() async {
         let week = makeTestWeek()
         let vm = makeVM(weeks: [week])
         vm.startEdit(weekIndex: 0, dayIndex: 0)
@@ -152,7 +152,7 @@ final class ConfirmationViewModelTests: XCTestCase {
         XCTAssertEqual(vm.editing?.draft.codeLabel, "수정됨")
     }
 
-    func testCommitEditAppliesAndClearsEditing() {
+    func testCommitEditAppliesAndClearsEditing() async {
         let week = makeTestWeek()
         let vm = makeVM(weeks: [week])
         vm.startEdit(weekIndex: 0, dayIndex: 0)
@@ -170,7 +170,7 @@ final class ConfirmationViewModelTests: XCTestCase {
         XCTAssertNil(vm.editing)
     }
 
-    func testAnswerSkipPromptSavesPreference() {
+    func testAnswerSkipPromptSavesPreference() async {
         let prefs = StubPreferencesRepository()
         prefs.skipConfirmPromptShown = true
         let vm = ConfirmationViewModel(weeks: [], image: nil, repository: StubScheduleRepository(), preferencesRepository: prefs)
