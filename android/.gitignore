@@ -1,0 +1,28 @@
+# Android / Gradle
+*.iml
+.gradle
+local.properties
+/build
+build/
+/captures
+.externalNativeBuild
+.cxx
+
+# IntelliJ / Android Studio 프로젝트 메타
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+/.idea/.gitignore
+/.idea/misc.xml
+/.idea/vcs.xml
+/.idea/deploymentTargetDropDown.xml
+/.idea/kotlinc.xml
+
+# Kotlin 데몬 캐시
+.kotlin/
+
+# 로컬 테스트용 이미지 (레포에 포함하지 않음)
+test_img/

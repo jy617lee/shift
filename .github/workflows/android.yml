@@ -1,12 +1,16 @@
-name: Quality Checks
+name: Android Quality Checks
 
 on:
   pull_request:
     branches: [main]
 
+defaults:
+  run:
+    working-directory: android
+
 jobs:
   quality:
-    name: 코드 품질 검사
+    name: 코드 품질 검사 (Android)
     runs-on: ubuntu-latest
 
     steps:
@@ -25,7 +29,7 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/libs.versions.toml') }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('android/**/*.gradle*', 'android/**/libs.versions.toml') }}
           restore-keys: ${{ runner.os }}-gradle-
 
       - name: Create local.properties
@@ -50,6 +54,7 @@ jobs:
         run: ./gradlew :app:checkTestRatio
 
       - name: "[6] jscpd 설치"
+        working-directory: ${{ github.workspace }}
         run: npm install -g jscpd@3
 
       - name: "[6] 중복 코드 검사"
@@ -61,12 +66,12 @@ jobs:
         with:
           name: reports
           path: |
-            app/build/reports/detekt/
-            app/build/reports/lint/
-            app/build/reports/jacoco/
-            domain/build/reports/detekt/
-            data/build/reports/detekt/
-            ocr/build/reports/detekt/
-            ui/build/reports/detekt/
-            analytics/build/reports/detekt/
+            android/app/build/reports/detekt/
+            android/app/build/reports/lint/
+            android/app/build/reports/jacoco/
+            android/domain/build/reports/detekt/
+            android/data/build/reports/detekt/
+            android/ocr/build/reports/detekt/
+            android/ui/build/reports/detekt/
+            android/analytics/build/reports/detekt/
           retention-days: 7

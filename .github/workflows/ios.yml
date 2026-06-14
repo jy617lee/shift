@@ -1,0 +1,21 @@
+name: iOS Quality Checks
+
+on:
+  pull_request:
+    branches: [main]
+
+# TODO(#79): Xcode 프로젝트 초기화 후 이 workflow를 구현
+# 예상 단계:
+#   - xcodebuild build/test
+#   - SwiftLint
+#   - 커버리지 리포트
+
+jobs:
+  placeholder:
+    name: iOS CI (준비 중)
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Placeholder
+        run: echo "iOS CI는 Xcode 프로젝트 초기화 후 구현 예정 (ios/ 디렉터리)"

@@ -1,33 +1,18 @@
-*.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-/.idea/.gitignore
-/.idea/misc.xml
-/.idea/vcs.xml
-/.idea/deploymentTargetDropDown.xml
-/.idea/kotlinc.xml
+# OS / 편집기
 .DS_Store
-/build
-build/
-/captures
-.externalNativeBuild
-.cxx
-local.properties
-
-# Kotlin 데몬 캐시
-.kotlin/
-
-# 로컬 디자인·테스트 파일 (레포에 포함하지 않음)
-design/
-test_img/
-4*2widgetdesign.png
+.idea/
 
 # 개인 토큰 포함 — git 추적 제외
 .mcp.json
 .claude/settings.local.json
+
+# 로컬 전용 에셋 (git 비추적)
+design/
+test_img/
+4*2widgetdesign.png
+
+# Android 루트 빌드 잔재 (모노레포 전환 후 android/ 내부로 이동됨)
+local.properties
+.gradle/
+.kotlin/
+build/
