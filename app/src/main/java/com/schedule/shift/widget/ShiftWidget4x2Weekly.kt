@@ -114,7 +114,8 @@ internal fun Widget4x2WeeklyContent(
             Image(
                 provider = ImageProvider(R.drawable.widget_wave_divider),
                 contentDescription = null,
-                modifier = GlanceModifier.fillMaxWidth().height(WAVE_HEIGHT_DP.dp),
+                modifier = GlanceModifier.fillMaxWidth().height(WAVE_HEIGHT_DP.dp)
+                    .background(HeaderBackground),
                 contentScale = ContentScale.FillBounds,
             )
         }
