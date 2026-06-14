@@ -73,6 +73,8 @@ for devs in data.get('devices',{}).values():
 
 if [ -n "$SIM_ID" ]; then
     DEST="id=$SIM_ID"
+    # 시뮬레이터 부팅 (이미 부팅된 경우 무시)
+    xcrun simctl boot "$SIM_ID" 2>/dev/null || true
 else
     DEST="platform=iOS Simulator,name=Any iOS Simulator Device"
 fi
