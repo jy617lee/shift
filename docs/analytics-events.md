@@ -179,13 +179,21 @@
 - 이미지 파일 (파싱 후 즉시 메모리 해제)
 - 출퇴근 시간 원본값 (`user_edit` 이벤트 외)
 
-## 구현 현황
+## 구현 현황 (Android)
 
 | 항목 | 상태 |
 |------|------|
-| Firebase 연동 | 미완료 (`NoOpAnalyticsTracker` 사용 중) |
-| 이벤트 정의 | 완료 (`AnalyticsEvent.kt`) |
-| 퍼널 이벤트 발생 | 완료 |
-| 설정 이벤트 발생 | 완료 |
-
-Firebase `google-services.json` 추가 후 `NoOpAnalyticsTracker` → `FirebaseAnalyticsTracker`로 교체 예정.
+| Firebase 연동 | 완료 (`google-services.json` + `FirebaseAnalyticsTracker`) |
+| 이벤트 정의 | 완료 (`AnalyticsEvent.kt` 14종) |
+| `AppOpen` | 완료 (`MainActivity.onCreate`) |
+| `RegisterStart` / `ImageSelected` | 완료 (`RegistrationFlowStateHolder`) |
+| `Stage1Result` / `ParseResult` | 완료 (`RegistrationFlowStateHolder`) |
+| `ConfirmShown` | 완료 (`ConfirmationViewModel.init`, skipConfirm 경로 포함) |
+| `UserEdit` | 완료 (`ConfirmationViewModel.commitEdit`, 필드별 추적) |
+| `RegisterComplete` | 완료 (`ConfirmationViewModel`, 자동저장 경로 포함) |
+| `RegisterAbandon` | 완료 (`ConfirmationViewModel.cancel`) |
+| `SettingChanged` | 완료 (`SettingsViewModel.setSkipConfirm`) |
+| `WidgetActive` | 미구현 (위젯 Provider 수정 필요) |
+| `HomeWeekViewed` | 미구현 (LazyColumn 스크롤 추적 필요) |
+| `RowFailDetail` / `SendDialog` | 미구현 (파서 부분 실패 / 신고 기능 없음) |
+| `ocrConfidenceAvg` | 0f 고정 (MlKitOcrEngine이 신뢰도 미노출) |
