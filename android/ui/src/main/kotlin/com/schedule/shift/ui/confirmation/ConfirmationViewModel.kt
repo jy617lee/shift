@@ -113,7 +113,12 @@ class ConfirmationViewModel @AssistedInject constructor(
     }
 
     fun cancel() {
-        tracker.track(AnalyticsEvent.RegisterAbandon(sessionId = sessionId, lastStep = AnalyticsEvent.RegisterAbandon.LAST_STEP_CONFIRM))
+        tracker.track(
+            AnalyticsEvent.RegisterAbandon(
+                sessionId = sessionId,
+                lastStep = AnalyticsEvent.RegisterAbandon.LAST_STEP_CONFIRM,
+            ),
+        )
         _uiState.value = ConfirmationUiState.Cancelled
     }
 
@@ -169,10 +174,22 @@ class ConfirmationViewModel @AssistedInject constructor(
 
     private fun buildChangedFields(original: ScheduleDay, draft: ScheduleDay): List<EditFieldChange> = buildList {
         if (original.startTime != draft.startTime) {
-            add(EditFieldChange(AnalyticsEvent.UserEdit.FIELD_START_TIME, original.startTime?.toString() ?: "", draft.startTime?.toString() ?: ""))
+            add(
+                EditFieldChange(
+                    AnalyticsEvent.UserEdit.FIELD_START_TIME,
+                    original.startTime?.toString() ?: "",
+                    draft.startTime?.toString() ?: "",
+                ),
+            )
         }
         if (original.endTime != draft.endTime) {
-            add(EditFieldChange(AnalyticsEvent.UserEdit.FIELD_END_TIME, original.endTime?.toString() ?: "", draft.endTime?.toString() ?: ""))
+            add(
+                EditFieldChange(
+                    AnalyticsEvent.UserEdit.FIELD_END_TIME,
+                    original.endTime?.toString() ?: "",
+                    draft.endTime?.toString() ?: "",
+                ),
+            )
         }
         if (original.codeLabel != draft.codeLabel) {
             add(EditFieldChange(AnalyticsEvent.UserEdit.FIELD_CODE_LABEL, original.codeLabel, draft.codeLabel))
