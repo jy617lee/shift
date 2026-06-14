@@ -114,10 +114,9 @@ private fun ConfirmationDestination(
         return
     }
 
-    val sessionId = flowHolder.pendingSessionId
     val viewModel: ConfirmationViewModel = hiltViewModel(
         creationCallback = { factory: ConfirmationViewModel.Factory ->
-            factory.create(weeks, imageUri, sessionId)
+            factory.create(weeks, imageUri)
         },
     )
     ConfirmationScreen(

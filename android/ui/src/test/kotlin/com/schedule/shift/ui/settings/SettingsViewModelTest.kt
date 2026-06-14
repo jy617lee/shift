@@ -1,7 +1,6 @@
 package com.schedule.shift.ui.settings
 
 import app.cash.turbine.test
-import com.schedule.shift.domain.analytics.AnalyticsTracker
 import com.schedule.shift.domain.preferences.UserPreferencesRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -23,13 +22,11 @@ class SettingsViewModelTest {
 
     private val testDispatcher = StandardTestDispatcher()
     private lateinit var preferences: UserPreferencesRepository
-    private lateinit var tracker: AnalyticsTracker
 
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         preferences = mockk()
-        tracker = mockk(relaxed = true)
     }
 
     @After
@@ -41,7 +38,7 @@ class SettingsViewModelTest {
     fun `skipConfirm starts as false then loads persisted value`() = runTest {
         coEvery { preferences.isSkipConfirm() } returns true
 
-        val vm = SettingsViewModel(preferences, tracker)
+        val vm = SettingsViewModel(preferences)
         vm.skipConfirm.test {
             assertFalse(awaitItem())
             testDispatcher.scheduler.advanceUntilIdle()
@@ -55,7 +52,7 @@ class SettingsViewModelTest {
         coEvery { preferences.isSkipConfirm() } returns false
         coEvery { preferences.setSkipConfirm(any()) } returns Unit
 
-        val vm = SettingsViewModel(preferences, tracker)
+        val vm = SettingsViewModel(preferences)
         testDispatcher.scheduler.advanceUntilIdle()
 
         vm.skipConfirm.test {
@@ -73,7 +70,7 @@ class SettingsViewModelTest {
         coEvery { preferences.isSkipConfirm() } returns true
         coEvery { preferences.setSkipConfirm(any()) } returns Unit
 
-        val vm = SettingsViewModel(preferences, tracker)
+        val vm = SettingsViewModel(preferences)
         testDispatcher.scheduler.advanceUntilIdle()
 
         vm.setSkipConfirm(false)
