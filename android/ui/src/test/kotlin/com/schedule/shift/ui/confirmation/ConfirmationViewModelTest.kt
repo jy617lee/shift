@@ -1,6 +1,7 @@
 package com.schedule.shift.ui.confirmation
 
 import app.cash.turbine.test
+import com.schedule.shift.domain.analytics.AnalyticsTracker
 import com.schedule.shift.domain.model.DayType
 import com.schedule.shift.domain.model.ScheduleDay
 import com.schedule.shift.domain.model.ScheduleWeek
@@ -32,6 +33,7 @@ class ConfirmationViewModelTest {
     private lateinit var repository: ScheduleRepository
     private lateinit var widgetRefresher: WidgetRefresher
     private lateinit var preferences: UserPreferencesRepository
+    private lateinit var tracker: AnalyticsTracker
 
     @Before
     fun setUp() {
@@ -39,6 +41,7 @@ class ConfirmationViewModelTest {
         repository = mockk(relaxed = true)
         widgetRefresher = mockk(relaxed = true)
         preferences = mockk(relaxed = true)
+        tracker = mockk(relaxed = true)
         coEvery { preferences.isSkipConfirmPromptShown() } returns true
     }
 
@@ -48,7 +51,7 @@ class ConfirmationViewModelTest {
     }
 
     private fun buildViewModel(weeks: List<ScheduleWeek> = listOf(buildTestWeek())) =
-        ConfirmationViewModel(weeks, null, repository, widgetRefresher, preferences)
+        ConfirmationViewModel(weeks, null, "test-session", repository, widgetRefresher, preferences, tracker)
 
     @Test
     fun `initial state shows weeks from constructor`() = runTest {

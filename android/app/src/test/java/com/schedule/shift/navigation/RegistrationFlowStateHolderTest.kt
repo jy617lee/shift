@@ -3,6 +3,7 @@ package com.schedule.shift.navigation
 import android.graphics.Bitmap
 import com.schedule.shift.domain.model.DayType
 import com.schedule.shift.domain.model.ScheduleDay
+import com.schedule.shift.domain.analytics.AnalyticsTracker
 import com.schedule.shift.domain.model.ScheduleWeek
 import com.schedule.shift.domain.model.SourceType
 import com.schedule.shift.domain.parser.FailureReason
@@ -37,6 +38,7 @@ class RegistrationFlowStateHolderTest {
     private lateinit var scheduleRepository: ScheduleRepository
     private lateinit var widgetRefresher: WidgetRefresher
     private lateinit var processImage: ProcessScheduleImageUseCase
+    private lateinit var tracker: AnalyticsTracker
     private lateinit var holder: RegistrationFlowStateHolder
 
     @Before
@@ -46,8 +48,9 @@ class RegistrationFlowStateHolderTest {
         scheduleRepository = mockk(relaxed = true)
         widgetRefresher = mockk(relaxed = true)
         processImage = mockk(relaxed = true)
+        tracker = mockk(relaxed = true)
         coEvery { preferences.isSkipConfirm() } returns false
-        holder = RegistrationFlowStateHolder(preferences, scheduleRepository, widgetRefresher, processImage)
+        holder = RegistrationFlowStateHolder(preferences, scheduleRepository, widgetRefresher, processImage, tracker)
     }
 
     @After
@@ -68,11 +71,11 @@ class RegistrationFlowStateHolderTest {
 
     @Test
     fun `handleImageSelected emits GoToConfirmation on success when skip is false`() = runTest {
-        val bitmap = mockk<Bitmap>()
+        val bitmap = mockk<Bitmap>(relaxed = true)
         val weeks = listOf(buildTestWeek())
         coEvery { preferences.isSkipConfirm() } returns false
         coEvery { processImage(bitmap) } returns ParseResult.Success(weeks)
-        holder = RegistrationFlowStateHolder(preferences, scheduleRepository, widgetRefresher, processImage)
+        holder = RegistrationFlowStateHolder(preferences, scheduleRepository, widgetRefresher, processImage, tracker)
         testDispatcher.scheduler.advanceUntilIdle()
 
         holder.handleImageSelected(bitmap, "content://test/image")
@@ -86,12 +89,12 @@ class RegistrationFlowStateHolderTest {
 
     @Test
     fun `handleImageSelected saves directly when skip is true and no conflict`() = runTest {
-        val bitmap = mockk<Bitmap>()
+        val bitmap = mockk<Bitmap>(relaxed = true)
         val weeks = listOf(buildTestWeek())
         coEvery { preferences.isSkipConfirm() } returns true
         coEvery { processImage(bitmap) } returns ParseResult.Success(weeks)
         coEvery { scheduleRepository.getWeekByDate(any()) } returns null
-        holder = RegistrationFlowStateHolder(preferences, scheduleRepository, widgetRefresher, processImage)
+        holder = RegistrationFlowStateHolder(preferences, scheduleRepository, widgetRefresher, processImage, tracker)
         testDispatcher.scheduler.advanceUntilIdle()
 
         holder.handleImageSelected(bitmap, null)
@@ -103,12 +106,12 @@ class RegistrationFlowStateHolderTest {
 
     @Test
     fun `handleImageSelected replaces and sets homeRefreshNeeded when skip is true and conflict exists`() = runTest {
-        val bitmap = mockk<Bitmap>()
+        val bitmap = mockk<Bitmap>(relaxed = true)
         val week = buildTestWeek()
         coEvery { preferences.isSkipConfirm() } returns true
         coEvery { processImage(bitmap) } returns ParseResult.Success(listOf(week))
         coEvery { scheduleRepository.getWeekByDate(week.weekStartDate) } returns week
-        holder = RegistrationFlowStateHolder(preferences, scheduleRepository, widgetRefresher, processImage)
+        holder = RegistrationFlowStateHolder(preferences, scheduleRepository, widgetRefresher, processImage, tracker)
         testDispatcher.scheduler.advanceUntilIdle()
 
         holder.handleImageSelected(bitmap, null)
@@ -120,7 +123,7 @@ class RegistrationFlowStateHolderTest {
 
     @Test
     fun `handleImageSelected sets imageErrorMessage on NOT_A_SCHEDULE failure`() = runTest {
-        val bitmap = mockk<Bitmap>()
+        val bitmap = mockk<Bitmap>(relaxed = true)
         coEvery { processImage(bitmap) } returns ParseResult.Failure(FailureReason.NOT_A_SCHEDULE)
 
         holder.handleImageSelected(bitmap, null)
@@ -133,7 +136,7 @@ class RegistrationFlowStateHolderTest {
 
     @Test
     fun `handleImageSelected sets imageErrorMessage on PARSE_ERROR failure`() = runTest {
-        val bitmap = mockk<Bitmap>()
+        val bitmap = mockk<Bitmap>(relaxed = true)
         coEvery { processImage(bitmap) } returns ParseResult.Failure(FailureReason.PARSE_ERROR)
 
         holder.handleImageSelected(bitmap, null)
@@ -144,7 +147,7 @@ class RegistrationFlowStateHolderTest {
 
     @Test
     fun `clearImageError clears imageErrorMessage`() = runTest {
-        val bitmap = mockk<Bitmap>()
+        val bitmap = mockk<Bitmap>(relaxed = true)
         coEvery { processImage(bitmap) } returns ParseResult.Failure(FailureReason.PARSE_ERROR)
         holder.handleImageSelected(bitmap, null)
         testDispatcher.scheduler.advanceUntilIdle()
@@ -156,11 +159,11 @@ class RegistrationFlowStateHolderTest {
 
     @Test
     fun `clearHomeRefresh resets homeRefreshNeeded`() = runTest {
-        val bitmap = mockk<Bitmap>()
+        val bitmap = mockk<Bitmap>(relaxed = true)
         coEvery { preferences.isSkipConfirm() } returns true
         coEvery { processImage(bitmap) } returns ParseResult.Success(listOf(buildTestWeek()))
         coEvery { scheduleRepository.getWeekByDate(any()) } returns null
-        holder = RegistrationFlowStateHolder(preferences, scheduleRepository, widgetRefresher, processImage)
+        holder = RegistrationFlowStateHolder(preferences, scheduleRepository, widgetRefresher, processImage, tracker)
         testDispatcher.scheduler.advanceUntilIdle()
 
         holder.handleImageSelected(bitmap, null)
@@ -172,7 +175,7 @@ class RegistrationFlowStateHolderTest {
 
     @Test
     fun `clear resets all state`() = runTest {
-        val bitmap = mockk<Bitmap>()
+        val bitmap = mockk<Bitmap>(relaxed = true)
         coEvery { processImage(bitmap) } returns ParseResult.Failure(FailureReason.PARSE_ERROR)
         holder.handleImageSelected(bitmap, null)
         testDispatcher.scheduler.advanceUntilIdle()
@@ -188,7 +191,7 @@ class RegistrationFlowStateHolderTest {
 
     @Test
     fun `resetAction resets pendingAction to None`() = runTest {
-        val bitmap = mockk<Bitmap>()
+        val bitmap = mockk<Bitmap>(relaxed = true)
         coEvery { processImage(bitmap) } returns ParseResult.Success(listOf(buildTestWeek()))
         holder.handleImageSelected(bitmap, null)
         testDispatcher.scheduler.advanceUntilIdle()
