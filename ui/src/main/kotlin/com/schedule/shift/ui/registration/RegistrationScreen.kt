@@ -138,8 +138,8 @@ internal fun RegistrationContent(
         )
         is RegistrationUiState.ParseError -> ErrorContent(
             icon = "⚠️",
-            title = "이미지 처리 중 오류가 발생했습니다",
-            description = "이미지를 불러오지 못했습니다. 다시 시도해주세요",
+            title = "이미지를 읽지 못했어요",
+            description = "다른 이미지로 다시 시도해주세요",
             buttonLabel = "다른 이미지 선택",
             onAction = onRetry,
         )
@@ -174,7 +174,7 @@ private fun IdleContent(onPickImage: () -> Unit) {
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "주간 스케쥴표 이미지를 선택하면\n자동으로 일정을 인식합니다",
+            text = "주간 스케쥴표 이미지를 선택하면\n자동으로 일정을 불러옵니다",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
@@ -204,7 +204,7 @@ private fun ProcessingContent() {
         )
         Spacer(modifier = Modifier.height(20.dp))
         Text(
-            text = "스케쥴을 인식하는 중...",
+            text = "스케쥴을 읽어오는 중...",
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onBackground,
         )

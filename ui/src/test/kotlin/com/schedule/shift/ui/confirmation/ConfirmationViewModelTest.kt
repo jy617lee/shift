@@ -5,6 +5,7 @@ import com.schedule.shift.domain.model.DayType
 import com.schedule.shift.domain.model.ScheduleDay
 import com.schedule.shift.domain.model.ScheduleWeek
 import com.schedule.shift.domain.model.SourceType
+import com.schedule.shift.domain.preferences.UserPreferencesRepository
 import com.schedule.shift.domain.repository.ScheduleRepository
 import com.schedule.shift.domain.widget.WidgetRefresher
 import io.mockk.coEvery
@@ -30,12 +31,15 @@ class ConfirmationViewModelTest {
     private val testDispatcher = StandardTestDispatcher()
     private lateinit var repository: ScheduleRepository
     private lateinit var widgetRefresher: WidgetRefresher
+    private lateinit var preferences: UserPreferencesRepository
 
     @Before
     fun setUp() {
         Dispatchers.setMain(testDispatcher)
         repository = mockk(relaxed = true)
         widgetRefresher = mockk(relaxed = true)
+        preferences = mockk(relaxed = true)
+        coEvery { preferences.isSkipConfirmPromptShown() } returns true
     }
 
     @After
@@ -44,7 +48,7 @@ class ConfirmationViewModelTest {
     }
 
     private fun buildViewModel(weeks: List<ScheduleWeek> = listOf(buildTestWeek())) =
-        ConfirmationViewModel(weeks, null, repository, widgetRefresher)
+        ConfirmationViewModel(weeks, null, repository, widgetRefresher, preferences)
 
     @Test
     fun `initial state shows weeks from constructor`() = runTest {

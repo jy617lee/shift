@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.schedule.shift.domain.model.ScheduleDay
 import com.schedule.shift.domain.model.ScheduleWeek
+import com.schedule.shift.domain.preferences.UserPreferencesRepository
 import com.schedule.shift.domain.repository.ScheduleRepository
 import com.schedule.shift.domain.widget.WidgetRefresher
 import dagger.assisted.Assisted
@@ -21,6 +22,7 @@ class ConfirmationViewModel @AssistedInject constructor(
     @Assisted private val imageUri: String?,
     private val repository: ScheduleRepository,
     private val widgetRefresher: WidgetRefresher,
+    private val preferences: UserPreferencesRepository,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<ConfirmationUiState>(
@@ -51,7 +53,7 @@ class ConfirmationViewModel @AssistedInject constructor(
                 }
             }
             widgetRefresher.refreshAll()
-            _uiState.value = ConfirmationUiState.Saved
+            finishAfterSave()
         }
     }
 
@@ -63,7 +65,24 @@ class ConfirmationViewModel @AssistedInject constructor(
     private suspend fun saveAllAndFinish(weeks: List<ScheduleWeek>) {
         weeks.forEach { repository.saveWeek(it) }
         widgetRefresher.refreshAll()
-        _uiState.value = ConfirmationUiState.Saved
+        finishAfterSave()
+    }
+
+    private suspend fun finishAfterSave() {
+        val state = _uiState.value as? ConfirmationUiState.Reviewing ?: return
+        if (!preferences.isSkipConfirmPromptShown()) {
+            _uiState.value = state.copy(showSkipPrompt = true)
+        } else {
+            _uiState.value = ConfirmationUiState.Saved
+        }
+    }
+
+    fun answerSkipPrompt(skipInFuture: Boolean) {
+        viewModelScope.launch {
+            preferences.setSkipConfirm(skipInFuture)
+            preferences.setSkipConfirmPromptShown(true)
+            _uiState.value = ConfirmationUiState.Saved
+        }
     }
 
     fun cancel() {

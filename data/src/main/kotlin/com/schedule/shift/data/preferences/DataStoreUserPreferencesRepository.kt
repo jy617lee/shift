@@ -19,7 +19,15 @@ class DataStoreUserPreferencesRepository(
         dataStore.edit { it[SKIP_CONFIRM_KEY] = value }
     }
 
+    override suspend fun isSkipConfirmPromptShown(): Boolean =
+        dataStore.data.map { it[SKIP_CONFIRM_PROMPT_SHOWN_KEY] ?: false }.first()
+
+    override suspend fun setSkipConfirmPromptShown(value: Boolean) {
+        dataStore.edit { it[SKIP_CONFIRM_PROMPT_SHOWN_KEY] = value }
+    }
+
     companion object {
         private val SKIP_CONFIRM_KEY = booleanPreferencesKey("skip_confirm")
+        private val SKIP_CONFIRM_PROMPT_SHOWN_KEY = booleanPreferencesKey("skip_confirm_prompt_shown")
     }
 }

@@ -53,8 +53,8 @@ fun SettingsScreen(
                 modifier = Modifier.padding(horizontal = 4.dp, vertical = 6.dp),
             )
             SettingsSwitchRow(
-                label = "OCR 결과 확인 건너뛰기",
-                description = "활성화하면 이미지 파싱 후 확인 없이 바로 저장합니다",
+                label = "스케쥴 확인 건너뛰기",
+                description = "이미지 선택 후 스케쥴을 바로 저장합니다",
                 checked = skipConfirm,
                 onCheckedChange = viewModel::setSkipConfirm,
             )

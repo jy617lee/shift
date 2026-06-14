@@ -4,6 +4,18 @@ import com.schedule.shift.domain.model.DayType
 import com.schedule.shift.domain.model.ScheduleDay
 import com.schedule.shift.domain.model.ScheduleWeek
 import com.schedule.shift.domain.model.SourceType
+import com.schedule.shift.domain.preferences.UserPreferencesRepository
+import com.schedule.shift.domain.repository.ScheduleRepository
+import com.schedule.shift.domain.widget.WidgetRefresher
+import io.mockk.coEvery
+import io.mockk.mockk
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
@@ -11,13 +23,28 @@ import org.junit.Before
 import org.junit.Test
 import java.time.LocalDate
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class RegistrationFlowStateHolderTest {
 
+    private val testDispatcher = StandardTestDispatcher()
+    private lateinit var preferences: UserPreferencesRepository
+    private lateinit var scheduleRepository: ScheduleRepository
+    private lateinit var widgetRefresher: WidgetRefresher
     private lateinit var holder: RegistrationFlowStateHolder
 
     @Before
     fun setUp() {
-        holder = RegistrationFlowStateHolder()
+        Dispatchers.setMain(testDispatcher)
+        preferences = mockk(relaxed = true)
+        scheduleRepository = mockk(relaxed = true)
+        widgetRefresher = mockk(relaxed = true)
+        coEvery { preferences.isSkipConfirm() } returns false
+        holder = RegistrationFlowStateHolder(preferences, scheduleRepository, widgetRefresher)
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
     }
 
     @Test
@@ -27,57 +54,57 @@ class RegistrationFlowStateHolderTest {
     }
 
     @Test
-    fun `setPendingWeeks stores weeks`() {
-        val weeks = listOf(buildTestWeek())
-        holder.setPendingWeeks(weeks)
-        assertEquals(weeks, holder.pendingWeeks)
+    fun `initial pendingAction is None`() = runTest {
+        assertEquals(FlowPendingAction.None, holder.pendingAction.value)
     }
 
     @Test
-    fun `setPendingImageUri stores uri`() {
-        holder.setPendingImageUri("content://test/image")
+    fun `handleParsed emits GoToConfirmation when skip is disabled`() = runTest {
+        coEvery { preferences.isSkipConfirm() } returns false
+        val weeks = listOf(buildTestWeek())
+
+        holder.handleParsed(weeks, "content://test/image")
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals(FlowPendingAction.GoToConfirmation, holder.pendingAction.value)
+        assertEquals(weeks, holder.pendingWeeks)
         assertEquals("content://test/image", holder.pendingImageUri)
     }
 
     @Test
-    fun `clear resets both fields`() {
-        holder.setPendingWeeks(listOf(buildTestWeek()))
-        holder.setPendingImageUri("content://test/image")
+    fun `handleParsed emits SavedDirectly when skip is enabled`() = runTest {
+        coEvery { preferences.isSkipConfirm() } returns true
+        coEvery { scheduleRepository.getWeekByDate(any()) } returns null
+        val weeks = listOf(buildTestWeek())
+
+        holder.handleParsed(weeks, null)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals(FlowPendingAction.SavedDirectly, holder.pendingAction.value)
+    }
+
+    @Test
+    fun `clear resets all state`() = runTest {
+        val weeks = listOf(buildTestWeek())
+        holder.handleParsed(weeks, "content://test/image")
+        testDispatcher.scheduler.advanceUntilIdle()
+
         holder.clear()
+
         assertTrue(holder.pendingWeeks.isEmpty())
         assertNull(holder.pendingImageUri)
+        assertEquals(FlowPendingAction.None, holder.pendingAction.value)
     }
 
     @Test
-    fun `setPendingImageUri with null clears uri`() {
-        holder.setPendingImageUri("content://test/image")
-        holder.setPendingImageUri(null)
-        assertNull(holder.pendingImageUri)
-    }
+    fun `resetAction resets pendingAction to None`() = runTest {
+        coEvery { preferences.isSkipConfirm() } returns false
+        holder.handleParsed(listOf(buildTestWeek()), null)
+        testDispatcher.scheduler.advanceUntilIdle()
 
-    @Test
-    fun `setPendingWeeks with empty list clears weeks`() {
-        holder.setPendingWeeks(listOf(buildTestWeek()))
-        holder.setPendingWeeks(emptyList())
-        assertTrue(holder.pendingWeeks.isEmpty())
-    }
+        holder.resetAction()
 
-    @Test
-    fun `setPendingWeeks replaces previous value`() {
-        val week1 = buildTestWeek()
-        val week2 = buildTestWeek()
-        holder.setPendingWeeks(listOf(week1))
-        holder.setPendingWeeks(listOf(week2))
-        assertEquals(listOf(week2), holder.pendingWeeks)
-    }
-
-    @Test
-    fun `multiple clears are idempotent`() {
-        holder.setPendingWeeks(listOf(buildTestWeek()))
-        holder.clear()
-        holder.clear()
-        assertTrue(holder.pendingWeeks.isEmpty())
-        assertNull(holder.pendingImageUri)
+        assertEquals(FlowPendingAction.None, holder.pendingAction.value)
     }
 
     private fun buildTestWeek(): ScheduleWeek {
