@@ -32,10 +32,14 @@ fun ShiftNavGraph(
         if (openRegistration) navController.navigate(Routes.REGISTRATION)
     }
     NavHost(navController = navController, startDestination = Routes.HOME) {
-        composable(Routes.HOME) {
+        composable(Routes.HOME) { backStackEntry ->
+            val flowHolder: RegistrationFlowStateHolder = hiltViewModel(backStackEntry)
+            val homeRefreshNeeded by flowHolder.homeRefreshNeeded.collectAsStateWithLifecycle()
             HomeScreen(
                 onAddSchedule = { navController.navigate(Routes.REGISTRATION) },
                 onSettings = { navController.navigate(Routes.SETTINGS) },
+                refreshTrigger = homeRefreshNeeded,
+                onRefreshConsumed = flowHolder::clearHomeRefresh,
             )
         }
         composable(Routes.SETTINGS) {
@@ -57,23 +61,18 @@ private fun RegistrationDestination(
 ) {
     val homeEntry = remember(backStackEntry) { navController.getBackStackEntry(Routes.HOME) }
     val flowHolder: RegistrationFlowStateHolder = hiltViewModel(homeEntry)
+    val skipConfirm by flowHolder.skipConfirm.collectAsStateWithLifecycle()
     val pendingAction by flowHolder.pendingAction.collectAsStateWithLifecycle()
     LaunchedEffect(pendingAction) {
-        when (pendingAction) {
-            FlowPendingAction.GoToConfirmation -> {
-                flowHolder.resetAction()
-                navController.navigate(Routes.CONFIRMATION)
-            }
-            FlowPendingAction.SavedDirectly -> {
-                flowHolder.clear()
-                navController.navigate(Routes.HOME) { popUpTo(Routes.HOME) { inclusive = true } }
-            }
-            FlowPendingAction.None -> Unit
+        if (pendingAction == FlowPendingAction.GoToConfirmation) {
+            flowHolder.resetAction()
+            navController.navigate(Routes.CONFIRMATION)
         }
     }
     RegistrationScreen(
         onParsed = { weeks, imageUri -> flowHolder.handleParsed(weeks, imageUri) },
         onBack = { navController.popBackStack() },
+        skipImageHandler = if (skipConfirm) flowHolder::startSkipSave else null,
     )
 }
 

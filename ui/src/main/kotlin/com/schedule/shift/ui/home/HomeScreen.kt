@@ -34,6 +34,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -69,9 +70,17 @@ private val WEEK_RANGE_FMT = DateTimeFormatter.ofPattern("M월 d일")
 fun HomeScreen(
     onAddSchedule: () -> Unit,
     onSettings: () -> Unit,
+    refreshTrigger: Boolean = false,
+    onRefreshConsumed: () -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    LaunchedEffect(refreshTrigger) {
+        if (refreshTrigger) {
+            viewModel.refresh()
+            onRefreshConsumed()
+        }
+    }
     HomeContent(uiState = uiState, onAddSchedule = onAddSchedule, onSettings = onSettings, onRefresh = viewModel::refresh)
 }
 

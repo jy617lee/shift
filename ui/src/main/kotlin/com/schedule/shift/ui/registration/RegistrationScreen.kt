@@ -49,6 +49,7 @@ import com.schedule.shift.domain.model.ScheduleWeek
 fun RegistrationScreen(
     onParsed: (List<ScheduleWeek>, String?) -> Unit,
     onBack: () -> Unit = {},
+    skipImageHandler: ((Bitmap, String?) -> Unit)? = null,
     viewModel: RegistrationViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -59,7 +60,14 @@ fun RegistrationScreen(
     ) { uri ->
         uri?.let {
             val bitmap = loadBitmapFromUri(context, uri)
-            bitmap?.let { bmp -> viewModel.onImageSelected(bmp, uri.toString()) }
+            bitmap?.let { bmp ->
+                if (skipImageHandler != null) {
+                    skipImageHandler(bmp, uri.toString())
+                    onBack()
+                } else {
+                    viewModel.onImageSelected(bmp, uri.toString())
+                }
+            }
         }
     }
 
