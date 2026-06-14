@@ -322,4 +322,3 @@ struct DayEditSheet: View {
         return minutes.isEmpty ? hours : "\(hours):\(minutes)"
     }
 }
-// swiftlint:enable file_length

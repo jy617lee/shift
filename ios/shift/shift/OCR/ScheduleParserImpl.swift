@@ -4,6 +4,7 @@ struct ScheduleParserImpl: ScheduleParser {
     private let validator: Stage1Validator
     private let today: Date
 
+    // swiftlint:disable:next line_length
     private static let linePattern = makePattern(
         #"(\d{1,2})/(\d{1,2})\([^)]*\)\s*(?:(?:[P@O0R]\s*)*(\d{2}:\d{2})[~\s]*(?:[P@O0R]\s*)*(\d{2}:\d{2})\s*)?(?:(?:[P@O0R]\s*)*(.*))?"#
     )
