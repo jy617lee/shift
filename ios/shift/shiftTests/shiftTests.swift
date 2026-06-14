@@ -123,7 +123,7 @@ final class ConfirmationViewModelTests: XCTestCase {
         XCTAssertTrue(vm.isCancelled)
     }
 
-    func testDismissConflictResetsCount() {
+    func testDismissConflictResetsCount() async {
         let vm = makeVM()
         vm.conflictCount = 3
         vm.dismissConflict()
@@ -163,7 +163,7 @@ final class ConfirmationViewModelTests: XCTestCase {
         XCTAssertEqual(vm.weeks[0].days[0].codeLabel, "수정됨")
     }
 
-    func testDismissEditClearsState() {
+    func testDismissEditClearsState() async {
         let vm = makeVM(weeks: [makeTestWeek()])
         vm.startEdit(weekIndex: 0, dayIndex: 0)
         vm.dismissEdit()
