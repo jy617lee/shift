@@ -19,9 +19,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Mint 캐시 복원
+        uses: actions/cache@v4
+        with:
+          path: ~/.mint
+          key: mint-${{ runner.os }}-${{ hashFiles('ios/Mintfile') }}
+          restore-keys: mint-${{ runner.os }}-
+
       - name: "[1] SwiftLint 정적 분석 + 린터"
         run: |
           brew install mint
+          mint bootstrap
           mint run swiftlint --strict
 
       - name: "[2] 단위 테스트 + 커버리지 수집"
