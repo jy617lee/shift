@@ -1,6 +1,10 @@
 package com.schedule.shift.ui.registration
 
+import android.app.Activity
+import android.content.Intent
 import android.graphics.Bitmap
+import android.net.Uri
+import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -55,18 +59,36 @@ fun RegistrationScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
-    val imagePicker = rememberLauncherForActivityResult(
-        ActivityResultContracts.PickVisualMedia(),
-    ) { uri ->
+    val handleUri = { uri: Uri? ->
         uri?.let {
-            val bitmap = loadBitmapFromUri(context, uri)
-            bitmap?.let { bmp -> viewModel.onImageSelected(bmp, uri.toString()) }
+            val bitmap = loadBitmapFromUri(context, it)
+            bitmap?.let { bmp -> viewModel.onImageSelected(bmp, it.toString()) }
         }
     }
 
-    LaunchedEffect(Unit) {
-        imagePicker.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+    val visualMediaLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.PickVisualMedia(),
+    ) { uri -> handleUri(uri) }
+
+    val pickFallbackLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult(),
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) handleUri(result.data?.data)
     }
+
+    val launchPicker: () -> Unit = {
+        if (ActivityResultContracts.PickVisualMedia.isPhotoPickerAvailable(context)) {
+            visualMediaLauncher.launch(
+                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly),
+            )
+        } else {
+            pickFallbackLauncher.launch(
+                Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI),
+            )
+        }
+    }
+
+    LaunchedEffect(Unit) { launchPicker() }
 
     LaunchedEffect(uiState) {
         val success = uiState as? RegistrationUiState.ParseSuccess ?: return@LaunchedEffect
@@ -110,16 +132,10 @@ fun RegistrationScreen(
         ) {
             RegistrationContent(
                 uiState = uiState,
-                onPickImage = {
-                    imagePicker.launch(
-                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly),
-                    )
-                },
+                onPickImage = { launchPicker() },
                 onRetry = {
                     viewModel.reset()
-                    imagePicker.launch(
-                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly),
-                    )
+                    launchPicker()
                 },
             )
         }
