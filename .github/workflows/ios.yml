@@ -41,26 +41,10 @@ jobs:
       - name: "[2] 단위 테스트 + 커버리지 수집"
         working-directory: ios/shift
         run: |
-          # xcodebuild -showdestinations 로 유효한 iOS Simulator UDID 직접 추출
-          SIM_ID=$(xcodebuild -project shift.xcodeproj -scheme shift -showdestinations 2>&1 | \
-            python3 -c "
-          import sys, re
-          for line in sys.stdin:
-              if 'iOS Simulator' in line and 'placeholder' not in line:
-                  m = re.search(r'id:([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})', line)
-                  if m:
-                      print(m.group(1)); exit(0)
-          " 2>/dev/null)
-          if [ -n "$SIM_ID" ]; then
-            xcrun simctl boot "$SIM_ID" 2>/dev/null || true
-            DEST="id=$SIM_ID"
-          else
-            DEST="id=dvtdevice-DVTiOSDeviceSimulatorPlaceholder-iphonesimulator:placeholder"
-          fi
           xcodebuild test \
             -project shift.xcodeproj \
             -scheme shift \
-            -destination "$DEST" \
+            -destination 'platform=iOS Simulator' \
             -enableCodeCoverage YES \
             -derivedDataPath /tmp/DerivedData \
             -skip-testing:shiftUITests \
