@@ -11,6 +11,7 @@ enum RegistrationPhase: Equatable {
     case skipModeSaved(weeksCount: Int)
     case notASchedule
     case parseError
+    case saveError
 }
 
 @MainActor
@@ -74,19 +75,27 @@ final class RegistrationViewModel {
     }
 
     func proceedSkipReplace() async {
-        for week in parsedWeeks {
-            if (try? await repository.getWeekByDate(week.weekStartDate)) != nil {
-                try? await repository.replaceWeek(week)
-            } else {
-                try? await repository.saveWeek(week)
+        do {
+            for week in parsedWeeks {
+                if (try? await repository.getWeekByDate(week.weekStartDate)) != nil {
+                    try await repository.replaceWeek(week)
+                } else {
+                    try await repository.saveWeek(week)
+                }
             }
+            phase = .skipModeSaved(weeksCount: parsedWeeks.count)
+        } catch {
+            phase = .saveError
         }
-        phase = .skipModeSaved(weeksCount: parsedWeeks.count)
     }
 
     private func directSave(weeks: [ScheduleWeek]) async {
-        for week in weeks { try? await repository.saveWeek(week) }
-        phase = .skipModeSaved(weeksCount: weeks.count)
+        do {
+            for week in weeks { try await repository.saveWeek(week) }
+            phase = .skipModeSaved(weeksCount: weeks.count)
+        } catch {
+            phase = .saveError
+        }
     }
 
     func reportFailure(image: UIImage) {

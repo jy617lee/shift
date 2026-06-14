@@ -7,11 +7,16 @@ struct ConfirmationView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
-                if let image = viewModel.image {
-                    ImagePreviewView(image: image)
+            ZStack {
+                VStack(spacing: 0) {
+                    if let image = viewModel.image {
+                        ImagePreviewView(image: image)
+                    }
+                    weekList
                 }
-                weekList
+                if let msg = viewModel.toastMessage {
+                    ToastBanner(message: msg)
+                }
             }
             .navigationTitle("스케쥴 확인")
             .navigationBarTitleDisplayMode(.inline)

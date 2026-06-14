@@ -126,7 +126,10 @@ struct HomeView: View {
         case .parseError:
             parseErrorImage = registrationVM.capturedImage
             showParseErrorAlert = true
-        default:
+        case .saveError:
+            viewModel.showToast("저장에 실패했어요. 다시 시도해주세요.")
+            registrationVM.reset()
+        case .idle, .processing:
             break
         }
     }

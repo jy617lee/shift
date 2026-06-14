@@ -22,6 +22,7 @@ final class ConfirmationViewModel {
     var savedSuccessfully = false
     var savedWeeksCount = 0
     var isCancelled = false
+    var toastMessage: String?
 
     init(
         weeks: [ScheduleWeek],
@@ -50,23 +51,48 @@ final class ConfirmationViewModel {
 
     func proceedWithReplace() {
         Task {
-            for week in weeks {
-                if (try? await repository.getWeekByDate(week.weekStartDate)) != nil {
-                    try? await repository.replaceWeek(week)
-                } else {
-                    try? await repository.saveWeek(week)
+            do {
+                for week in weeks {
+                    if (try? await repository.getWeekByDate(week.weekStartDate)) != nil {
+                        try await repository.replaceWeek(week)
+                    } else {
+                        try await repository.saveWeek(week)
+                    }
                 }
+                conflictCount = 0
+                await finishAfterSave()
+            } catch {
+                conflictCount = 0
+                showToast(saveErrorMessage(error))
             }
-            conflictCount = 0
-            await finishAfterSave()
         }
     }
 
     func dismissConflict() { conflictCount = 0 }
 
     private func saveAllAndFinish() async {
-        for week in weeks { try? await repository.saveWeek(week) }
-        await finishAfterSave()
+        do {
+            for week in weeks { try await repository.saveWeek(week) }
+            await finishAfterSave()
+        } catch {
+            showToast(saveErrorMessage(error))
+        }
+    }
+
+    func showToast(_ message: String) {
+        toastMessage = message
+        Task {
+            try? await Task.sleep(for: .seconds(3))
+            withAnimation { self.toastMessage = nil }
+        }
+    }
+
+    private func saveErrorMessage(_ error: Error) -> String {
+        let nsError = error as NSError
+        if nsError.domain == NSPOSIXErrorDomain && nsError.code == 28 {
+            return "저장 공간이 부족합니다"
+        }
+        return "저장에 실패했어요. 다시 시도해주세요."
     }
 
     private func finishAfterSave() async {
