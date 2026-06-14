@@ -20,6 +20,8 @@ import kotlinx.coroutines.launch
 
 private const val DAYS_IN_WEEK = 7
 
+private data class EditFieldChange(val field: String, val parsed: String, val corrected: String)
+
 @Suppress("LongParameterList")
 @HiltViewModel(assistedFactory = ConfirmationViewModel.Factory::class)
 class ConfirmationViewModel @AssistedInject constructor(
@@ -111,7 +113,7 @@ class ConfirmationViewModel @AssistedInject constructor(
     }
 
     fun cancel() {
-        tracker.track(AnalyticsEvent.RegisterAbandon(sessionId = sessionId, lastStep = "confirm"))
+        tracker.track(AnalyticsEvent.RegisterAbandon(sessionId = sessionId, lastStep = AnalyticsEvent.RegisterAbandon.LAST_STEP_CONFIRM))
         _uiState.value = ConfirmationUiState.Cancelled
     }
 
@@ -148,46 +150,32 @@ class ConfirmationViewModel @AssistedInject constructor(
         _uiState.value = state.copy(weeks = updatedWeeks, editing = null)
     }
 
-    @Suppress("LongMethod", "LongParameterList")
+    @Suppress("LongParameterList")
     private fun trackChangedFields(original: ScheduleDay, draft: ScheduleDay, rowIndex: Int) {
-        if (original.startTime != draft.startTime) {
+        buildChangedFields(original, draft).forEach { change ->
             tracker.track(
                 AnalyticsEvent.UserEdit(
                     sessionId = sessionId,
                     rowIndex = rowIndex,
-                    field = "start_time",
-                    parsedValue = original.startTime?.toString() ?: "",
-                    correctedValue = draft.startTime?.toString() ?: "",
+                    field = change.field,
+                    parsedValue = change.parsed,
+                    correctedValue = change.corrected,
                     wasFailedRow = false,
-                    editSource = "manual",
+                    editSource = AnalyticsEvent.UserEdit.EDIT_SOURCE_MANUAL,
                 ),
             )
+        }
+    }
+
+    private fun buildChangedFields(original: ScheduleDay, draft: ScheduleDay): List<EditFieldChange> = buildList {
+        if (original.startTime != draft.startTime) {
+            add(EditFieldChange(AnalyticsEvent.UserEdit.FIELD_START_TIME, original.startTime?.toString() ?: "", draft.startTime?.toString() ?: ""))
         }
         if (original.endTime != draft.endTime) {
-            tracker.track(
-                AnalyticsEvent.UserEdit(
-                    sessionId = sessionId,
-                    rowIndex = rowIndex,
-                    field = "end_time",
-                    parsedValue = original.endTime?.toString() ?: "",
-                    correctedValue = draft.endTime?.toString() ?: "",
-                    wasFailedRow = false,
-                    editSource = "manual",
-                ),
-            )
+            add(EditFieldChange(AnalyticsEvent.UserEdit.FIELD_END_TIME, original.endTime?.toString() ?: "", draft.endTime?.toString() ?: ""))
         }
         if (original.codeLabel != draft.codeLabel) {
-            tracker.track(
-                AnalyticsEvent.UserEdit(
-                    sessionId = sessionId,
-                    rowIndex = rowIndex,
-                    field = "code_label",
-                    parsedValue = original.codeLabel,
-                    correctedValue = draft.codeLabel,
-                    wasFailedRow = false,
-                    editSource = "manual",
-                ),
-            )
+            add(EditFieldChange(AnalyticsEvent.UserEdit.FIELD_CODE_LABEL, original.codeLabel, draft.codeLabel))
         }
     }
 
