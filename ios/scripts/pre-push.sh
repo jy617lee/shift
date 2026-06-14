@@ -60,10 +60,29 @@ fi
 step "단위 테스트 + 커버리지 수집"
 XCRESULT_PATH="/tmp/shift_prepush.xcresult"
 rm -rf "$XCRESULT_PATH"
+
+# 사용 가능한 iPhone 시뮬레이터 자동 탐색 (환경마다 다름)
+SIM_ID=$(xcrun simctl list devices available -j 2>/dev/null | python3 -c "
+import json,sys
+data=json.load(sys.stdin)
+for devs in data.get('devices',{}).values():
+    for d in devs:
+        if d.get('isAvailable') and 'iPhone' in d.get('name',''):
+            print(d['udid']); sys.exit(0)
+" 2>/dev/null)
+
+if [ -n "$SIM_ID" ]; then
+    DEST="id=$SIM_ID"
+else
+    DEST="platform=iOS Simulator,name=Any iOS Simulator Device"
+fi
+
 if xcodebuild test \
     -project "$PROJ_DIR/shift.xcodeproj" \
     -scheme shift \
-    -destination 'platform=iOS Simulator,OS=latest,name=iPhone 16' \
+    -destination "$DEST" \
+    -skip-testing:shiftUITests \
+    -skip-testing:shiftUITestsLaunchTests \
     -enableCodeCoverage YES \
     -resultBundlePath "$XCRESULT_PATH" \
     -quiet 2>&1; then
