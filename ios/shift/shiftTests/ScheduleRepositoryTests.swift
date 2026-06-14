@@ -7,13 +7,13 @@ final class ScheduleRepositoryTests: XCTestCase {
     var container: ModelContainer!
     var repository: SwiftDataScheduleRepository!
 
-    override func setUpWithError() throws {
+    override func setUp() async throws {
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
         container = try ModelContainer(for: ScheduleWeekEntry.self, configurations: config)
         repository = SwiftDataScheduleRepository(context: container.mainContext)
     }
 
-    override func tearDownWithError() throws {
+    override func tearDown() async throws {
         container = nil
         repository = nil
     }
