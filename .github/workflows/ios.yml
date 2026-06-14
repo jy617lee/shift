@@ -41,10 +41,24 @@ jobs:
       - name: "[2] 단위 테스트 + 커버리지 수집"
         working-directory: ios/shift
         run: |
+          SIM_ID=$(xcrun simctl list devices available -j | python3 -c "
+          import json,sys
+          data=json.load(sys.stdin)
+          for devs in data.get('devices',{}).values():
+              for d in devs:
+                  if d.get('isAvailable') and ('iPhone' in d.get('name','') or 'iPad' in d.get('name','')):
+                      print(d['udid']); exit(0)
+          " 2>/dev/null)
+          if [ -n "$SIM_ID" ]; then
+            xcrun simctl boot "$SIM_ID" 2>/dev/null || true
+            DEST="id=$SIM_ID"
+          else
+            DEST="platform=iOS Simulator"
+          fi
           xcodebuild test \
             -project shift.xcodeproj \
             -scheme shift \
-            -destination 'platform=iOS Simulator,name=Any iOS Simulator Device' \
+            -destination "$DEST" \
             -enableCodeCoverage YES \
             -derivedDataPath /tmp/DerivedData \
             -skip-testing:shiftUITests \
