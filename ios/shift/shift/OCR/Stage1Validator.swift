@@ -5,7 +5,7 @@ struct Stage1Validator {
         #"\d{1,2}/\d{1,2}\([월화수목금토일]\)"#
     )
     private static let headerKeywords = [
-        "근무", "출근", "시간표", "스케줄", "스케쥴", "근태", "일정표",
+        "근무", "출근", "시간표", "스케줄", "스케쥴", "근태", "일정표"
     ]
 
     func isScheduleText(_ text: String) -> Bool {

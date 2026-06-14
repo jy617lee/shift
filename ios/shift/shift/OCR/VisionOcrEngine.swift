@@ -6,12 +6,9 @@ final class VisionOcrEngine: OcrEngine {
 
     func recognizeText(image: UIImage) async -> OcrResult {
         guard let cgImage = image.cgImage else { return .failure }
-        return await withCheckedContinuation { continuation in
-            Task.detached {
-                let text = Self.performRecognition(cgImage: cgImage)
-                continuation.resume(returning: text)
-            }
-        }
+        return await Task.detached(priority: .userInitiated) {
+            Self.performRecognition(cgImage: cgImage)
+        }.value
     }
 
     private static func performRecognition(cgImage: CGImage) -> OcrResult {
@@ -31,10 +28,10 @@ final class VisionOcrEngine: OcrEngine {
 
     private static func reconstructRows(from observations: [VNRecognizedTextObservation]) -> String {
         guard !observations.isEmpty else { return "" }
-        let lines = observations.compactMap { obs -> (text: String, top: CGFloat, left: CGFloat)? in
+        let lines = observations.compactMap { obs -> TextLine? in
             guard let candidate = obs.topCandidates(1).first else { return nil }
             let top = obs.boundingBox.origin.y + obs.boundingBox.height
-            return (candidate.string, top, obs.boundingBox.origin.x)
+            return TextLine(text: candidate.string, top: top, left: obs.boundingBox.origin.x)
         }
         let sorted = lines.sorted { $0.top > $1.top }
         let rows = groupIntoRows(sorted)
@@ -43,11 +40,9 @@ final class VisionOcrEngine: OcrEngine {
             .joined(separator: "\n")
     }
 
-    private static func groupIntoRows(
-        _ lines: [(text: String, top: CGFloat, left: CGFloat)]
-    ) -> [[(text: String, top: CGFloat, left: CGFloat)]] {
-        var rows: [[(text: String, top: CGFloat, left: CGFloat)]] = []
-        var current: [(text: String, top: CGFloat, left: CGFloat)] = []
+    private static func groupIntoRows(_ lines: [TextLine]) -> [[TextLine]] {
+        var rows: [[TextLine]] = []
+        var current: [TextLine] = []
         for line in lines {
             if current.isEmpty {
                 current.append(line)
@@ -64,4 +59,10 @@ final class VisionOcrEngine: OcrEngine {
         if !current.isEmpty { rows.append(current) }
         return rows
     }
+}
+
+private struct TextLine {
+    let text: String
+    let top: CGFloat
+    let left: CGFloat
 }

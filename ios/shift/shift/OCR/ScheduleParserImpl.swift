@@ -1,4 +1,3 @@
-// swiftlint:disable file_length
 import Foundation
 
 struct ScheduleParserImpl: ScheduleParser {
@@ -6,14 +5,12 @@ struct ScheduleParserImpl: ScheduleParser {
     private let today: Date
 
     private static let linePattern = makePattern(
-        // swiftlint:disable:next line_length
         #"(\d{1,2})/(\d{1,2})\([^)]*\)\s*(?:(?:[P@O0R]\s*)*(\d{2}:\d{2})[~\s]*(?:[P@O0R]\s*)*(\d{2}:\d{2})\s*)?(?:(?:[P@O0R]\s*)*(.*))?"#
     )
     private static let dateOnlyPattern = makePattern(
         #"^(\d{1,2})/(\d{1,2})\([^)]*\)\s*$"#
     )
     private static let orphanTimePattern = makePattern(
-        // swiftlint:disable:next line_length
         #"(?:[P@O0R]\s*)*(\d{2}:\d{2})[~\s]*(?:[P@O0R]\s*)*(\d{2}:\d{2})\s*(?:(?:[P@O0R]\s*)*(.*))?"#
     )
 
@@ -159,7 +156,6 @@ struct ScheduleParserImpl: ScheduleParser {
     }
 }
 
-private extension String {
-    var nilIfEmpty: String? { isEmpty ? nil : self }
+extension String {
+    fileprivate var nilIfEmpty: String? { isEmpty ? nil : self }
 }
-// swiftlint:enable file_length

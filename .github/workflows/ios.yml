@@ -3,6 +3,8 @@ name: iOS Quality Checks
 on:
   pull_request:
     branches: [main]
+    paths:
+      - "ios/**"
 
 defaults:
   run:

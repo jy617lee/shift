@@ -1,4 +1,3 @@
-// swiftlint:disable file_length
 import SwiftUI
 
 struct ConfirmationView: View {
@@ -91,7 +90,9 @@ struct ImagePreviewView: View {
 struct WeekSectionHeader: View {
     let week: ScheduleWeek
     private static let fmt: DateFormatter = {
-        let f = DateFormatter(); f.dateFormat = "M월 d일"; return f
+        let formatter = DateFormatter()
+        formatter.dateFormat = "M월 d일"
+        return formatter
     }()
 
     var body: some View {
@@ -113,10 +114,15 @@ struct ReviewDayRow: View {
     let onTap: () -> Void
 
     private static let dayFmt: DateFormatter = {
-        let f = DateFormatter(); f.dateFormat = "EE"; f.locale = Locale(identifier: "ko_KR"); return f
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EE"
+        formatter.locale = Locale(identifier: "ko_KR")
+        return formatter
     }()
     private static let dateFmt: DateFormatter = {
-        let f = DateFormatter(); f.dateFormat = "M/d"; return f
+        let formatter = DateFormatter()
+        formatter.dateFormat = "M/d"
+        return formatter
     }()
 
     var body: some View {
@@ -178,7 +184,10 @@ struct DayEditSheet: View {
     @State private var endError = false
 
     private static let dayFmt: DateFormatter = {
-        let f = DateFormatter(); f.dateFormat = "M/d(EE)"; f.locale = Locale(identifier: "ko_KR"); return f
+        let formatter = DateFormatter()
+        formatter.dateFormat = "M/d(EE)"
+        formatter.locale = Locale(identifier: "ko_KR")
+        return formatter
     }()
 
     init(editing: EditingState, onDraftChange: @escaping (ScheduleDay) -> Void,
@@ -308,9 +317,9 @@ struct DayEditSheet: View {
     private func autoFormatTime(_ raw: String) -> String {
         let digits = raw.filter(\.isNumber)
         guard digits.count >= 2 else { return digits }
-        let h = String(digits.prefix(2))
-        let m = String(digits.dropFirst(2).prefix(2))
-        return m.isEmpty ? h : "\(h):\(m)"
+        let hours = String(digits.prefix(2))
+        let minutes = String(digits.dropFirst(2).prefix(2))
+        return minutes.isEmpty ? hours : "\(hours):\(minutes)"
     }
 }
 // swiftlint:enable file_length

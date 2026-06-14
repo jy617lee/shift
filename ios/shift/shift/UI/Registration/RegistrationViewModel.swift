@@ -1,7 +1,7 @@
 import Foundation
+import Observation
 import PhotosUI
 import SwiftUI
-import Observation
 
 enum RegistrationPhase: Equatable {
     case idle
@@ -64,9 +64,7 @@ final class RegistrationViewModel {
     private func runSkipFlow(weeks: [ScheduleWeek]) async {
         var conflictCount = 0
         for week in weeks {
-            if (try? await repository.getWeekByDate(week.weekStartDate)) != nil {
-                conflictCount += 1
-            }
+            conflictCount += (try? await repository.getWeekByDate(week.weekStartDate)) != nil ? 1 : 0
         }
         if conflictCount > 0 {
             phase = .skipModeConflict(count: conflictCount)

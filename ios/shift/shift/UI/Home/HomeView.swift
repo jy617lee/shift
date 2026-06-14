@@ -1,6 +1,5 @@
-// swiftlint:disable file_length
-import SwiftUI
 import PhotosUI
+import SwiftUI
 
 struct HomeView: View {
     @State var viewModel: HomeViewModel
@@ -50,14 +49,18 @@ struct HomeView: View {
             selectedPhotoItem = nil
         }
         .onChange(of: registrationVM.phase) { _, phase in handlePhaseChange(phase) }
-        .sheet(isPresented: $showConfirmation, onDismiss: { Task { await viewModel.loadWeeks() } }) {
-            if let vm = confirmationVM {
-                ConfirmationView(viewModel: vm, onDismiss: {
-                    showConfirmation = false
-                    if vm.savedSuccessfully { viewModel.showToast(savedToastMessage(vm.savedWeeksCount)) }
-                })
+        .sheet(
+            isPresented: $showConfirmation,
+            onDismiss: { Task { await viewModel.loadWeeks() } },
+            content: {
+                if let vm = confirmationVM {
+                    ConfirmationView(viewModel: vm, onDismiss: {
+                        showConfirmation = false
+                        if vm.savedSuccessfully { viewModel.showToast(savedToastMessage(vm.savedWeeksCount)) }
+                    })
+                }
             }
-        }
+        )
         .alert("지원하지 않는 이미지 형식입니다", isPresented: $showNotAScheduleAlert) {
             Button("확인", role: .cancel) { registrationVM.reset() }
         } message: { Text("스케쥴 표가 포함된 이미지를 선택해주세요.") }
@@ -235,10 +238,9 @@ struct HomeErrorView: View {
     }
 }
 
-private extension Array {
-    subscript(safe index: Int) -> Element? {
+extension Array {
+    fileprivate subscript(safe index: Int) -> Element? {
         guard index >= 0, index < count else { return nil }
         return self[index]
     }
 }
-// swiftlint:enable file_length

@@ -43,10 +43,12 @@ struct WeekCardView: View {
         let start = week.weekStartDate
         guard let end = Calendar.current.date(byAdding: .day, value: 6, to: start) else { return "" }
         let startStr = Self.weekRangeFmt.string(from: start)
-        if Calendar.current.component(.month, from: start) == Calendar.current.component(.month, from: end) {
-            return "\(Calendar.current.component(.year, from: start))년 \(startStr)–\(Calendar.current.component(.day, from: end))일"
+        let cal = Calendar.current
+        let year = cal.component(.year, from: start)
+        if cal.component(.month, from: start) == cal.component(.month, from: end) {
+            return "\(year)년 \(startStr)–\(cal.component(.day, from: end))일"
         }
-        return "\(Calendar.current.component(.year, from: start))년 \(startStr) – \(Self.weekRangeFmt.string(from: end))"
+        return "\(year)년 \(startStr) – \(Self.weekRangeFmt.string(from: end))"
     }
 }
 

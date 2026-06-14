@@ -3,6 +3,8 @@ name: Android Quality Checks
 on:
   pull_request:
     branches: [main]
+    paths:
+      - "android/**"
 
 defaults:
   run:

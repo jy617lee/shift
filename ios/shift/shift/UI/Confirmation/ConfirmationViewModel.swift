@@ -1,6 +1,6 @@
 import Foundation
-import UIKit
 import Observation
+import UIKit
 
 struct EditingState: Equatable {
     var weekIndex: Int
@@ -42,7 +42,7 @@ final class ConfirmationViewModel {
     private func runConfirm() async {
         var conflicts = 0
         for week in weeks {
-            if (try? await repository.getWeekByDate(week.weekStartDate)) != nil { conflicts += 1 }
+            conflicts += (try? await repository.getWeekByDate(week.weekStartDate)) != nil ? 1 : 0
         }
         conflictCount = conflicts
         if conflicts == 0 { await saveAllAndFinish() }
