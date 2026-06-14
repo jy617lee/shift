@@ -41,15 +41,15 @@ jobs:
       - name: "[2] 단위 테스트 + 커버리지 수집"
         working-directory: ios/shift
         run: |
-          # 런타임 키에 'iOS' 포함 여부로 필터 (tvOS/watchOS/visionOS 제외)
-          SIM_ID=$(xcrun simctl list devices available -j | python3 -c "
-          import json,sys
-          data=json.load(sys.stdin)
-          for rt, devs in data.get('devices',{}).items():
-              if 'iOS' in rt and 'tvOS' not in rt and 'watchOS' not in rt and 'visionOS' not in rt:
-                  for d in devs:
-                      if d.get('isAvailable'):
-                          print(d['udid']); exit(0)
+          # xcodebuild -showdestinations 로 유효한 iOS Simulator UDID 직접 추출
+          SIM_ID=$(xcodebuild -project shift.xcodeproj -scheme shift -showdestinations 2>&1 | \
+            python3 -c "
+          import sys, re
+          for line in sys.stdin:
+              if 'iOS Simulator' in line and 'placeholder' not in line:
+                  m = re.search(r'id:([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12})', line)
+                  if m:
+                      print(m.group(1)); exit(0)
           " 2>/dev/null)
           if [ -n "$SIM_ID" ]; then
             xcrun simctl boot "$SIM_ID" 2>/dev/null || true
