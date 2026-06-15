@@ -22,8 +22,9 @@ struct WeekCardView: View {
                     .font(.system(size: 11, weight: .medium))
                     .foregroundStyle(ShiftColors.mutedForeground)
             }
+            .frame(maxWidth: .infinity)
             .padding(.horizontal, 14)
-            .padding(.vertical, 8)
+            .padding(.vertical, 12)
             .background(ShiftColors.muted.opacity(0.6))
 
             Divider()
@@ -104,7 +105,7 @@ struct DayRowView: View {
                 ShiftTypeBadge(label: "근무", type: .work)
                 if let start = day.startTime, let end = day.endTime {
                     Text("\(start)–\(end)")
-                        .font(.system(size: 13))
+                        .font(.system(size: 13, weight: .light))
                         .foregroundStyle(Color.primary)
                 }
             }

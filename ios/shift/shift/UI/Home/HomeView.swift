@@ -104,8 +104,8 @@ struct HomeView: View {
                 .font(.system(size: 16, weight: .medium))
             Spacer()
             Button { showSettings = true } label: {
-                Image(systemName: "gear")
-                    .font(.system(size: 22))
+                Image(systemName: "gearshape.fill")
+                    .font(.system(size: 20))
                     .foregroundStyle(ShiftColors.mutedForeground)
             }
             .buttonStyle(.plain)
