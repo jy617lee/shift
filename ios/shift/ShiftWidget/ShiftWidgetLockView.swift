@@ -225,6 +225,26 @@ struct ShiftLockWidgetCountdownView: View {
     }
 }
 
+// MARK: - Previews
+
+#Preview("오늘 근무", as: .accessoryRectangular) {
+    ShiftLockWidget4x1()
+} timeline: {
+    WidgetEntry.placeholder
+}
+
+#Preview("주간 스케줄", as: .accessoryRectangular) {
+    ShiftLockWidget4x2()
+} timeline: {
+    WidgetEntry.placeholder
+}
+
+#Preview("카운트다운", as: .accessoryRectangular) {
+    ShiftLockWidgetCountdown()
+} timeline: {
+    WidgetEntry.placeholder
+}
+
 // MARK: - 공통 레이아웃 상수
 
 private enum LockLayout {
