@@ -264,8 +264,6 @@ final class ScheduleParserTests: XCTestCase {
     }
 
     // MARK: - iOS Vision OCR duplicate time format (sample_14)
-    // iOS Vision reads "계획/실적" dual-column schedules with each time appearing twice:
-    // e.g. "P 08:00 P 08:00 17:00 P 17:00" — start must be 08:00, end must be 17:00.
 
     func testSample14ParsesOneWeek() async throws {
         let text = try loadSample("sample_14_ios_vision_duplicate_times.txt")

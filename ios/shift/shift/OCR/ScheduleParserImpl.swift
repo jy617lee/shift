@@ -93,9 +93,7 @@ struct ScheduleParserImpl: ScheduleParser {
         )
     }
 
-    // Extracts all HH:MM tokens, then removes consecutive duplicates.
-    // Handles the "계획/실적" dual-column format where each time appears twice in a row
-    // (e.g. "P 08:00 P 08:00 17:00 P 17:00" → ["08:00", "17:00"]).
+    // 계획/실적 2열 포맷에서 같은 시간이 연속 중복(P 08:00 P 08:00 …)되므로 제거 후 반환.
     private func uniqueTimes(in text: String) -> [String] {
         let range = NSRange(text.startIndex..., in: text)
         return Self.allTimesRx.matches(in: text, range: range)
@@ -103,7 +101,6 @@ struct ScheduleParserImpl: ScheduleParser {
             .reduce(into: [String]()) { acc, t in if acc.last != t { acc.append(t) } }
     }
 
-    // Strips all HH:MM tokens and OCR noise chars, returning the trimmed code label.
     private func codeLabel(from rest: String) -> String {
         let noTimes = Self.allTimesRx.stringByReplacingMatches(
             in: rest, range: NSRange(rest.startIndex..., in: rest), withTemplate: " ")
