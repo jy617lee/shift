@@ -111,7 +111,7 @@ struct HomeView: View {
             .buttonStyle(.plain)
         }
         .padding(.horizontal, 16)
-        .padding(.vertical, 8)
+        .padding(.vertical, 12)
         .background(Color(.systemBackground))
         .overlay(alignment: .bottom) {
             Divider()
