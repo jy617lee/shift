@@ -36,8 +36,8 @@ struct WeekCardView: View {
                 }
             }
         }
+        .background(Color(.systemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 12))
-        .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 12))
         .shadow(color: Color.black.opacity(0.06), radius: 8, x: 0, y: 2)
     }
 
