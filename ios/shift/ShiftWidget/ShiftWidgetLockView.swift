@@ -62,15 +62,10 @@ struct ShiftLockWidget4x1View: View {
                     .minimumScaleFactor(0.85)
             }
         } else {
-            Text(offText(day))
+            Text(day?.displayOffText ?? "스케줄 없음")
                 .font(.system(size: LockLayout.offStateFontSize, weight: .medium))
                 .lineLimit(2)
         }
-    }
-
-    private func offText(_ day: WidgetScheduleDay?) -> String {
-        guard let day else { return "스케줄 없음" }
-        return day.codeLabel.isEmpty ? "휴무" : day.codeLabel
     }
 }
 
@@ -120,12 +115,12 @@ private struct LockDayCell: View {
     let isToday: Bool
 
     var body: some View {
-        VStack(spacing: 2) {
+        VStack(spacing: LockLayout.gridCellSpacing) {
             Text(date.formatted(.dateTime.weekday(.narrow)))
-                .font(.system(size: 9, weight: isToday ? .semibold : .regular))
+                .font(.system(size: LockLayout.gridDayLabelSize, weight: isToday ? .semibold : .regular))
                 .foregroundStyle(isToday ? AnyShapeStyle(.primary) : AnyShapeStyle(.secondary))
             Text(cellText)
-                .font(.system(size: 8))
+                .font(.system(size: LockLayout.gridCellTextSize))
                 .lineLimit(2)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(isToday ? AnyShapeStyle(.primary) : AnyShapeStyle(.secondary))
@@ -167,26 +162,25 @@ struct ShiftLockWidgetCountdownView: View {
         let targetDate = entry.targetDate
         let day = entry.today
 
-        VStack(alignment: .leading, spacing: 2) {
+        VStack(alignment: .leading, spacing: LockLayout.countdownVSpacing) {
             Text(dateLabel(targetDate, isTomorrow: entry.isShowingTomorrow))
-                .font(.system(size: 10, weight: .medium))
+                .font(.system(size: LockLayout.countdownDateSize, weight: .medium))
                 .foregroundStyle(.secondary)
 
             if let day {
                 if day.isWork, let start = day.startTime, let end = day.endTime {
                     Text("\(start) - \(end)")
-                        .font(.system(size: 14, weight: .semibold))
+                        .font(.system(size: LockLayout.countdownTimeSize, weight: .semibold))
                         .lineLimit(1)
                     countdownRow(day: day, targetDate: targetDate)
                 } else {
-                    let label = day.codeLabel.isEmpty ? "휴무" : day.codeLabel
-                    Text(label)
-                        .font(.system(size: 14, weight: .medium))
+                    Text(day.displayOffText)
+                        .font(.system(size: LockLayout.countdownTimeSize, weight: .medium))
                         .foregroundStyle(.secondary)
                 }
             } else {
                 Text("스케줄 없음")
-                    .font(.system(size: 13))
+                    .font(.system(size: LockLayout.countdownDateSize))
                     .foregroundStyle(.secondary)
             }
         }
@@ -197,26 +191,26 @@ struct ShiftLockWidgetCountdownView: View {
     private func countdownRow(day: WidgetScheduleDay, targetDate: Date) -> some View {
         let now = Date()
         if let startDate = day.shiftStartDate(on: targetDate), now < startDate {
-            HStack(spacing: 3) {
+            HStack(spacing: LockLayout.countdownHSpacing) {
                 Text("출근까지")
-                    .font(.system(size: 10))
+                    .font(.system(size: LockLayout.countdownLabelSize))
                     .foregroundStyle(.secondary)
                 Text(timerInterval: now...startDate, countsDown: true)
-                    .font(.system(size: 10, weight: .semibold))
+                    .font(.system(size: LockLayout.countdownLabelSize, weight: .semibold))
                     .monospacedDigit()
             }
         } else if let endDate = day.shiftEndDate(on: targetDate), now < endDate {
-            HStack(spacing: 3) {
+            HStack(spacing: LockLayout.countdownHSpacing) {
                 Text("퇴근까지")
-                    .font(.system(size: 10))
+                    .font(.system(size: LockLayout.countdownLabelSize))
                     .foregroundStyle(.secondary)
                 Text(timerInterval: now...endDate, countsDown: true)
-                    .font(.system(size: 10, weight: .semibold))
+                    .font(.system(size: LockLayout.countdownLabelSize, weight: .semibold))
                     .monospacedDigit()
             }
         } else {
             Text("근무 종료")
-                .font(.system(size: 10))
+                .font(.system(size: LockLayout.countdownLabelSize))
                 .foregroundStyle(.secondary)
         }
     }
@@ -234,6 +228,7 @@ struct ShiftLockWidgetCountdownView: View {
 // MARK: - 공통 레이아웃 상수
 
 private enum LockLayout {
+    // 4×1 오늘 근무
     static let dateColumnWidth: CGFloat = 32
     static let dividerHeight: CGFloat = 28
     static let dividerHPad: CGFloat = 8
@@ -242,4 +237,14 @@ private enum LockLayout {
     static let codeLabelSize: CGFloat = 9
     static let workTimeFontSize: CGFloat = 13
     static let offStateFontSize: CGFloat = 12
+    // 주간 그리드 셀
+    static let gridCellSpacing: CGFloat = 2
+    static let gridDayLabelSize: CGFloat = 9
+    static let gridCellTextSize: CGFloat = 8
+    // 카운트다운
+    static let countdownVSpacing: CGFloat = 2
+    static let countdownHSpacing: CGFloat = 3
+    static let countdownDateSize: CGFloat = 10
+    static let countdownTimeSize: CGFloat = 14
+    static let countdownLabelSize: CGFloat = 10
 }

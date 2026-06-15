@@ -10,6 +10,10 @@ struct WidgetScheduleDay: Codable, Sendable {
 
     var isWork: Bool { type == "WORK" }
 
+    var displayOffText: String {
+        codeLabel.isEmpty ? "휴무" : codeLabel
+    }
+
     func shiftStartDate(on referenceDate: Date) -> Date? {
         parseTime(startTime, on: referenceDate)
     }

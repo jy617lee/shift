@@ -76,7 +76,7 @@ final class SwiftDataScheduleRepository: ScheduleRepository {
     }
 
     private func refreshWidget() async {
-        let weeks = (try? await getAllWeeks()) ?? []
+        guard let weeks = try? await getAllWeeks() else { return }
         WidgetSharedStore.write(weeks)
     }
 

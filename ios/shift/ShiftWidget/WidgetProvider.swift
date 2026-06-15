@@ -61,19 +61,11 @@ struct WidgetProvider: TimelineProvider {
     }
 
     private func loadDays() -> [WidgetScheduleDay] {
-        guard let ud = UserDefaults(suiteName: appGroupID) else {
-            print("[WidgetProvider] ❌ App Group 접근 불가 — \(appGroupID)")
+        guard let ud = UserDefaults(suiteName: appGroupID),
+              let data = ud.data(forKey: daysKey),
+              let days = try? JSONDecoder().decode([WidgetScheduleDay].self, from: data) else {
             return []
         }
-        guard let data = ud.data(forKey: daysKey) else {
-            print("[WidgetProvider] ❌ 데이터 없음 — key: \(daysKey)")
-            return []
-        }
-        guard let days = try? JSONDecoder().decode([WidgetScheduleDay].self, from: data) else {
-            print("[WidgetProvider] ❌ 디코딩 실패 (\(data.count) bytes)")
-            return []
-        }
-        print("[WidgetProvider] ✅ \(days.count)개 날짜 로드 성공")
         return days
     }
 

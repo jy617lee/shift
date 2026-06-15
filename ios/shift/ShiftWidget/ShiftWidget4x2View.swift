@@ -159,6 +159,7 @@ private struct DayCell: View {
             }
         }
         .frame(minHeight: Layout.cellValueMinHeight, alignment: .top)
+    }
 
     private var offText: String {
         guard let day else { return "-" }

@@ -59,16 +59,11 @@ struct ShiftWidget2x2View: View {
                     .lineLimit(2)
             }
         } else {
-            Text(offText(day))
+            Text(day?.displayOffText ?? "스케줄 없음")
                 .font(.system(size: Layout.offStateFontSize, weight: .medium))
                 .foregroundStyle(WidgetColors.onSurface)
                 .lineLimit(2)
         }
-    }
-
-    private func offText(_ day: WidgetScheduleDay?) -> String {
-        guard let day else { return "스케줄 없음" }
-        return day.codeLabel.isEmpty ? "휴무" : day.codeLabel
     }
 }
 
