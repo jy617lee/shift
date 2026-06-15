@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		AA00000DAA00000DAA00000D /* ShiftWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AA000001AA000001AA000001 /* ShiftWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		28D532722FDE7DC3004376C0 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -21,12 +25,34 @@
 			remoteGlobalIDString = 28D532632FDE7DC0004376C0;
 			remoteInfo = shift;
 		};
+		AA00000AAA00000AAA00000A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 28D5325C2FDE7DC0004376C0 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AA000003AA000003AA000003;
+			remoteInfo = ShiftWidget;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		AA00000CAA00000CAA00000C /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				AA00000DAA00000DAA00000D /* ShiftWidget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		28D532642FDE7DC0004376C0 /* shift.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = shift.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		28D532712FDE7DC3004376C0 /* shiftTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = shiftTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		28D5327B2FDE7DC3004376C0 /* shiftUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = shiftUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA000001AA000001AA000001 /* ShiftWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ShiftWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -44,6 +70,21 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = shiftUITests;
 			sourceTree = "<group>";
+		};
+		AA000002AA000002AA000002 /* ShiftWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				AA000002EE000002EE000002 /* PBXFileSystemSynchronizedBuildFileExceptionSet */,
+			);
+			path = ShiftWidget;
+			sourceTree = "<group>";
+		};
+		AA000002EE000002EE000002 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = AA000003AA000003AA000003 /* ShiftWidget */;
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
@@ -69,6 +110,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		AA000005AA000005AA000005 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -78,6 +126,7 @@
 				28D532662FDE7DC0004376C0 /* shift */,
 				28D532742FDE7DC3004376C0 /* shiftTests */,
 				28D5327E2FDE7DC3004376C0 /* shiftUITests */,
+				AA000002AA000002AA000002 /* ShiftWidget */,
 				28D532652FDE7DC0004376C0 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -88,6 +137,7 @@
 				28D532642FDE7DC0004376C0 /* shift.app */,
 				28D532712FDE7DC3004376C0 /* shiftTests.xctest */,
 				28D5327B2FDE7DC3004376C0 /* shiftUITests.xctest */,
+				AA000001AA000001AA000001 /* ShiftWidget.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -102,10 +152,12 @@
 				28D532602FDE7DC0004376C0 /* Sources */,
 				28D532612FDE7DC0004376C0 /* Frameworks */,
 				28D532622FDE7DC0004376C0 /* Resources */,
+				AA00000CAA00000CAA00000C /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				AA00000BAA00000BAA00000B /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				28D532662FDE7DC0004376C0 /* shift */,
@@ -163,6 +215,28 @@
 			productReference = 28D5327B2FDE7DC3004376C0 /* shiftUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		AA000003AA000003AA000003 /* ShiftWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AA000007AA000007AA000007 /* Build configuration list for PBXNativeTarget "ShiftWidget" */;
+			buildPhases = (
+				AA000004AA000004AA000004 /* Sources */,
+				AA000005AA000005AA000005 /* Frameworks */,
+				AA000006AA000006AA000006 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				AA000002AA000002AA000002 /* ShiftWidget */,
+			);
+			name = ShiftWidget;
+			packageProductDependencies = (
+			);
+			productName = ShiftWidget;
+			productReference = AA000001AA000001AA000001 /* ShiftWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -184,6 +258,9 @@
 						CreatedOnToolsVersion = 26.1;
 						TestTargetID = 28D532632FDE7DC0004376C0;
 					};
+					AA000003AA000003AA000003 = {
+						CreatedOnToolsVersion = 26.1;
+					};
 				};
 			};
 			buildConfigurationList = 28D5325F2FDE7DC0004376C0 /* Build configuration list for PBXProject "shift" */;
@@ -203,6 +280,7 @@
 				28D532632FDE7DC0004376C0 /* shift */,
 				28D532702FDE7DC3004376C0 /* shiftTests */,
 				28D5327A2FDE7DC3004376C0 /* shiftUITests */,
+				AA000003AA000003AA000003 /* ShiftWidget */,
 			);
 		};
 /* End PBXProject section */
@@ -223,6 +301,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		28D532792FDE7DC3004376C0 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA000006AA000006AA000006 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -253,6 +338,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		AA000004AA000004AA000004 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -265,6 +357,11 @@
 			isa = PBXTargetDependency;
 			target = 28D532632FDE7DC0004376C0 /* shift */;
 			targetProxy = 28D5327C2FDE7DC3004376C0 /* PBXContainerItemProxy */;
+		};
+		AA00000BAA00000BAA00000B /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AA000003AA000003AA000003 /* ShiftWidget */;
+			targetProxy = AA00000AAA00000AAA00000A /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -395,6 +492,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = shift/shift.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 9Q6XC7XQJN;
@@ -427,6 +525,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = shift/shift.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 9Q6XC7XQJN;
@@ -538,6 +637,59 @@
 			};
 			name = Release;
 		};
+		AA000008AA000008AA000008 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = ShiftWidget/ShiftWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9Q6XC7XQJN;
+				INFOPLIST_FILE = ShiftWidget/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.timezonealarm.shift.ShiftWidget;
+				PRODUCT_NAME = ShiftWidget;
+				SKIP_INSTALL = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		AA000009AA000009AA000009 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = ShiftWidget/ShiftWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9Q6XC7XQJN;
+				INFOPLIST_FILE = ShiftWidget/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.timezonealarm.shift.ShiftWidget;
+				PRODUCT_NAME = ShiftWidget;
+				SKIP_INSTALL = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -573,6 +725,15 @@
 			buildConfigurations = (
 				28D5328C2FDE7DC3004376C0 /* Debug */,
 				28D5328D2FDE7DC3004376C0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AA000007AA000007AA000007 /* Build configuration list for PBXNativeTarget "ShiftWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA000008AA000008AA000008 /* Debug */,
+				AA000009AA000009AA000009 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
