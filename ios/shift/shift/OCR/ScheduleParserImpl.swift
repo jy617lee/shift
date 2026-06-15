@@ -4,16 +4,14 @@ struct ScheduleParserImpl: ScheduleParser {
     private let validator: Stage1Validator
     private let today: Date
 
-    private static let linePattern = makePattern(
-        // swiftlint:disable:next line_length
-        #"(\d{1,2})/(\d{1,2})\([^)]*\)\s*(?:(?:[P@O0R]\s*)*(\d{2}:\d{2})[~\s]*(?:[P@O0R]\s*)*(\d{2}:\d{2})\s*)?(?:(?:[P@O0R]\s*)*(.*))?"#
-    )
-    private static let dateOnlyPattern = makePattern(
-        #"^(\d{1,2})/(\d{1,2})\([^)]*\)\s*$"#
-    )
-    private static let orphanTimePattern = makePattern(
-        #"(?:[P@O0R]\s*)*(\d{2}:\d{2})[~\s]*(?:[P@O0R]\s*)*(\d{2}:\d{2})\s*(?:(?:[P@O0R]\s*)*(.*))?"#
-    )
+    // Matches "MM/DD(...)" at the start of a line, capturing month and day.
+    private static let datePrefixRx = makePattern(#"^(\d{1,2})/(\d{1,2})\([^)]*\)\s*"#)
+    // Matches a date-only line (nothing meaningful after the parenthesised weekday).
+    private static let dateOnlyPattern = makePattern(#"^(\d{1,2})/(\d{1,2})\([^)]*\)\s*$"#)
+    // Matches any HH:MM time token.
+    private static let allTimesRx = makePattern(#"\d{2}:\d{2}"#)
+    // OCR noise characters that appear around time values.
+    private static let noiseRx = makePattern(#"[P@O0R®©~]"#)
 
     private static let pastDaysThreshold = -90
     private static let futureDaysThreshold = 56
@@ -54,19 +52,22 @@ struct ScheduleParserImpl: ScheduleParser {
 
     private func parseLine(_ line: String) -> ScheduleDay? {
         let range = NSRange(line.startIndex..., in: line)
-        guard let match = Self.linePattern.firstMatch(in: line, range: range) else { return nil }
-        let monthStr = capture(match, at: 1, in: line)
-        let dayStr = capture(match, at: 2, in: line)
-        guard let month = Int(monthStr), let day = Int(dayStr) else { return nil }
-        let startTime = capture(match, at: 3, in: line).nilIfEmpty
-        let endTime = capture(match, at: 4, in: line).nilIfEmpty
-        let code = capture(match, at: 5, in: line)
-        guard startTime != nil || !code.isEmpty else { return nil }
+        guard let dateMatch = Self.datePrefixRx.firstMatch(in: line, range: range) else { return nil }
+        let month = Int(capture(dateMatch, at: 1, in: line)) ?? 0
+        let day   = Int(capture(dateMatch, at: 2, in: line)) ?? 0
+        guard month > 0, day > 0 else { return nil }
+        guard let prefixRange = Range(dateMatch.range, in: line) else { return nil }
+        let rest = String(line[prefixRange.upperBound...])
+
+        let times = uniqueTimes(in: rest)
+        let code  = codeLabel(from: rest)
+        guard !times.isEmpty || !code.isEmpty else { return nil }
+
         return ScheduleDay(
             date: assignYear(month: month, day: day),
-            type: startTime != nil ? .work : .other,
-            startTime: startTime,
-            endTime: endTime,
+            type: times.isEmpty ? .other : .work,
+            startTime: times.first,
+            endTime: times.count >= 2 ? times[1] : nil,
             codeLabel: code,
             source: .parsed
         )
@@ -82,16 +83,30 @@ struct ScheduleParserImpl: ScheduleParser {
     }
 
     private func parseOrphanedTimeLine(_ line: String, date: Date) -> ScheduleDay? {
-        let range = NSRange(line.startIndex..., in: line)
-        guard let match = Self.orphanTimePattern.firstMatch(in: line, range: range) else { return nil }
-        let startTime = capture(match, at: 1, in: line).nilIfEmpty
-        let endTime = capture(match, at: 2, in: line).nilIfEmpty
-        guard startTime != nil, endTime != nil else { return nil }
+        let times = uniqueTimes(in: line)
+        guard times.count >= 2 else { return nil }
         return ScheduleDay(
             date: date, type: .work,
-            startTime: startTime, endTime: endTime,
-            codeLabel: capture(match, at: 3, in: line), source: .parsed
+            startTime: times[0], endTime: times[1],
+            codeLabel: codeLabel(from: line),
+            source: .parsed
         )
+    }
+
+    // 계획/실적 2열 포맷에서 같은 시간이 연속 중복(P 08:00 P 08:00 …)되므로 제거 후 반환.
+    private func uniqueTimes(in text: String) -> [String] {
+        let range = NSRange(text.startIndex..., in: text)
+        return Self.allTimesRx.matches(in: text, range: range)
+            .compactMap { Range($0.range, in: text).map { String(text[$0]) } }
+            .reduce(into: [String]()) { acc, time in if acc.last != time { acc.append(time) } }
+    }
+
+    private func codeLabel(from rest: String) -> String {
+        let noTimes = Self.allTimesRx.stringByReplacingMatches(
+            in: rest, range: NSRange(rest.startIndex..., in: rest), withTemplate: " ")
+        let noNoise = Self.noiseRx.stringByReplacingMatches(
+            in: noTimes, range: NSRange(noTimes.startIndex..., in: noTimes), withTemplate: " ")
+        return noNoise.components(separatedBy: .whitespaces).filter { !$0.isEmpty }.joined(separator: " ")
     }
 
     private func assignYear(month: Int, day: Int) -> Date {
@@ -123,7 +138,9 @@ struct ScheduleParserImpl: ScheduleParser {
         return weeks
     }
 
-    private func makeWeek(startingAt monday: Date, dayMap: [Date: ScheduleDay], calendar: Calendar) -> ScheduleWeek {
+    private func makeWeek(
+        startingAt monday: Date, dayMap: [Date: ScheduleDay], calendar: Calendar
+    ) -> ScheduleWeek {
         let weekDays = (0..<7).map { offset -> ScheduleDay in
             let date = calendar.date(byAdding: .day, value: offset, to: monday) ?? monday
             return dayMap[date] ?? ScheduleDay(
@@ -155,8 +172,4 @@ struct ScheduleParserImpl: ScheduleParser {
             fatalError("ScheduleParserImpl: invalid regex — \(error)")
         }
     }
-}
-
-extension String {
-    fileprivate var nilIfEmpty: String? { isEmpty ? nil : self }
 }

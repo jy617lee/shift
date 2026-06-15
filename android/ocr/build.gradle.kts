@@ -20,6 +20,12 @@ android {
     testOptions {
         unitTests.isIncludeAndroidResources = true
     }
+
+    sourceSets {
+        getByName("test") {
+            resources.srcDirs("${rootProject.projectDir.parent}/test-fixtures")
+        }
+    }
 }
 
 detekt {

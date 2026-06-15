@@ -263,6 +263,65 @@ final class ScheduleParserTests: XCTestCase {
         XCTAssertEqual(days[5].codeLabel, "연차휴가")
     }
 
+    // MARK: - iOS Vision OCR duplicate time format (sample_14)
+
+    func testSample14ParsesOneWeek() async throws {
+        let text = try loadSample("sample_14_ios_vision_duplicate_times.txt")
+        guard case .success(let weeks) = await parser.parse(text) else { return XCTFail() }
+        XCTAssertEqual(weeks.count, 1)
+        assertDate(weeks[0].weekStartDate, year: 2026, month: 4, day: 27)
+    }
+
+    func testSample14DuplicateTimesDeduped() async throws {
+        let text = try loadSample("sample_14_ios_vision_duplicate_times.txt")
+        guard case .success(let weeks) = await parser.parse(text) else { return XCTFail() }
+        let days = weeks[0].days
+        XCTAssertEqual(days[1].startTime, "08:00")
+        XCTAssertEqual(days[1].endTime, "17:00")
+        XCTAssertEqual(days[2].startTime, "08:30")
+        XCTAssertEqual(days[2].endTime, "18:30")
+        XCTAssertEqual(days[3].startTime, "06:30")
+        XCTAssertEqual(days[3].endTime, "15:30")
+    }
+
+    func testSample14StartNotEqualEnd() async throws {
+        let text = try loadSample("sample_14_ios_vision_duplicate_times.txt")
+        guard case .success(let weeks) = await parser.parse(text) else { return XCTFail() }
+        let workDays = weeks.flatMap(\.days).filter { $0.type == .work }
+        for day in workDays {
+            XCTAssertNotEqual(day.startTime, day.endTime, "start == end for \(day.date)")
+        }
+    }
+
+    func testSample14CodeLabels() async throws {
+        let text = try loadSample("sample_14_ios_vision_duplicate_times.txt")
+        guard case .success(let weeks) = await parser.parse(text) else { return XCTFail() }
+        let days = weeks[0].days
+        XCTAssertEqual(days[1].codeLabel, "정상")
+        XCTAssertEqual(days[2].codeLabel, "정상")
+        XCTAssertEqual(days[3].codeLabel, "정상")
+        XCTAssertEqual(days[0].codeLabel, "정규휴일")
+        XCTAssertEqual(days[4].codeLabel, "법정휴일")
+    }
+
+    func testRegisteredSymbolNoiseIsDedupedAndStripped() async {
+        // ® is an iOS Vision OCR artifact that appears between duplicate times.
+        let text = """
+주간 스케줄 조회
+06/09(화) 15:00 ® 15:00 20:30 ® 20:30 정상
+06/10(수) 15:00 ® 15:00 20:30 ® 20:30 정상
+06/11(목) 15:00 ® 15:00 20:30 ® 20:30 정상
+"""
+        guard case .success(let weeks) = await parser.parse(text) else { return XCTFail() }
+        let days = weeks[0].days.filter { $0.type == .work }
+        XCTAssertFalse(days.isEmpty)
+        for day in days {
+            XCTAssertEqual(day.startTime, "15:00")
+            XCTAssertEqual(day.endTime, "20:30")
+            XCTAssertEqual(day.codeLabel, "정상")
+        }
+    }
+
     // MARK: - Helpers
 
     private func sampleWeek() -> String {
@@ -288,11 +347,11 @@ final class ScheduleParserTests: XCTestCase {
     private func loadSample(_ fileName: String) throws -> String {
         let fileURL = URL(fileURLWithPath: #filePath)
         let samplesURL = fileURL
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
-            .appendingPathComponent("android/ocr/src/test/resources/ocr_samples")
+            .deletingLastPathComponent()  // shiftTests/
+            .deletingLastPathComponent()  // shift/
+            .deletingLastPathComponent()  // ios/
+            .deletingLastPathComponent()  // repo root
+            .appendingPathComponent("test-fixtures/ocr_samples")
             .appendingPathComponent(fileName)
         return try String(contentsOf: samplesURL, encoding: .utf8)
     }
