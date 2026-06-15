@@ -266,14 +266,14 @@ final class ScheduleParserTests: XCTestCase {
     // MARK: - iOS Vision OCR duplicate time format (sample_14)
 
     func testSample14ParsesOneWeek() async throws {
-        let text = try loadSample("sample_14_ios_vision_duplicate_times.txt")
+        let text = try loadIOSSample("sample_14_ios_vision_duplicate_times.txt")
         guard case .success(let weeks) = await parser.parse(text) else { return XCTFail() }
         XCTAssertEqual(weeks.count, 1)
         assertDate(weeks[0].weekStartDate, year: 2026, month: 4, day: 27)
     }
 
     func testSample14DuplicateTimesDeduped() async throws {
-        let text = try loadSample("sample_14_ios_vision_duplicate_times.txt")
+        let text = try loadIOSSample("sample_14_ios_vision_duplicate_times.txt")
         guard case .success(let weeks) = await parser.parse(text) else { return XCTFail() }
         let days = weeks[0].days
         XCTAssertEqual(days[1].startTime, "08:00")
@@ -285,7 +285,7 @@ final class ScheduleParserTests: XCTestCase {
     }
 
     func testSample14StartNotEqualEnd() async throws {
-        let text = try loadSample("sample_14_ios_vision_duplicate_times.txt")
+        let text = try loadIOSSample("sample_14_ios_vision_duplicate_times.txt")
         guard case .success(let weeks) = await parser.parse(text) else { return XCTFail() }
         let workDays = weeks.flatMap(\.days).filter { $0.type == .work }
         for day in workDays {
@@ -294,7 +294,7 @@ final class ScheduleParserTests: XCTestCase {
     }
 
     func testSample14CodeLabels() async throws {
-        let text = try loadSample("sample_14_ios_vision_duplicate_times.txt")
+        let text = try loadIOSSample("sample_14_ios_vision_duplicate_times.txt")
         guard case .success(let weeks) = await parser.parse(text) else { return XCTFail() }
         let days = weeks[0].days
         XCTAssertEqual(days[1].codeLabel, "정상")
@@ -352,6 +352,15 @@ final class ScheduleParserTests: XCTestCase {
             .deletingLastPathComponent()
             .deletingLastPathComponent()
             .appendingPathComponent("android/ocr/src/test/resources/ocr_samples")
+            .appendingPathComponent(fileName)
+        return try String(contentsOf: samplesURL, encoding: .utf8)
+    }
+
+    private func loadIOSSample(_ fileName: String) throws -> String {
+        let fileURL = URL(fileURLWithPath: #filePath)
+        let samplesURL = fileURL
+            .deletingLastPathComponent()
+            .appendingPathComponent("ocr_samples")
             .appendingPathComponent(fileName)
         return try String(contentsOf: samplesURL, encoding: .utf8)
     }
