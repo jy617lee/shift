@@ -19,7 +19,7 @@ struct ShiftTypeBadge: View {
     private var colors: (Color, Color) {
         switch type {
         case .work: return (Color.accentColor.opacity(0.15), .accentColor)
-        case .off: return (Color(.systemGray5), Color(.systemGray))
+        case .off: return (ShiftColors.muted, ShiftColors.mutedForeground)
         }
     }
 }

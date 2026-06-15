@@ -91,39 +91,48 @@ struct HomeView: View {
     }
 
     private var appBar: some View {
-        HStack(spacing: 10) {
+        HStack(spacing: 8) {
             ZStack {
-                RoundedRectangle(cornerRadius: 10)
+                RoundedRectangle(cornerRadius: 8)
                     .fill(Color.accentColor)
-                    .frame(width: 38, height: 38)
-                Image(systemName: "plus.circle")
-                    .font(.system(size: 18, weight: .semibold))
+                    .frame(width: 28, height: 28)
+                Text("+")
+                    .font(.system(size: 16, weight: .bold))
                     .foregroundStyle(.white)
             }
             Text("Shift")
-                .font(.system(size: 22, weight: .bold))
+                .font(.system(size: 16, weight: .medium))
             Spacer()
             Button { showSettings = true } label: {
-                Image(systemName: "gearshape")
+                Image(systemName: "gearshape.fill")
                     .font(.system(size: 20))
-                    .foregroundStyle(.primary)
+                    .foregroundStyle(ShiftColors.mutedForeground)
             }
             .buttonStyle(.plain)
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
-        .background(ShiftColors.background)
+        .padding(.leading, 16)
+        .padding(.trailing, 4)
+        .padding(.vertical, 8)
+        .background(Color(.systemBackground))
+        .overlay(alignment: .bottom) {
+            Divider()
+        }
     }
 
     private var fabButton: some View {
         Button { showPhotoPicker = true } label: {
-            Label("스케줄 추가", systemImage: "plus")
-                .font(.system(size: 15, weight: .semibold))
-                .foregroundStyle(.white)
-                .padding(.horizontal, 20)
-                .padding(.vertical, 14)
-                .background(Color.accentColor, in: RoundedRectangle(cornerRadius: 16))
+            HStack(spacing: 6) {
+                Image(systemName: "plus")
+                    .font(.system(size: 18, weight: .medium))
+                Text("스케줄 추가")
+                    .font(.system(size: 14, weight: .medium))
+            }
+            .foregroundStyle(.white)
+            .padding(.horizontal, 16)
+            .padding(.vertical, 18)
+            .background(Color.accentColor, in: RoundedRectangle(cornerRadius: 16))
         }
+        .buttonStyle(.plain)
         .padding()
         .opacity(registrationVM.phase == .processing ? 0 : 1)
     }
@@ -188,7 +197,7 @@ struct WeekListView: View {
         ScrollViewReader { proxy in
             List(weeks, id: \.weekStartDate) { week in
                 WeekCardView(week: week, today: todayNorm)
-                    .listRowInsets(EdgeInsets(top: 4, leading: 16, bottom: 4, trailing: 16))
+                    .listRowInsets(EdgeInsets(top: 5, leading: 16, bottom: 5, trailing: 16))
                     .listRowSeparator(.hidden)
                     .listRowBackground(Color.clear)
                     .id(week.weekStartDate)
