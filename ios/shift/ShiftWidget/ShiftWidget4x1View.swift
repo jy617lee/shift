@@ -35,11 +35,12 @@ struct ShiftWidget4x1View: View {
     }
 
     private func todayDateColumn(today: Date) -> some View {
-        VStack(spacing: 2) {
+        let dayNumber = Calendar.current.component(.day, from: today)
+        return VStack(spacing: 2) {
             Text(today.formatted(.dateTime.weekday(.abbreviated)))
                 .font(.system(size: Layout.dayLabelSize, weight: .medium))
                 .foregroundStyle(WidgetColors.primary.opacity(0.8))
-            Text(today.formatted(.dateTime.day()))
+            Text(String(dayNumber))
                 .font(.system(size: Layout.dateLabelSize, weight: .semibold))
                 .foregroundStyle(WidgetColors.primary)
         }
@@ -77,13 +78,13 @@ struct ShiftWidget4x1View: View {
 }
 
 private enum Layout {
-    static let dividerHeight: CGFloat = 44
-    static let dividerHPad: CGFloat = 16
+    static let dividerHeight: CGFloat = 42
+    static let dividerHPad: CGFloat = 14
     static let outerHPad: CGFloat = 20
-    static let dateColumnWidth: CGFloat = 60
+    static let dateColumnWidth: CGFloat = 56
     static let dayLabelSize: CGFloat = 13
-    static let dateLabelSize: CGFloat = 40
-    static let offStateFontSize: CGFloat = 22
-    static let workTimeFontSize: CGFloat = 20
-    static let codeLabelSize: CGFloat = 11
+    static let dateLabelSize: CGFloat = 32
+    static let offStateFontSize: CGFloat = 24
+    static let workTimeFontSize: CGFloat = 22
+    static let codeLabelSize: CGFloat = 12
 }

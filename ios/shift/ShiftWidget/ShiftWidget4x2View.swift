@@ -29,7 +29,7 @@ struct ShiftWidget4x2View: View {
                     .frame(height: Layout.waveHeight)
                 headerContent(today: today)
                     .padding(.horizontal, Layout.headerHPad)
-                    .padding(.bottom, Layout.headerHPad)
+                    .padding(.bottom, Layout.headerBPad)
             }
             .frame(height: Layout.headerHeight)
             WeekGrid(days: entry.weekDays(around: today), today: today)
@@ -43,12 +43,13 @@ struct ShiftWidget4x2View: View {
     @ViewBuilder
     private func headerContent(today: Date) -> some View {
         let day = entry.today
+        let dayNumber = Calendar.current.component(.day, from: today)
         HStack(spacing: 0) {
             VStack(spacing: Layout.headerInnerSpacing) {
                 Text(today.formatted(.dateTime.weekday(.abbreviated)))
-                    .font(.system(size: Layout.dayLabelSize, weight: .medium))
+                    .font(.system(size: Layout.headerDayLabelSize, weight: .medium))
                     .foregroundStyle(.white.opacity(0.8))
-                Text(today.formatted(.dateTime.day()))
+                Text(String(dayNumber))
                     .font(.system(size: Layout.dateLabelSize, weight: .semibold))
                     .foregroundStyle(.white)
             }
@@ -128,14 +129,14 @@ private struct DayCell: View {
         return Group {
             if isToday {
                 Text(label)
-                    .font(.system(size: Layout.dayLabelSize, weight: .medium))
+                    .font(.system(size: Layout.cellDayLabelSize, weight: .medium))
                     .foregroundStyle(.white)
                     .frame(width: Layout.badgeSize, height: Layout.badgeSize)
                     .background(WidgetColors.primary)
                     .clipShape(Circle())
             } else {
                 Text(label)
-                    .font(.system(size: Layout.dayLabelSize, weight: .medium))
+                    .font(.system(size: Layout.cellDayLabelSize, weight: .medium))
                     .foregroundStyle(WidgetColors.gridDate)
                     .frame(width: Layout.badgeSize, height: Layout.badgeSize)
             }
@@ -162,21 +163,23 @@ private struct DayCell: View {
 }
 
 private enum Layout {
-    static let headerHeight: CGFloat = 66
-    static let waveHeight: CGFloat = 12
+    static let headerHeight: CGFloat = 74
+    static let waveHeight: CGFloat = 18
     static let headerHPad: CGFloat = 14
-    static let headerLeftWidth: CGFloat = 52
+    static let headerBPad: CGFloat = 22
+    static let headerLeftWidth: CGFloat = 72
     static let headerInnerSpacing: CGFloat = 1
     static let headerDividerHeight: CGFloat = 32
-    static let headerDividerPadding: CGFloat = 12
-    static let dayLabelSize: CGFloat = 11
-    static let dateLabelSize: CGFloat = 24
-    static let stateFontSizeWork: CGFloat = 18
-    static let stateFontSizeOff: CGFloat = 14
+    static let headerDividerPadding: CGFloat = 10
+    static let headerDayLabelSize: CGFloat = 13
+    static let cellDayLabelSize: CGFloat = 12
+    static let dateLabelSize: CGFloat = 28
+    static let stateFontSizeWork: CGFloat = 26
+    static let stateFontSizeOff: CGFloat = 20
     static let gridHPad: CGFloat = 8
-    static let gridBPad: CGFloat = 10
+    static let gridBPad: CGFloat = 16
     static let gridTopPad: CGFloat = 8
-    static let badgeSize: CGFloat = 22
-    static let cellSpacing: CGFloat = 2
-    static let cellValueSize: CGFloat = 9
+    static let badgeSize: CGFloat = 26
+    static let cellSpacing: CGFloat = 3
+    static let cellValueSize: CGFloat = 12
 }

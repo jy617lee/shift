@@ -22,8 +22,10 @@ struct ShiftWidget2x1View: View {
     var body: some View {
         let today = Date()
         let day = entry.today
+        let dayNumber = Calendar.current.component(.day, from: today)
+        let monthNumber = Calendar.current.component(.month, from: today)
         VStack(spacing: Layout.spacing) {
-            Text(today.formatted(.dateTime.month(.defaultDigits).day().weekday(.abbreviated)))
+            Text("\(monthNumber)/\(dayNumber) " + today.formatted(.dateTime.weekday(.abbreviated)))
                 .font(.system(size: Layout.dateLabelSize))
                 .foregroundStyle(WidgetColors.onSurfaceVariant)
             Text(mainText(day))
