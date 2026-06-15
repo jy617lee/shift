@@ -26,7 +26,11 @@ sealed class AnalyticsEvent {
         val sessionId: String,
         val pass: Boolean,
         val failReason: String?,
-    ) : AnalyticsEvent()
+    ) : AnalyticsEvent() {
+        companion object {
+            const val FAIL_NOT_A_SCHEDULE = "not_a_schedule"
+        }
+    }
 
     data class ParseResult(
         val sessionId: String,
@@ -55,7 +59,14 @@ sealed class AnalyticsEvent {
         val correctedValue: String,
         val wasFailedRow: Boolean,
         val editSource: String,
-    ) : AnalyticsEvent()
+    ) : AnalyticsEvent() {
+        companion object {
+            const val FIELD_START_TIME = "start_time"
+            const val FIELD_END_TIME = "end_time"
+            const val FIELD_CODE_LABEL = "code_label"
+            const val EDIT_SOURCE_MANUAL = "manual"
+        }
+    }
 
     data class RegisterComplete(
         val sessionId: String,
@@ -65,7 +76,11 @@ sealed class AnalyticsEvent {
         val totalDurationMs: Long,
     ) : AnalyticsEvent()
 
-    data class RegisterAbandon(val sessionId: String, val lastStep: String) : AnalyticsEvent()
+    data class RegisterAbandon(val sessionId: String, val lastStep: String) : AnalyticsEvent() {
+        companion object {
+            const val LAST_STEP_CONFIRM = "confirm"
+        }
+    }
 }
 
 enum class AppOpenSource(val value: String) {

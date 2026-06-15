@@ -105,7 +105,7 @@ class RegistrationFlowStateHolder @Inject constructor(
                         AnalyticsEvent.Stage1Result(
                             sessionId = sessionId,
                             pass = false,
-                            failReason = "not_a_schedule",
+                            failReason = AnalyticsEvent.Stage1Result.FAIL_NOT_A_SCHEDULE,
                         ),
                     )
                 FailureReason.PARSE_ERROR -> {
