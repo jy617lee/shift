@@ -20,23 +20,19 @@ struct WeekCardView: View {
             }
         }
         .clipShape(RoundedRectangle(cornerRadius: 12))
-        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12))
+        .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 12))
+        .shadow(color: Color.black.opacity(0.06), radius: 8, x: 0, y: 2)
     }
 
     private var weekHeader: some View {
-        HStack {
-            Text("내 스케쥴")
-                .font(.system(size: 10, weight: .medium))
-                .foregroundStyle(.secondary)
-                .kerning(1.5)
-            Spacer()
-            Text(headerText)
-                .font(.system(size: 10))
-                .foregroundStyle(.secondary)
-        }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 8)
-        .background(Color(.tertiarySystemBackground))
+        Text(headerText)
+            .font(.system(size: 10, weight: .medium, design: .monospaced))
+            .foregroundStyle(ShiftColors.mutedForeground)
+            .kerning(2.0)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 8)
+            .background(ShiftColors.muted.opacity(0.6))
     }
 
     private var headerText: String {
@@ -69,52 +65,57 @@ struct DayRowView: View {
     }()
 
     var body: some View {
-        HStack(spacing: 0) {
-            todayBar
-            HStack(spacing: 10) {
-                dateColumn
-                shiftContent
+        HStack(spacing: 10) {
+            dateColumn
+            shiftContent
+            Spacer()
+            if isToday {
+                Text("오늘")
+                    .font(.system(size: 10, weight: .semibold))
+                    .foregroundStyle(Color.accentColor)
             }
-            .padding(.horizontal, 11)
-            .padding(.vertical, 10)
         }
-        .background(isToday ? Color.accentColor.opacity(0.08) : Color.clear)
-    }
-
-    private var todayBar: some View {
-        Rectangle()
-            .fill(isToday ? Color.accentColor : Color.clear)
-            .frame(width: 3, height: 44)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .background(isToday ? Color.accentColor.opacity(0.06) : Color.clear)
+        .overlay(alignment: .leading) {
+            if isToday { Color.accentColor.frame(width: 3) }
+        }
     }
 
     private var dateColumn: some View {
-        VStack(spacing: 1) {
+        HStack(spacing: 4) {
             Text(Self.dayFmt.string(from: day.date))
-                .font(.system(size: 10, weight: .medium))
+                .font(.system(size: 12, weight: .medium))
                 .foregroundStyle(dayColor)
             Text(Self.dateFmt.string(from: day.date))
-                .font(.system(size: 14, weight: .semibold))
+                .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(isToday ? Color.accentColor : Color.primary)
         }
-        .frame(width: 28)
+        .frame(minWidth: 52, alignment: .leading)
     }
 
+    @ViewBuilder
     private var shiftContent: some View {
-        HStack(spacing: 8) {
-            switch day.type {
-            case .work:
-                ShiftTypeBadge(label: "근무", type: .work)
-                Text("\(day.startTime ?? "")–\(day.endTime ?? "")")
-                    .font(.system(size: 13))
-            case .off:
-                ShiftTypeBadge(label: day.codeLabel.isEmpty ? "휴무" : day.codeLabel, type: .off)
-            case .other:
-                ShiftTypeBadge(label: day.codeLabel, type: .off)
-            case .unregistered:
-                Text("—").font(.system(size: 13)).foregroundStyle(.secondary)
-            }
+        switch day.type {
+        case .work:
+            workTimeText
+        case .off:
+            ShiftTypeBadge(label: day.codeLabel.isEmpty ? "휴무" : day.codeLabel, type: .off)
+        case .other:
+            ShiftTypeBadge(label: day.codeLabel, type: .off)
+        case .unregistered:
+            Text("—").font(.system(size: 13)).foregroundStyle(.secondary)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    @ViewBuilder
+    private var workTimeText: some View {
+        if let start = day.startTime, let end = day.endTime {
+            Text("\(start) – \(end)")
+                .font(.system(size: 13, design: .monospaced))
+                .foregroundStyle(Color.primary.opacity(0.8))
+        }
     }
 
     private var dayColor: Color {

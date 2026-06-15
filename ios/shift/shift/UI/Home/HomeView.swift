@@ -37,9 +37,11 @@ struct HomeView: View {
                 if registrationVM.phase == .processing { ProcessingOverlay() }
                 if let msg = viewModel.toastMessage { ToastBanner(message: msg) }
             }
-            .navigationTitle("Shift")
-            .navigationBarTitleDisplayMode(.inline)
+            .background(ShiftColors.background)
+            .navigationTitle("")
             .toolbar { toolbarContent }
+            .toolbarBackground(ShiftColors.background, for: .navigationBar)
+            .toolbarBackground(.visible, for: .navigationBar)
             .overlay(alignment: .bottomTrailing) { fabButton }
         }
         .photosPicker(isPresented: $showPhotoPicker, selection: $selectedPhotoItem, matching: .images)
@@ -63,15 +65,15 @@ struct HomeView: View {
         )
         .alert("지원하지 않는 이미지 형식입니다", isPresented: $showNotAScheduleAlert) {
             Button("확인", role: .cancel) { registrationVM.reset() }
-        } message: { Text("스케쥴 표가 포함된 이미지를 선택해주세요.") }
+        } message: { Text("스케줄 표가 포함된 이미지를 선택해주세요.") }
         .alert("인식 실패", isPresented: $showParseErrorAlert) {
             Button("보내기") { sendFailureReport(); registrationVM.reset() }
             Button("취소", role: .cancel) { registrationVM.reset() }
-        } message: { Text("스케쥴을 인식하지 못했습니다. 이미지를 보내주시면 개선에 활용할게요.") }
-        .alert("스케쥴 교체", isPresented: $showSkipConflictDialog) {
+        } message: { Text("스케줄을 인식하지 못했습니다. 이미지를 보내주시면 개선에 활용할게요.") }
+        .alert("스케줄 교체", isPresented: $showSkipConflictDialog) {
             Button("교체하기") { Task { await registrationVM.proceedSkipReplace() } }
             Button("취소", role: .cancel) { registrationVM.reset() }
-        } message: { Text("\(skipConflictCount)개 주 스케쥴이 이미 있습니다. 교체할까요?") }
+        } message: { Text("\(skipConflictCount)개 주 스케줄이 이미 있습니다. 교체할까요?") }
         .task { await viewModel.loadWeeks() }
     }
 
@@ -90,6 +92,20 @@ struct HomeView: View {
 
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
+        ToolbarItem(placement: .navigationBarLeading) {
+            HStack(spacing: 8) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 8)
+                        .fill(Color.accentColor)
+                        .frame(width: 34, height: 34)
+                    Image(systemName: "plus.circle")
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(.white)
+                }
+                Text("Shift")
+                    .font(.system(size: 20, weight: .bold))
+            }
+        }
         ToolbarItem(placement: .navigationBarTrailing) {
             Button { showSettings = true } label: {
                 Image(systemName: "gearshape")
@@ -99,7 +115,7 @@ struct HomeView: View {
 
     private var fabButton: some View {
         Button { showPhotoPicker = true } label: {
-            Label("스케쥴 추가", systemImage: "plus")
+            Label("스케줄 추가", systemImage: "plus")
                 .font(.system(size: 15, weight: .semibold))
                 .foregroundStyle(.white)
                 .padding(.horizontal, 20)
@@ -153,7 +169,7 @@ struct HomeView: View {
     }
 
     private func savedToastMessage(_ count: Int) -> String {
-        count == 1 ? "스케쥴이 저장됐어요" : "\(count)주 스케쥴이 저장됐어요"
+        count == 1 ? "스케줄이 저장됐어요" : "\(count)주 스케줄이 저장됐어요"
     }
 }
 
@@ -176,6 +192,7 @@ struct WeekListView: View {
                     .id(week.weekStartDate)
             }
             .listStyle(.plain)
+            .scrollContentBackground(.hidden)
             .onAppear { proxy.scrollTo(weeks[safe: initialIndex]?.weekStartDate, anchor: .top) }
         }
     }
@@ -214,9 +231,9 @@ struct HomeEmptyView: View {
             Image(systemName: "calendar.badge.plus")
                 .font(.system(size: 40))
                 .foregroundStyle(.secondary)
-            Text("등록된 스케쥴이 없어요")
+            Text("등록된 스케줄이 없어요")
                 .font(.headline)
-            Text("스케쥴 추가 버튼을 눌러\n첫 번째 일정을 등록해 보세요.")
+            Text("스케줄 추가 버튼을 눌러\n첫 번째 일정을 등록해 보세요.")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
@@ -232,7 +249,7 @@ struct HomeErrorView: View {
     let onRetry: () -> Void
     var body: some View {
         VStack(spacing: 16) {
-            Text("스케쥴을 불러오는 중\n오류가 발생했습니다")
+            Text("스케줄을 불러오는 중\n오류가 발생했습니다")
                 .multilineTextAlignment(.center)
                 .font(.headline)
             Button("다시 시도", action: onRetry)
