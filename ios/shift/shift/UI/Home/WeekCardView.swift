@@ -24,7 +24,7 @@ struct WeekCardView: View {
             }
             .frame(maxWidth: .infinity)
             .padding(.horizontal, 14)
-            .padding(.vertical, 12)
+            .padding(.vertical, 16)
             .background(ShiftColors.muted.opacity(0.6))
 
             Divider()

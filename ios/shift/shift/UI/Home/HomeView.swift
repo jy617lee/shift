@@ -110,8 +110,7 @@ struct HomeView: View {
             }
             .buttonStyle(.plain)
         }
-        .padding(.leading, 16)
-        .padding(.trailing, 4)
+        .padding(.horizontal, 16)
         .padding(.vertical, 8)
         .background(Color(.systemBackground))
         .overlay(alignment: .bottom) {
