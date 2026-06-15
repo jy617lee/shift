@@ -23,6 +23,8 @@ struct ShiftWidget2x2View: View {
         let today = Date()
         let dayNumber = Calendar.current.component(.day, from: today)
         let day = entry.today
+        let nextWork = !(day?.isWork ?? false) ? entry.nextWorkDay(after: today) : nil
+        let nextStart = nextWork.flatMap { $0.shiftStartDate(on: $0.date) }
 
         VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .lastTextBaseline, spacing: 5) {
@@ -37,15 +39,18 @@ struct ShiftWidget2x2View: View {
                 .fill(Color(white: 0.85))
                 .frame(height: 1)
                 .padding(.vertical, Layout.dividerVPad)
-            stateContent(day: day, today: today)
+            stateContent(day: day)
             Spacer(minLength: 0)
+            if let nextStart {
+                nextWorkView(nextStart: nextStart, today: today)
+            }
         }
         .padding(Layout.outerPad)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 
     @ViewBuilder
-    private func stateContent(day: WidgetScheduleDay?, today: Date) -> some View {
+    private func stateContent(day: WidgetScheduleDay?) -> some View {
         if let day, day.isWork {
             VStack(alignment: .leading, spacing: 4) {
                 if !day.codeLabel.isEmpty {
@@ -59,31 +64,24 @@ struct ShiftWidget2x2View: View {
                     .lineLimit(2)
             }
         } else {
-            offDayContent(day: day, today: today)
-        }
-    }
-
-    @ViewBuilder
-    private func offDayContent(day: WidgetScheduleDay?, today: Date) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
             Text(day?.displayOffText ?? "스케줄 없음")
                 .font(.system(size: Layout.offStateFontSize, weight: .medium))
                 .foregroundStyle(WidgetColors.onSurface)
                 .lineLimit(1)
-            if let next = entry.nextWorkDay(after: today),
-               let nextStart = next.shiftStartDate(on: next.date) {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("다음 근무까지")
-                        .font(.system(size: Layout.countdownLabelSize))
-                        .foregroundStyle(WidgetColors.onSurfaceVariant)
-                    Text(timerInterval: today...nextStart, countsDown: true)
-                        .font(.system(size: Layout.countdownTimerSize, weight: .semibold))
-                        .foregroundStyle(WidgetColors.primary)
-                        .monospacedDigit()
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
-                }
-            }
+        }
+    }
+
+    private func nextWorkView(nextStart: Date, today: Date) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text("다음 근무까지")
+                .font(.system(size: Layout.countdownLabelSize))
+                .foregroundStyle(WidgetColors.onSurfaceVariant)
+            Text(timerInterval: today...nextStart, countsDown: true)
+                .font(.system(size: Layout.countdownTimerSize, weight: .semibold))
+                .foregroundStyle(WidgetColors.primary)
+                .monospacedDigit()
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
         }
     }
 }
