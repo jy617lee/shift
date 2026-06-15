@@ -172,19 +172,16 @@ private fun TodayHeader(
 
 @Composable
 private fun TodayStateText(state: WidgetState, timeFmt: DateTimeFormatter) {
-    val (text, color) = when (state) {
-        is WidgetState.WorkDay ->
-            "${state.startTime.format(timeFmt)}-${state.endTime.format(timeFmt)}" to ColorProvider(Color.White)
-        is WidgetState.OffDay ->
-            state.codeLabel.ifEmpty { "휴무" } to ColorProvider(Color.White.copy(alpha = ALPHA_OFF_DAY))
-        is WidgetState.Unregistered ->
-            "-" to ColorProvider(Color.White.copy(alpha = ALPHA_UNREGISTERED))
+    val text = when (state) {
+        is WidgetState.WorkDay -> "${state.startTime.format(timeFmt)}-${state.endTime.format(timeFmt)}"
+        is WidgetState.OffDay -> state.codeLabel.ifEmpty { "휴무" }
+        is WidgetState.Unregistered -> "-"
     }
     Text(
         text = text,
         style = TextDefaults.defaultTextStyle.copy(
-            color = color,
-            fontSize = if (state is WidgetState.WorkDay) 29.sp else 14.sp,
+            color = ColorProvider(Color.White),
+            fontSize = 29.sp,
             fontWeight = FontWeight.Normal,
             textAlign = TextAlign.Center,
         ),
@@ -302,8 +299,6 @@ private val GridDateColor = ColorProvider(Color(0xFF1E3932))
 @Suppress("MagicNumber")
 private val GridMutedColor = ColorProvider(Color(0xFF6B6760))
 
-private const val ALPHA_OFF_DAY = 0.7f
-private const val ALPHA_UNREGISTERED = 0.5f
 private const val MAX_CODE_CHARS = 4
 private const val GRID_OFFSET_START = -2
 private const val GRID_OFFSET_END = 2
