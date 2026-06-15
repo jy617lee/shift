@@ -12,31 +12,34 @@ struct WeekCardView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            weekHeader
+            HStack {
+                Text("내 스케줄")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(ShiftColors.mutedForeground)
+                    .kerning(1.5)
+                Spacer()
+                Text(headerText)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundStyle(ShiftColors.mutedForeground)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 10)
+            .background(ShiftColors.muted.opacity(0.6))
+
             Divider()
+
             ForEach(Array(week.days.enumerated()), id: \.offset) { index, day in
                 DayRowView(day: day, isToday: Calendar.current.isDate(day.date, inSameDayAs: today))
-                if index < week.days.count - 1 { Divider().padding(.leading, 52) }
+                if index < week.days.count - 1 {
+                    Divider()
+                        .padding(.horizontal, 14)
+                }
             }
         }
+        .background(Color(.systemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 12))
-        .background(Color(.secondarySystemBackground), in: RoundedRectangle(cornerRadius: 12))
-    }
-
-    private var weekHeader: some View {
-        HStack {
-            Text("내 스케쥴")
-                .font(.system(size: 10, weight: .medium))
-                .foregroundStyle(.secondary)
-                .kerning(1.5)
-            Spacer()
-            Text(headerText)
-                .font(.system(size: 10))
-                .foregroundStyle(.secondary)
-        }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 8)
-        .background(Color(.tertiarySystemBackground))
+        .shadow(color: Color.black.opacity(0.06), radius: 8, x: 0, y: 2)
     }
 
     private var headerText: String {
@@ -69,26 +72,21 @@ struct DayRowView: View {
     }()
 
     var body: some View {
-        HStack(spacing: 0) {
-            todayBar
-            HStack(spacing: 10) {
-                dateColumn
-                shiftContent
-            }
-            .padding(.horizontal, 11)
-            .padding(.vertical, 10)
+        HStack(spacing: 10) {
+            dateColumn
+            shiftContent
+            Spacer()
         }
-        .background(isToday ? Color.accentColor.opacity(0.08) : Color.clear)
-    }
-
-    private var todayBar: some View {
-        Rectangle()
-            .fill(isToday ? Color.accentColor : Color.clear)
-            .frame(width: 3, height: 44)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+        .background(isToday ? Color.accentColor.opacity(0.06) : Color.clear)
+        .overlay(alignment: .leading) {
+            if isToday { Color.accentColor.frame(width: 3) }
+        }
     }
 
     private var dateColumn: some View {
-        VStack(spacing: 1) {
+        VStack(spacing: 2) {
             Text(Self.dayFmt.string(from: day.date))
                 .font(.system(size: 10, weight: .medium))
                 .foregroundStyle(dayColor)
@@ -96,25 +94,28 @@ struct DayRowView: View {
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundStyle(isToday ? Color.accentColor : Color.primary)
         }
-        .frame(width: 28)
+        .frame(width: 32, alignment: .center)
     }
 
+    @ViewBuilder
     private var shiftContent: some View {
-        HStack(spacing: 8) {
-            switch day.type {
-            case .work:
+        switch day.type {
+        case .work:
+            HStack(spacing: 12) {
                 ShiftTypeBadge(label: "근무", type: .work)
-                Text("\(day.startTime ?? "")–\(day.endTime ?? "")")
-                    .font(.system(size: 13))
-            case .off:
-                ShiftTypeBadge(label: day.codeLabel.isEmpty ? "휴무" : day.codeLabel, type: .off)
-            case .other:
-                ShiftTypeBadge(label: day.codeLabel, type: .off)
-            case .unregistered:
-                Text("—").font(.system(size: 13)).foregroundStyle(.secondary)
+                if let start = day.startTime, let end = day.endTime {
+                    Text("\(start)–\(end)")
+                        .font(.system(size: 13))
+                        .foregroundStyle(Color.primary)
+                }
             }
+        case .off:
+            ShiftTypeBadge(label: day.codeLabel.isEmpty ? "휴무" : day.codeLabel, type: .off)
+        case .other:
+            ShiftTypeBadge(label: day.codeLabel, type: .off)
+        case .unregistered:
+            Text("—").font(.system(size: 13)).foregroundStyle(.secondary)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var dayColor: Color {
@@ -122,6 +123,6 @@ struct DayRowView: View {
         let weekday = Calendar.current.component(.weekday, from: day.date)
         if weekday == 1 { return Color(.systemRed) }
         if weekday == 7 { return Color(.systemBlue) }
-        return Color.secondary
+        return ShiftColors.mutedForeground
     }
 }

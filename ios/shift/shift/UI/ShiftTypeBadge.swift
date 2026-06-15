@@ -12,14 +12,14 @@ struct ShiftTypeBadge: View {
             .font(.system(size: 11, weight: .medium))
             .foregroundStyle(fg)
             .padding(.horizontal, 8)
-            .padding(.vertical, 2)
+            .padding(.vertical, 4)
             .background(bg, in: RoundedRectangle(cornerRadius: 6))
     }
 
     private var colors: (Color, Color) {
         switch type {
         case .work: return (Color.accentColor.opacity(0.15), .accentColor)
-        case .off: return (Color(.systemGray5), Color(.systemGray))
+        case .off: return (ShiftColors.muted, ShiftColors.mutedForeground)
         }
     }
 }

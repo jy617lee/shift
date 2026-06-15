@@ -18,24 +18,24 @@ struct ConfirmationView: View {
                     ToastBanner(message: msg)
                 }
             }
-            .navigationTitle("스케쥴 확인")
+            .navigationTitle("스케줄 확인")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar { toolbarContent }
         }
         .onChange(of: viewModel.savedSuccessfully) { _, saved in if saved { onDismiss() } }
         .onChange(of: viewModel.isCancelled) { _, cancelled in if cancelled { onDismiss() } }
         .onChange(of: viewModel.editing) { _, state in showEditSheet = state != nil }
-        .alert("스케쥴 교체", isPresented: .constant(viewModel.conflictCount > 0)) {
+        .alert("스케줄 교체", isPresented: .constant(viewModel.conflictCount > 0)) {
             Button("교체하기", action: viewModel.proceedWithReplace)
             Button("취소", role: .cancel, action: viewModel.dismissConflict)
         } message: {
-            Text("\(viewModel.conflictCount)개 주 스케쥴이 이미 있습니다.\n교체할까요?")
+            Text("\(viewModel.conflictCount)개 주 스케줄이 이미 있습니다.\n교체할까요?")
         }
         .alert("다음부터 이 단계를 건너뛸까요?", isPresented: $viewModel.showSkipPrompt) {
             Button("다음부터 건너뛰기") { viewModel.answerSkipPrompt(skipInFuture: true) }
             Button("매번 확인할게요", role: .cancel) { viewModel.answerSkipPrompt(skipInFuture: false) }
         } message: {
-            Text("저장하기를 누르면 스케쥴 확인 없이 바로 저장돼요.\n설정에서 언제든 바꿀 수 있어요.")
+            Text("저장하기를 누르면 스케줄 확인 없이 바로 저장돼요.\n설정에서 언제든 바꿀 수 있어요.")
         }
         .sheet(isPresented: $showEditSheet, onDismiss: viewModel.dismissEdit) {
             if let editing = viewModel.editing {
