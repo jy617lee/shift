@@ -89,8 +89,8 @@ struct ShiftWidget2x2View: View {
 }
 
 private enum Layout {
-    static let outerPad: CGFloat = 14
-    static let dividerVPad: CGFloat = 8
+    static let outerPad: CGFloat = 7
+    static let dividerVPad: CGFloat = 4
     static let dayLabelSize: CGFloat = 13
     static let dateLabelSize: CGFloat = 28
     static let offStateFontSize: CGFloat = 18
