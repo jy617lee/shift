@@ -13,7 +13,6 @@ struct ShiftWidget4x2: Widget {
         .configurationDisplayName("주간 스케줄")
         .description("이번 주 근무 일정을 한눈에 확인하세요.")
         .supportedFamilies([.systemMedium])
-        .contentMarginsDisabled()
     }
 }
 
@@ -23,14 +22,10 @@ struct ShiftWidget4x2View: View {
     var body: some View {
         let today = Date()
         VStack(spacing: 0) {
-            ZStack(alignment: .bottom) {
+            ZStack {
                 WidgetColors.headerBg
-                HeaderWave()
-                    .fill(WidgetColors.surface)
-                    .frame(height: Layout.waveHeight)
                 headerContent(today: today)
                     .padding(.horizontal, Layout.headerHPad)
-                    .padding(.bottom, Layout.headerBPad)
             }
             .frame(height: Layout.headerHeight)
             WeekGrid(days: entry.weekDays(around: today), today: today)
@@ -74,21 +69,6 @@ struct ShiftWidget4x2View: View {
             return "\(start) - \(end)"
         }
         return day.codeLabel.isEmpty ? "휴무" : day.codeLabel
-    }
-}
-
-private struct HeaderWave: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        path.move(to: CGPoint(x: 0, y: 0))
-        path.addLine(to: CGPoint(x: rect.maxX, y: 0))
-        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
-        path.addQuadCurve(
-            to: CGPoint(x: 0, y: rect.maxY),
-            control: CGPoint(x: rect.midX, y: rect.minY - 4)
-        )
-        path.closeSubpath()
-        return path
     }
 }
 
@@ -165,9 +145,7 @@ private struct WeekGrid: View {
 
 private enum Layout {
     static let headerHeight: CGFloat = 74
-    static let waveHeight: CGFloat = 18
     static let headerHPad: CGFloat = 14
-    static let headerBPad: CGFloat = 22
     static let headerLeftWidth: CGFloat = 72
     static let headerInnerSpacing: CGFloat = 1
     static let headerDividerHeight: CGFloat = 32
