@@ -13,6 +13,7 @@ struct ShiftWidget4x2: Widget {
         .configurationDisplayName("주간 스케줄")
         .description("이번 주 근무 일정을 한눈에 확인하세요.")
         .supportedFamilies([.systemMedium])
+        .contentMarginsDisabled()
     }
 }
 
@@ -84,14 +85,12 @@ private struct WeekGrid: View {
         }
 
         VStack(spacing: Layout.cellSpacing) {
-            // 요일 뱃지 행 — 같은 HStack에 있어 Y 위치 완벽히 동일
             HStack(spacing: 0) {
                 ForEach(0..<5, id: \.self) { idx in
                     dayBadge(date: dates[idx], isToday: idx == 2)
                         .frame(maxWidth: .infinity)
                 }
             }
-            // 시간/코드 행
             HStack(alignment: .top, spacing: 0) {
                 ForEach(0..<5, id: \.self) { idx in
                     dayValue(day: days[idx], isToday: idx == 2)
