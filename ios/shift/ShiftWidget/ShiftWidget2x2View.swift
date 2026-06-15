@@ -99,3 +99,9 @@ private enum Layout {
     static let countdownLabelSize: CGFloat = 10
     static let countdownTimerSize: CGFloat = 16
 }
+
+#Preview(as: .systemSmall) {
+    ShiftWidget2x2()
+} timeline: {
+    WidgetEntry.placeholder
+}

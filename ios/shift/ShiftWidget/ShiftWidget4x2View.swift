@@ -185,3 +185,9 @@ private enum Layout {
     static let cellValueSize: CGFloat = 12
     static let cellValueMinHeight: CGFloat = 30
 }
+
+#Preview(as: .systemMedium) {
+    ShiftWidget4x2()
+} timeline: {
+    WidgetEntry.placeholder
+}
