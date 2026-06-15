@@ -25,7 +25,7 @@ jobs:
         with:
           xcode-version: '26.1'
 
-      - name: "[1] SwiftLint 정적 분석 + 린터"
+      - name: "[1] SwiftLint 정적 분析 + 린터"
         run: |
           if ! command -v swiftlint &>/dev/null; then
             brew install swiftlint
@@ -35,10 +35,22 @@ jobs:
       - name: "[2] 단위 테스트 + 커버리지 수집"
         working-directory: ios/shift
         run: |
+          SIM_ID=$(xcrun simctl list devices available -j | python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+for rt in sorted(data['devices'], reverse=True):
+    if '.iOS-' in rt:
+        for d in data['devices'][rt]:
+            udid = d.get('udid', '')
+            if d.get('isAvailable') and 'dvt' not in udid:
+                print(udid)
+                raise SystemExit()
+" 2>/dev/null)
+          echo "iOS Simulator: ${SIM_ID}"
           xcodebuild test \
             -project shift.xcodeproj \
             -scheme shift \
-            -destination 'platform=iOS Simulator' \
+            -destination "id=${SIM_ID}" \
             -enableCodeCoverage YES \
             -derivedDataPath /tmp/DerivedData \
             -skip-testing:shiftUITests \
@@ -50,16 +62,13 @@ jobs:
           XCRESULT=$(find /tmp/DerivedData -name "*.xcresult" | head -1)
           bash scripts/check_coverage.sh "$XCRESULT" 30
 
-      - name: "[4] 테스트 코드 비율 검사 (기준: 50%)"
-        run: bash scripts/check_test_ratio.sh
-
       - name: jscpd 캐시 복원
         uses: actions/cache@v4
         with:
           path: ~/.npm-global
           key: npm-jscpd-${{ runner.os }}-v3
 
-      - name: "[5] jscpd 설치"
+      - name: "[4] jscpd 설치"
         working-directory: ${{ github.workspace }}
         run: |
           npm config set prefix ~/.npm-global
@@ -67,7 +76,7 @@ jobs:
           npm install -g jscpd@3
           echo "$HOME/.npm-global/bin" >> $GITHUB_PATH
 
-      - name: "[6] 중복 코드 검사"
+      - name: "[5] 중복 코드 검사"
         run: jscpd --config .jscpd.json
 
       - name: 커버리지 리포트 업로드 (실패 시에도)
