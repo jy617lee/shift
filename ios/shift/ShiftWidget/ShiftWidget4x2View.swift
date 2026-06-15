@@ -7,7 +7,8 @@ struct ShiftWidget4x2: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: WidgetProvider()) { entry in
             ShiftWidget4x2View(entry: entry)
-                .containerBackground(WidgetColors.headerBg, for: .widget)
+                .containerBackground(WidgetColors
+                    .headerBg, for: .widget)
                 .widgetURL(URL(string: "shift://open?source=widget_4x2"))
         }
         .configurationDisplayName("주간 스케줄")
@@ -25,12 +26,11 @@ struct ShiftWidget4x2View: View {
             headerContent(today: today)
                 .padding(.horizontal, Layout.headerHPad)
                 .frame(height: Layout.headerHeight)
-            WidgetColors.surface
-                .overlay(
-                    WeekGrid(days: entry.weekDays(around: today), today: today)
-                        .padding(.horizontal, Layout.gridHPad)
-                        .padding(.bottom, Layout.gridBPad)
-                )
+            WeekGrid(days: entry.weekDays(around: today), today: today)
+                .padding(.horizontal, Layout.gridHPad)
+                .padding(.bottom, Layout.gridBPad)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .background(WidgetColors.surface)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
