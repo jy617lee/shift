@@ -97,71 +97,67 @@ private struct WeekGrid: View {
     let today: Date
 
     var body: some View {
-        HStack(alignment: .top, spacing: 0) {
-            ForEach(0..<5, id: \.self) { idx in
-                let offset = idx - 2
-                let date = Calendar.current.date(
-                    byAdding: .day,
-                    value: offset,
-                    to: Calendar.current.startOfDay(for: today)
-                ) ?? today
-                DayCell(date: date, day: days[idx], isToday: offset == 0)
-                    .frame(maxWidth: .infinity)
+        let cal = Calendar.current
+        let todayStart = cal.startOfDay(for: today)
+        let dates: [Date] = (0..<5).map { idx in
+            cal.date(byAdding: .day, value: idx - 2, to: todayStart) ?? todayStart
+        }
+
+        VStack(spacing: Layout.cellSpacing) {
+            // 요일 뱃지 행 — 같은 HStack에 있어 Y 위치 완벽히 동일
+            HStack(spacing: 0) {
+                ForEach(0..<5, id: \.self) { idx in
+                    dayBadge(date: dates[idx], isToday: idx == 2)
+                        .frame(maxWidth: .infinity)
+                }
+            }
+            // 시간/코드 행
+            HStack(alignment: .top, spacing: 0) {
+                ForEach(0..<5, id: \.self) { idx in
+                    dayValue(day: days[idx], isToday: idx == 2)
+                        .frame(maxWidth: .infinity, minHeight: Layout.cellValueMinHeight, alignment: .top)
+                }
             }
         }
         .padding(.top, Layout.gridTopPad)
     }
-}
 
-private struct DayCell: View {
-    let date: Date
-    let day: WidgetScheduleDay?
-    let isToday: Bool
-
-    var body: some View {
-        VStack(spacing: Layout.cellSpacing) {
-            dayBadge
-            dayValue
-        }
-    }
-
-    private var dayBadge: some View {
+    @ViewBuilder
+    private func dayBadge(date: Date, isToday: Bool) -> some View {
         let label = date.formatted(.dateTime.weekday(.narrow))
-        return Group {
-            if isToday {
-                Text(label)
-                    .font(.system(size: Layout.cellDayLabelSize, weight: .medium))
-                    .foregroundStyle(.white)
-                    .frame(width: Layout.badgeSize, height: Layout.badgeSize)
-                    .background(WidgetColors.primary)
-                    .clipShape(Circle())
-            } else {
-                Text(label)
-                    .font(.system(size: Layout.cellDayLabelSize, weight: .medium))
-                    .foregroundStyle(WidgetColors.gridDate)
-                    .frame(width: Layout.badgeSize, height: Layout.badgeSize)
-            }
+        if isToday {
+            Text(label)
+                .font(.system(size: Layout.cellDayLabelSize, weight: .medium))
+                .foregroundStyle(.white)
+                .frame(width: Layout.badgeSize, height: Layout.badgeSize)
+                .background(WidgetColors.primary)
+                .clipShape(Circle())
+        } else {
+            Text(label)
+                .font(.system(size: Layout.cellDayLabelSize, weight: .medium))
+                .foregroundStyle(WidgetColors.gridDate)
+                .frame(width: Layout.badgeSize, height: Layout.badgeSize)
         }
     }
 
     @ViewBuilder
-    private var dayValue: some View {
+    private func dayValue(day: WidgetScheduleDay?, isToday: Bool) -> some View {
         let color: Color = isToday ? WidgetColors.primary : WidgetColors.gridMuted
         let style = Font.system(size: Layout.cellValueSize)
-        VStack(spacing: 1) {
-            if let day, day.isWork, let start = day.startTime, let end = day.endTime {
+        if let day, day.isWork, let start = day.startTime, let end = day.endTime {
+            VStack(spacing: 1) {
                 Text(start).font(style).foregroundStyle(color)
                 Text(end).font(style).foregroundStyle(color)
-            } else {
-                Text(offText).font(style).foregroundStyle(color)
-                    .lineLimit(2).multilineTextAlignment(.center)
-                Text("").font(style)  // 빈 줄로 work day와 높이 동일하게 유지
             }
+        } else {
+            Text(offLabel(day))
+                .font(style)
+                .foregroundStyle(color)
+                .multilineTextAlignment(.center)
         }
-        .frame(minHeight: Layout.cellValueMinHeight, alignment: .top)
     }
 
-    private var offText: String {
+    private func offLabel(_ day: WidgetScheduleDay?) -> String {
         guard let day else { return "-" }
         return day.codeLabel.isEmpty ? "휴무" : String(day.codeLabel.prefix(4))
     }

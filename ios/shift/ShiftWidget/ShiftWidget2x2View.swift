@@ -37,7 +37,7 @@ struct ShiftWidget2x2View: View {
                 .fill(Color(white: 0.85))
                 .frame(height: 1)
                 .padding(.vertical, Layout.dividerVPad)
-            stateContent(day: day)
+            stateContent(day: day, today: today)
             Spacer(minLength: 0)
         }
         .padding(Layout.outerPad)
@@ -45,7 +45,7 @@ struct ShiftWidget2x2View: View {
     }
 
     @ViewBuilder
-    private func stateContent(day: WidgetScheduleDay?) -> some View {
+    private func stateContent(day: WidgetScheduleDay?, today: Date) -> some View {
         if let day, day.isWork {
             VStack(alignment: .leading, spacing: 4) {
                 if !day.codeLabel.isEmpty {
@@ -59,10 +59,31 @@ struct ShiftWidget2x2View: View {
                     .lineLimit(2)
             }
         } else {
+            offDayContent(day: day, today: today)
+        }
+    }
+
+    @ViewBuilder
+    private func offDayContent(day: WidgetScheduleDay?, today: Date) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
             Text(day?.displayOffText ?? "스케줄 없음")
                 .font(.system(size: Layout.offStateFontSize, weight: .medium))
                 .foregroundStyle(WidgetColors.onSurface)
-                .lineLimit(2)
+                .lineLimit(1)
+            if let next = entry.nextWorkDay(after: today),
+               let nextStart = next.shiftStartDate(on: next.date) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("다음 근무까지")
+                        .font(.system(size: Layout.countdownLabelSize))
+                        .foregroundStyle(WidgetColors.onSurfaceVariant)
+                    Text(timerInterval: today...nextStart, countsDown: true)
+                        .font(.system(size: Layout.countdownTimerSize, weight: .semibold))
+                        .foregroundStyle(WidgetColors.primary)
+                        .monospacedDigit()
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                }
+            }
         }
     }
 }
@@ -72,7 +93,9 @@ private enum Layout {
     static let dividerVPad: CGFloat = 8
     static let dayLabelSize: CGFloat = 13
     static let dateLabelSize: CGFloat = 28
-    static let offStateFontSize: CGFloat = 22
+    static let offStateFontSize: CGFloat = 18
     static let workTimeFontSize: CGFloat = 20
     static let codeLabelSize: CGFloat = 11
+    static let countdownLabelSize: CGFloat = 10
+    static let countdownTimerSize: CGFloat = 16
 }

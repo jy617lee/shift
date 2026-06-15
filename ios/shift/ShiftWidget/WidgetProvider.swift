@@ -22,16 +22,21 @@ struct WidgetProvider: TimelineProvider {
         let current = makeEntry(at: now)
         entries.append(current)
 
-        // 오늘 근무가 있고 아직 종료 전이면 → 종료 시점에 '내일' 엔트리 추가
         let today = cal.startOfDay(for: now)
         let tomorrow = cal.date(byAdding: .day, value: 1, to: today) ?? today
         let days = current.days
-        if let todayDay = days.first(where: { cal.isDate($0.date, inSameDayAs: today) }),
-           todayDay.isWork,
-           let endDate = todayDay.shiftEndDate(on: today),
-           now < endDate {
-            let nextEntry = WidgetEntry(date: endDate, days: days, targetDate: tomorrow)
-            entries.append(nextEntry)
+        let todayDay = days.first(where: { cal.isDate($0.date, inSameDayAs: today) })
+
+        if let todayDay, todayDay.isWork,
+           let endDate = todayDay.shiftEndDate(on: today), now < endDate {
+            // 오늘 근무 종료 시점에 '내일' 엔트리 추가
+            entries.append(WidgetEntry(date: endDate, days: days, targetDate: tomorrow))
+        } else if todayDay.map({ !$0.isWork }) ?? true,
+                  let nextWork = current.nextWorkDay(after: now),
+                  let nextStart = nextWork.shiftStartDate(on: nextWork.date),
+                  now < nextStart {
+            // 오프데이: 다음 근무 시작 시점에 갱신
+            entries.append(WidgetEntry(date: nextStart, days: days, targetDate: today))
         }
 
         completion(Timeline(entries: entries, policy: .after(nextMidnight())))

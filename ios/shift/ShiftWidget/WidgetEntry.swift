@@ -52,6 +52,14 @@ struct WidgetEntry: TimelineEntry {
         !Calendar.current.isDateInToday(targetDate)
     }
 
+    func nextWorkDay(after referenceDate: Date) -> WidgetScheduleDay? {
+        let cal = Calendar.current
+        let start = cal.startOfDay(for: referenceDate)
+        return days
+            .filter { !cal.isDate($0.date, inSameDayAs: start) && $0.date > start && $0.isWork }
+            .min(by: { $0.date < $1.date })
+    }
+
     func weekDays(around referenceDate: Date) -> [WidgetScheduleDay?] {
         let cal = Calendar.current
         let todayStart = cal.startOfDay(for: referenceDate)
