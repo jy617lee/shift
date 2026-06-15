@@ -45,7 +45,8 @@ struct ShiftWidget2x2View: View {
                 nextWorkView(nextStart: nextStart, today: today)
             }
         }
-        .padding(Layout.outerPad)
+        .padding(.horizontal, Layout.hPad)
+        .padding(.vertical, Layout.vPad)
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 
@@ -87,10 +88,11 @@ struct ShiftWidget2x2View: View {
 }
 
 private enum Layout {
-    static let outerPad: CGFloat = 7
+    static let hPad: CGFloat = 7
+    static let vPad: CGFloat = 6   // 7 × 0.85
     static let dividerVPad: CGFloat = 4
     static let dayLabelSize: CGFloat = 13
-    static let dateLabelSize: CGFloat = 28
+    static let dateLabelSize: CGFloat = 24
     static let offStateFontSize: CGFloat = 18
     static let workTimeFontSize: CGFloat = 20
     static let codeLabelSize: CGFloat = 11
