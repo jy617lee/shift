@@ -101,11 +101,11 @@ struct DayRowView: View {
     private var shiftContent: some View {
         switch day.type {
         case .work:
-            HStack(spacing: 8) {
+            HStack(spacing: 12) {
                 ShiftTypeBadge(label: "근무", type: .work)
                 if let start = day.startTime, let end = day.endTime {
                     Text("\(start)–\(end)")
-                        .font(.system(size: 13, weight: .light))
+                        .font(.system(size: 13))
                         .foregroundStyle(Color.primary)
                 }
             }
