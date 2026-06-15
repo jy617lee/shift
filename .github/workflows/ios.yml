@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - "ios/**"
+      - "test-fixtures/**"
       - ".github/workflows/ios.yml"
 
 defaults:
