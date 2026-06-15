@@ -19,6 +19,11 @@ struct ShiftApp: App {
             ContentView()
                 .environment(container)
                 .modelContainer(container.modelContainer)
+                .task {
+                    if let weeks = try? await container.repository.getAllWeeks() {
+                        WidgetSharedStore.write(weeks)
+                    }
+                }
         }
     }
 }

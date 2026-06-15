@@ -1,0 +1,107 @@
+import SwiftUI
+import WidgetKit
+
+struct ShiftWidget2x2: Widget {
+    let kind = "ShiftWidget2x2"
+
+    var body: some WidgetConfiguration {
+        StaticConfiguration(kind: kind, provider: WidgetProvider()) { entry in
+            ShiftWidget2x2View(entry: entry)
+                .containerBackground(WidgetColors.surface, for: .widget)
+                .widgetURL(URL(string: "shift://open?source=widget_2x2"))
+        }
+        .configurationDisplayName("오늘 근무")
+        .description("오늘의 출퇴근 시간을 확인하세요.")
+        .supportedFamilies([.systemSmall])
+    }
+}
+
+struct ShiftWidget2x2View: View {
+    let entry: WidgetEntry
+
+    var body: some View {
+        let today = Date()
+        let dayNumber = Calendar.current.component(.day, from: today)
+        let day = entry.today
+        let nextWork = !(day?.isWork ?? false) ? entry.nextWorkDay(after: today) : nil
+        let nextStart = nextWork.flatMap { $0.shiftStartDate(on: $0.date) }
+
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(alignment: .lastTextBaseline, spacing: 5) {
+                Text(String(dayNumber))
+                    .font(.system(size: Layout.dateLabelSize, weight: .semibold))
+                    .foregroundStyle(WidgetColors.primary)
+                Text(today.formatted(.dateTime.weekday(.abbreviated)))
+                    .font(.system(size: Layout.dayLabelSize, weight: .medium))
+                    .foregroundStyle(WidgetColors.primary.opacity(0.8))
+            }
+            Rectangle()
+                .fill(Color(white: 0.85))
+                .frame(height: 1)
+                .padding(.vertical, Layout.dividerVPad)
+            stateContent(day: day)
+            Spacer(minLength: 0)
+            if let nextStart {
+                nextWorkView(nextStart: nextStart, today: today)
+            }
+        }
+        .padding(.horizontal, Layout.hPad)
+        .padding(.vertical, Layout.vPad)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+    }
+
+    @ViewBuilder
+    private func stateContent(day: WidgetScheduleDay?) -> some View {
+        if let day, day.isWork {
+            VStack(alignment: .leading, spacing: 4) {
+                if !day.codeLabel.isEmpty {
+                    Text(day.codeLabel)
+                        .font(.system(size: Layout.codeLabelSize))
+                        .foregroundStyle(WidgetColors.onSurfaceVariant)
+                }
+                Text("\(day.startTime ?? "") - \(day.endTime ?? "")")
+                    .font(.system(size: Layout.workTimeFontSize, weight: .semibold))
+                    .foregroundStyle(WidgetColors.primary)
+                    .lineLimit(2)
+            }
+        } else {
+            Text(day?.displayOffText ?? "스케줄 없음")
+                .font(.system(size: Layout.offStateFontSize, weight: .medium))
+                .foregroundStyle(WidgetColors.onSurface)
+                .lineLimit(1)
+        }
+    }
+
+    private func nextWorkView(nextStart: Date, today: Date) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text("다음 근무까지")
+                .font(.system(size: Layout.countdownLabelSize))
+                .foregroundStyle(WidgetColors.onSurfaceVariant)
+            Text(timerInterval: today...nextStart, countsDown: true)
+                .font(.system(size: Layout.countdownTimerSize, weight: .semibold))
+                .foregroundStyle(WidgetColors.primary)
+                .monospacedDigit()
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+        }
+    }
+}
+
+private enum Layout {
+    static let hPad: CGFloat = 7
+    static let vPad: CGFloat = 6   // 7 × 0.85
+    static let dividerVPad: CGFloat = 4
+    static let dayLabelSize: CGFloat = 13
+    static let dateLabelSize: CGFloat = 24
+    static let offStateFontSize: CGFloat = 18
+    static let workTimeFontSize: CGFloat = 20
+    static let codeLabelSize: CGFloat = 11
+    static let countdownLabelSize: CGFloat = 10
+    static let countdownTimerSize: CGFloat = 16
+}
+
+#Preview(as: .systemSmall) {
+    ShiftWidget2x2()
+} timeline: {
+    WidgetEntry.placeholder
+}

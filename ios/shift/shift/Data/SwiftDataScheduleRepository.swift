@@ -47,6 +47,7 @@ final class SwiftDataScheduleRepository: ScheduleRepository {
         let entry = try ScheduleWeekEntry.from(week)
         context.insert(entry)
         try context.save()
+        await refreshWidget()
     }
 
     func replaceWeek(_ week: ScheduleWeek) async throws {
@@ -60,6 +61,7 @@ final class SwiftDataScheduleRepository: ScheduleRepository {
         let entry = try ScheduleWeekEntry.from(week)
         context.insert(entry)
         try context.save()
+        await refreshWidget()
     }
 
     func deleteWeek(weekStartDate: Date) async throws {
@@ -70,6 +72,12 @@ final class SwiftDataScheduleRepository: ScheduleRepository {
             context.delete(entry)
             try context.save()
         }
+        await refreshWidget()
+    }
+
+    private func refreshWidget() async {
+        guard let weeks = try? await getAllWeeks() else { return }
+        WidgetSharedStore.write(weeks)
     }
 
     private func mondayOfWeek(for date: Date) -> Date {

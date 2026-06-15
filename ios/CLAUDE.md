@@ -73,15 +73,23 @@ app (widget)     →   ShiftWidget target   (WidgetKit Extension)
 
 - **App Group** 필수: 앱 ↔ Widget Extension 간 SwiftData / UserDefaults 공유.
   - App Group ID: `group.com.yourteam.shift` (Xcode Signing & Capabilities에서 설정)
+- App Group ID: `group.com.timezonealarm.shift`
 - `TimelineProvider`: 매일 00:00 + 스케쥴 저장/교체 직후 `WidgetCenter.shared.reloadAllTimelines()`
-- 딥링크: `.widgetURL(URL(string: "shift://open?source=widget_\(size)"))` — `app_open` 이벤트 source 전달
+- 근무 종료 시각에 타임라인 엔트리 추가 → 내일 스케줄로 자동 전환
+- 딥링크: `.widgetURL(URL(string: "shift://open?source=\(kind)"))` — `app_open` 이벤트 source 전달
 
-**위젯 사이즈 매핑** (PRD §7):
-| Android | iOS WidgetKit | `WidgetFamily` |
-|---------|--------------|----------------|
-| 2×1 | Small | `.systemSmall` |
-| 4×1 | Medium | `.systemMedium` |
-| 4×2 주간 미리보기 | Medium | `.systemMedium` |
+**홈 화면 위젯** (PRD §7):
+| 위젯 | iOS WidgetKit | `WidgetFamily` |
+|------|--------------|----------------|
+| 2×2 오늘 근무 | Small | `.systemSmall` |
+| 4×2 주간 미리보기 | Medium | `.systemMedium` (`.contentMarginsDisabled()`) |
+
+**잠금화면 위젯** (PRD §7):
+| 위젯 | `WidgetFamily` |
+|------|----------------|
+| 오늘 근무 (4×1 요소) | `.accessoryRectangular` |
+| 주간 미리보기 (5일 그리드) | `.accessoryRectangular` |
+| 카운트다운 (출근·퇴근 남은 시간) | `.accessoryRectangular` |
 
 ---
 

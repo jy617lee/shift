@@ -39,10 +39,13 @@ struct HomeView: View {
                     if registrationVM.phase == .processing { ProcessingOverlay() }
                     if let msg = viewModel.toastMessage { ToastBanner(message: msg) }
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
             }
             .background(ShiftColors.background)
             .toolbar(.hidden, for: .navigationBar)
-            .overlay(alignment: .bottomTrailing) { fabButton }
+            .overlay(alignment: .bottomTrailing) {
+            if !viewModel.weeks.isEmpty { fabButton }
+        }
         }
         .photosPicker(isPresented: $showPhotoPicker, selection: $selectedPhotoItem, matching: .images)
         .onChange(of: selectedPhotoItem) { _, item in
@@ -251,6 +254,7 @@ struct HomeEmptyView: View {
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .padding(32)
     }
 }
