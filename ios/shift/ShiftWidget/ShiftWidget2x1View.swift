@@ -22,9 +22,9 @@ struct ShiftWidget2x1View: View {
     var body: some View {
         let today = Date()
         let day = entry.today
-        VStack(spacing: 6) {
+        VStack(spacing: Layout.spacing) {
             Text(today.formatted(.dateTime.month(.defaultDigits).day().weekday(.abbreviated)))
-                .font(.system(size: 13))
+                .font(.system(size: Layout.dateLabelSize))
                 .foregroundStyle(WidgetColors.onSurfaceVariant)
             Text(mainText(day))
                 .font(.system(size: mainFontSize(day), weight: day?.isWork == true ? .semibold : .medium))
@@ -32,7 +32,7 @@ struct ShiftWidget2x1View: View {
                 .lineLimit(2)
                 .multilineTextAlignment(.center)
         }
-        .padding(16)
+        .padding(Layout.outerPad)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
@@ -45,10 +45,18 @@ struct ShiftWidget2x1View: View {
     }
 
     private func mainFontSize(_ day: WidgetScheduleDay?) -> CGFloat {
-        day?.isWork == true ? 20 : 17
+        day?.isWork == true ? Layout.workFontSize : Layout.offFontSize
     }
 
     private func mainColor(_ day: WidgetScheduleDay?) -> Color {
         day?.isWork == true ? WidgetColors.primary : WidgetColors.onSurface
     }
+}
+
+private enum Layout {
+    static let spacing: CGFloat = 6
+    static let dateLabelSize: CGFloat = 13
+    static let workFontSize: CGFloat = 20
+    static let offFontSize: CGFloat = 17
+    static let outerPad: CGFloat = 16
 }

@@ -2,6 +2,7 @@ import Foundation
 import WidgetKit
 
 struct WidgetProvider: TimelineProvider {
+    // WidgetSharedStore에서도 동일 값을 선언 — 타깃 분리로 공유 불가, 변경 시 함께 수정 필요
     private let appGroupID = "group.com.timezonealarm.shift"
     private let daysKey = "shift.widget.schedule_days"
 

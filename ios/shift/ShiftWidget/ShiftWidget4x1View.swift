@@ -25,25 +25,25 @@ struct ShiftWidget4x1View: View {
             todayDateColumn(today: today)
             Rectangle()
                 .fill(Color(white: 0.8))
-                .frame(width: 1, height: 44)
-                .padding(.horizontal, 16)
+                .frame(width: 1, height: Layout.dividerHeight)
+                .padding(.horizontal, Layout.dividerHPad)
             stateColumn(day: entry.today)
             Spacer(minLength: 0)
         }
-        .padding(.horizontal, 20)
+        .padding(.horizontal, Layout.outerHPad)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private func todayDateColumn(today: Date) -> some View {
         VStack(spacing: 2) {
             Text(today.formatted(.dateTime.weekday(.abbreviated)))
-                .font(.system(size: 13, weight: .medium))
+                .font(.system(size: Layout.dayLabelSize, weight: .medium))
                 .foregroundStyle(WidgetColors.primary.opacity(0.8))
             Text(today.formatted(.dateTime.day()))
-                .font(.system(size: 40, weight: .semibold))
+                .font(.system(size: Layout.dateLabelSize, weight: .semibold))
                 .foregroundStyle(WidgetColors.primary)
         }
-        .frame(width: 60)
+        .frame(width: Layout.dateColumnWidth)
     }
 
     @ViewBuilder
@@ -52,7 +52,7 @@ struct ShiftWidget4x1View: View {
             workStateView(day: day)
         } else {
             Text(offStateText(day))
-                .font(.system(size: 22, weight: .medium))
+                .font(.system(size: Layout.offStateFontSize, weight: .medium))
                 .foregroundStyle(WidgetColors.onSurface)
         }
     }
@@ -61,11 +61,11 @@ struct ShiftWidget4x1View: View {
         VStack(alignment: .leading, spacing: 3) {
             if !day.codeLabel.isEmpty {
                 Text(day.codeLabel)
-                    .font(.system(size: 11))
+                    .font(.system(size: Layout.codeLabelSize))
                     .foregroundStyle(WidgetColors.onSurfaceVariant)
             }
             Text("\(day.startTime ?? "") - \(day.endTime ?? "")")
-                .font(.system(size: 20, weight: .semibold))
+                .font(.system(size: Layout.workTimeFontSize, weight: .semibold))
                 .foregroundStyle(WidgetColors.primary)
         }
     }
@@ -74,4 +74,16 @@ struct ShiftWidget4x1View: View {
         guard let day else { return "스케줄 없음" }
         return day.codeLabel.isEmpty ? "휴무" : day.codeLabel
     }
+}
+
+private enum Layout {
+    static let dividerHeight: CGFloat = 44
+    static let dividerHPad: CGFloat = 16
+    static let outerHPad: CGFloat = 20
+    static let dateColumnWidth: CGFloat = 60
+    static let dayLabelSize: CGFloat = 13
+    static let dateLabelSize: CGFloat = 40
+    static let offStateFontSize: CGFloat = 22
+    static let workTimeFontSize: CGFloat = 20
+    static let codeLabelSize: CGFloat = 11
 }

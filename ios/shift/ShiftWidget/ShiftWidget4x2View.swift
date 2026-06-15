@@ -26,38 +26,40 @@ struct ShiftWidget4x2View: View {
                 WidgetColors.headerBg
                 HeaderWave()
                     .fill(WidgetColors.surface)
-                    .frame(height: 12)
+                    .frame(height: Layout.waveHeight)
                 headerContent(today: today)
-                    .padding(.horizontal, 14)
-                    .padding(.bottom, 14)
+                    .padding(.horizontal, Layout.headerHPad)
+                    .padding(.bottom, Layout.headerHPad)
             }
-            .frame(height: 66)
+            .frame(height: Layout.headerHeight)
             WeekGrid(days: entry.weekDays(around: today), today: today)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .padding(.horizontal, 8)
-                .padding(.bottom, 10)
+                .padding(.horizontal, Layout.gridHPad)
+                .padding(.bottom, Layout.gridBPad)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
+    @ViewBuilder
     private func headerContent(today: Date) -> some View {
+        let day = entry.today
         HStack(spacing: 0) {
-            VStack(spacing: 1) {
+            VStack(spacing: Layout.headerInnerSpacing) {
                 Text(today.formatted(.dateTime.weekday(.abbreviated)))
-                    .font(.system(size: 11, weight: .medium))
+                    .font(.system(size: Layout.dayLabelSize, weight: .medium))
                     .foregroundStyle(.white.opacity(0.8))
                 Text(today.formatted(.dateTime.day()))
-                    .font(.system(size: 24, weight: .semibold))
+                    .font(.system(size: Layout.dateLabelSize, weight: .semibold))
                     .foregroundStyle(.white)
             }
-            .frame(width: 52)
+            .frame(width: Layout.headerLeftWidth)
             Rectangle()
                 .fill(Color.white.opacity(0.35))
-                .frame(width: 1, height: 32)
-                .padding(.horizontal, 12)
-            Text(headerStateText(entry.today))
-                .font(.system(size: entry.today?.isWork == true ? 18 : 14, weight: .regular))
-                .foregroundStyle(.white.opacity(entry.today?.isWork == true ? 1 : 0.8))
+                .frame(width: 1, height: Layout.headerDividerHeight)
+                .padding(.horizontal, Layout.headerDividerPadding)
+            Text(headerStateText(day))
+                .font(.system(size: day?.isWork == true ? Layout.stateFontSizeWork : Layout.stateFontSizeOff, weight: .regular))
+                .foregroundStyle(.white.opacity(day?.isWork == true ? 1 : 0.8))
                 .lineLimit(2)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: .infinity)
@@ -105,7 +107,7 @@ private struct WeekGrid: View {
                     .frame(maxWidth: .infinity)
             }
         }
-        .padding(.top, 8)
+        .padding(.top, Layout.gridTopPad)
     }
 }
 
@@ -115,7 +117,7 @@ private struct DayCell: View {
     let isToday: Bool
 
     var body: some View {
-        VStack(spacing: 2) {
+        VStack(spacing: Layout.cellSpacing) {
             dayBadge
             dayValue
         }
@@ -126,16 +128,16 @@ private struct DayCell: View {
         return Group {
             if isToday {
                 Text(label)
-                    .font(.system(size: 11, weight: .medium))
+                    .font(.system(size: Layout.dayLabelSize, weight: .medium))
                     .foregroundStyle(.white)
-                    .frame(width: 22, height: 22)
+                    .frame(width: Layout.badgeSize, height: Layout.badgeSize)
                     .background(WidgetColors.primary)
                     .clipShape(Circle())
             } else {
                 Text(label)
-                    .font(.system(size: 11, weight: .medium))
+                    .font(.system(size: Layout.dayLabelSize, weight: .medium))
                     .foregroundStyle(WidgetColors.gridDate)
-                    .frame(width: 22, height: 22)
+                    .frame(width: Layout.badgeSize, height: Layout.badgeSize)
             }
         }
     }
@@ -143,7 +145,7 @@ private struct DayCell: View {
     @ViewBuilder
     private var dayValue: some View {
         let color: Color = isToday ? WidgetColors.primary : WidgetColors.gridMuted
-        let style = Font.system(size: 9)
+        let style = Font.system(size: Layout.cellValueSize)
         if let day, day.isWork, let start = day.startTime, let end = day.endTime {
             Text(start).font(style).foregroundStyle(color)
             Text(end).font(style).foregroundStyle(color)
@@ -157,4 +159,24 @@ private struct DayCell: View {
         guard let day else { return "-" }
         return day.codeLabel.isEmpty ? "휴무" : String(day.codeLabel.prefix(4))
     }
+}
+
+private enum Layout {
+    static let headerHeight: CGFloat = 66
+    static let waveHeight: CGFloat = 12
+    static let headerHPad: CGFloat = 14
+    static let headerLeftWidth: CGFloat = 52
+    static let headerInnerSpacing: CGFloat = 1
+    static let headerDividerHeight: CGFloat = 32
+    static let headerDividerPadding: CGFloat = 12
+    static let dayLabelSize: CGFloat = 11
+    static let dateLabelSize: CGFloat = 24
+    static let stateFontSizeWork: CGFloat = 18
+    static let stateFontSizeOff: CGFloat = 14
+    static let gridHPad: CGFloat = 8
+    static let gridBPad: CGFloat = 10
+    static let gridTopPad: CGFloat = 8
+    static let badgeSize: CGFloat = 22
+    static let cellSpacing: CGFloat = 2
+    static let cellValueSize: CGFloat = 9
 }
