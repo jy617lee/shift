@@ -32,16 +32,16 @@ struct HomeView: View {
 
     var body: some View {
         NavigationStack {
-            ZStack {
-                contentBody
-                if registrationVM.phase == .processing { ProcessingOverlay() }
-                if let msg = viewModel.toastMessage { ToastBanner(message: msg) }
+            VStack(spacing: 0) {
+                appBar
+                ZStack {
+                    contentBody
+                    if registrationVM.phase == .processing { ProcessingOverlay() }
+                    if let msg = viewModel.toastMessage { ToastBanner(message: msg) }
+                }
             }
             .background(ShiftColors.background)
-            .navigationTitle("")
-            .toolbar { toolbarContent }
-            .toolbarBackground(ShiftColors.background, for: .navigationBar)
-            .toolbarBackground(.visible, for: .navigationBar)
+            .toolbar(.hidden, for: .navigationBar)
             .overlay(alignment: .bottomTrailing) { fabButton }
         }
         .photosPicker(isPresented: $showPhotoPicker, selection: $selectedPhotoItem, matching: .images)
@@ -90,27 +90,28 @@ struct HomeView: View {
         }
     }
 
-    @ToolbarContentBuilder
-    private var toolbarContent: some ToolbarContent {
-        ToolbarItem(placement: .navigationBarLeading) {
-            HStack(spacing: 8) {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 8)
-                        .fill(Color.accentColor)
-                        .frame(width: 34, height: 34)
-                    Image(systemName: "plus.circle")
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(.white)
-                }
-                Text("Shift")
-                    .font(.system(size: 20, weight: .bold))
+    private var appBar: some View {
+        HStack(spacing: 10) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(Color.accentColor)
+                    .frame(width: 38, height: 38)
+                Image(systemName: "plus.circle")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(.white)
             }
-        }
-        ToolbarItem(placement: .navigationBarTrailing) {
+            Text("Shift")
+                .font(.system(size: 22, weight: .bold))
+            Spacer()
             Button { showSettings = true } label: {
                 Image(systemName: "gearshape")
+                    .font(.system(size: 18))
+                    .foregroundStyle(.primary)
             }
         }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .background(ShiftColors.background)
     }
 
     private var fabButton: some View {

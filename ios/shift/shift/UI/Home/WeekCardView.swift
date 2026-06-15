@@ -11,28 +11,21 @@ struct WeekCardView: View {
     }()
 
     var body: some View {
-        VStack(spacing: 0) {
-            weekHeader
-            Divider()
-            ForEach(Array(week.days.enumerated()), id: \.offset) { index, day in
-                DayRowView(day: day, isToday: Calendar.current.isDate(day.date, inSameDayAs: today))
-                if index < week.days.count - 1 { Divider().padding(.leading, 52) }
+        VStack(alignment: .leading, spacing: 6) {
+            Text(headerText)
+                .font(.system(size: 10, weight: .medium, design: .monospaced))
+                .foregroundStyle(ShiftColors.mutedForeground)
+                .kerning(2.0)
+            VStack(spacing: 0) {
+                ForEach(Array(week.days.enumerated()), id: \.offset) { index, day in
+                    DayRowView(day: day, isToday: Calendar.current.isDate(day.date, inSameDayAs: today))
+                    if index < week.days.count - 1 { Divider() }
+                }
             }
+            .clipShape(RoundedRectangle(cornerRadius: 12))
+            .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 12))
+            .shadow(color: Color.black.opacity(0.06), radius: 8, x: 0, y: 2)
         }
-        .clipShape(RoundedRectangle(cornerRadius: 12))
-        .background(Color(.systemBackground), in: RoundedRectangle(cornerRadius: 12))
-        .shadow(color: Color.black.opacity(0.06), radius: 8, x: 0, y: 2)
-    }
-
-    private var weekHeader: some View {
-        Text(headerText)
-            .font(.system(size: 10, weight: .medium, design: .monospaced))
-            .foregroundStyle(ShiftColors.mutedForeground)
-            .kerning(2.0)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 14)
-            .padding(.vertical, 8)
-            .background(ShiftColors.muted.opacity(0.6))
     }
 
     private var headerText: String {
