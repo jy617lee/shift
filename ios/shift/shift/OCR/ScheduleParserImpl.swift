@@ -98,7 +98,7 @@ struct ScheduleParserImpl: ScheduleParser {
         let range = NSRange(text.startIndex..., in: text)
         return Self.allTimesRx.matches(in: text, range: range)
             .compactMap { Range($0.range, in: text).map { String(text[$0]) } }
-            .reduce(into: [String]()) { acc, t in if acc.last != t { acc.append(t) } }
+            .reduce(into: [String]()) { acc, time in if acc.last != time { acc.append(time) } }
     }
 
     private func codeLabel(from rest: String) -> String {
