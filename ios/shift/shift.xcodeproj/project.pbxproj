@@ -55,6 +55,16 @@
 		AA000001AA000001AA000001 /* ShiftWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ShiftWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		AA000002EE000002EE000002 /* Exceptions for "ShiftWidget" folder in "ShiftWidget" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = AA000003AA000003AA000003 /* ShiftWidget */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		28D532662FDE7DC0004376C0 /* shift */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
@@ -74,17 +84,10 @@
 		AA000002AA000002AA000002 /* ShiftWidget */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				AA000002EE000002EE000002 /* PBXFileSystemSynchronizedBuildFileExceptionSet */,
+				AA000002EE000002EE000002 /* Exceptions for "ShiftWidget" folder in "ShiftWidget" target */,
 			);
 			path = ShiftWidget;
 			sourceTree = "<group>";
-		};
-		AA000002EE000002EE000002 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Info.plist,
-			);
-			target = AA000003AA000003AA000003 /* ShiftWidget */;
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 

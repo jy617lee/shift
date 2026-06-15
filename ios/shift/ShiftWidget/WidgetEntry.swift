@@ -10,6 +10,25 @@ struct WidgetScheduleDay: Codable, Sendable {
 
     var isWork: Bool { type == "WORK" }
 
+    func shiftStartDate(on referenceDate: Date) -> Date? {
+        parseTime(startTime, on: referenceDate)
+    }
+
+    func shiftEndDate(on referenceDate: Date) -> Date? {
+        parseTime(endTime, on: referenceDate)
+    }
+
+    private func parseTime(_ timeString: String?, on referenceDate: Date) -> Date? {
+        guard let timeString else { return nil }
+        let parts = timeString.split(separator: ":").compactMap { Int($0) }
+        guard parts.count == 2 else { return nil }
+        var comps = Calendar.current.dateComponents([.year, .month, .day], from: referenceDate)
+        comps.hour = parts[0]
+        comps.minute = parts[1]
+        comps.second = 0
+        return Calendar.current.date(from: comps)
+    }
+
     enum CodingKeys: String, CodingKey {
         case date, type, startTime, endTime, codeLabel
     }
@@ -18,10 +37,15 @@ struct WidgetScheduleDay: Codable, Sendable {
 struct WidgetEntry: TimelineEntry {
     let date: Date
     let days: [WidgetScheduleDay]
+    let targetDate: Date
 
+    /// 표시 대상 날짜의 스케줄 (오늘 또는 내일)
     var today: WidgetScheduleDay? {
-        let cal = Calendar.current
-        return days.first { cal.isDateInToday($0.date) }
+        days.first { Calendar.current.isDate($0.date, inSameDayAs: targetDate) }
+    }
+
+    var isShowingTomorrow: Bool {
+        !Calendar.current.isDateInToday(targetDate)
     }
 
     func weekDays(around referenceDate: Date) -> [WidgetScheduleDay?] {
@@ -33,5 +57,7 @@ struct WidgetEntry: TimelineEntry {
         }
     }
 
-    static var placeholder: WidgetEntry { WidgetEntry(date: Date(), days: []) }
+    static var placeholder: WidgetEntry {
+        WidgetEntry(date: Date(), days: [], targetDate: Date())
+    }
 }

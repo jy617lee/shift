@@ -20,8 +20,13 @@ struct ShiftApp: App {
                 .environment(container)
                 .modelContainer(container.modelContainer)
                 .task {
-                    let weeks = (try? await container.repository.getAllWeeks()) ?? []
-                    WidgetSharedStore.write(weeks)
+                    do {
+                        let weeks = try await container.repository.getAllWeeks()
+                        print("[ShiftApp] 앱 시작 — \(weeks.count)개 주 위젯 동기화")
+                        WidgetSharedStore.write(weeks)
+                    } catch {
+                        print("[ShiftApp] getAllWeeks 실패: \(error)")
+                    }
                 }
         }
     }

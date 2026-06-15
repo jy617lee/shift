@@ -13,6 +13,7 @@ struct ShiftWidget4x2: Widget {
         .configurationDisplayName("주간 스케줄")
         .description("이번 주 근무 일정을 한눈에 확인하세요.")
         .supportedFamilies([.systemMedium])
+        .contentMarginsDisabled()
     }
 }
 
@@ -96,7 +97,7 @@ private struct WeekGrid: View {
     let today: Date
 
     var body: some View {
-        HStack(spacing: 0) {
+        HStack(alignment: .top, spacing: 0) {
             ForEach(0..<5, id: \.self) { idx in
                 let offset = idx - 2
                 let date = Calendar.current.date(
@@ -147,14 +148,17 @@ private struct DayCell: View {
     private var dayValue: some View {
         let color: Color = isToday ? WidgetColors.primary : WidgetColors.gridMuted
         let style = Font.system(size: Layout.cellValueSize)
-        if let day, day.isWork, let start = day.startTime, let end = day.endTime {
-            Text(start).font(style).foregroundStyle(color)
-            Text(end).font(style).foregroundStyle(color)
-        } else {
-            Text(offText).font(style).foregroundStyle(color)
-                .lineLimit(2).multilineTextAlignment(.center)
+        VStack(spacing: 1) {
+            if let day, day.isWork, let start = day.startTime, let end = day.endTime {
+                Text(start).font(style).foregroundStyle(color)
+                Text(end).font(style).foregroundStyle(color)
+            } else {
+                Text(offText).font(style).foregroundStyle(color)
+                    .lineLimit(2).multilineTextAlignment(.center)
+                Text("").font(style)  // 빈 줄로 work day와 높이 동일하게 유지
+            }
         }
-    }
+        .frame(minHeight: Layout.cellValueMinHeight, alignment: .top)
 
     private var offText: String {
         guard let day else { return "-" }
@@ -182,4 +186,5 @@ private enum Layout {
     static let badgeSize: CGFloat = 26
     static let cellSpacing: CGFloat = 3
     static let cellValueSize: CGFloat = 12
+    static let cellValueMinHeight: CGFloat = 30
 }

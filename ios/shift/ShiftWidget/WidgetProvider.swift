@@ -11,22 +11,70 @@ struct WidgetProvider: TimelineProvider {
     }
 
     func getSnapshot(in context: Context, completion: @escaping (WidgetEntry) -> Void) {
-        completion(loadEntry())
+        completion(makeEntry(at: Date()))
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<WidgetEntry>) -> Void) {
-        let entry = loadEntry()
-        let nextUpdate = nextMidnight()
-        completion(Timeline(entries: [entry], policy: .after(nextUpdate)))
+        let now = Date()
+        let cal = Calendar.current
+        var entries: [WidgetEntry] = []
+
+        let current = makeEntry(at: now)
+        entries.append(current)
+
+        // 오늘 근무가 있고 아직 종료 전이면 → 종료 시점에 '내일' 엔트리 추가
+        let today = cal.startOfDay(for: now)
+        let tomorrow = cal.date(byAdding: .day, value: 1, to: today) ?? today
+        let days = current.days
+        if let todayDay = days.first(where: { cal.isDate($0.date, inSameDayAs: today) }),
+           todayDay.isWork,
+           let endDate = todayDay.shiftEndDate(on: today),
+           now < endDate {
+            let nextEntry = WidgetEntry(date: endDate, days: days, targetDate: tomorrow)
+            entries.append(nextEntry)
+        }
+
+        completion(Timeline(entries: entries, policy: .after(nextMidnight())))
     }
 
-    private func loadEntry() -> WidgetEntry {
-        guard let ud = UserDefaults(suiteName: appGroupID),
-              let data = ud.data(forKey: daysKey),
-              let days = try? JSONDecoder().decode([WidgetScheduleDay].self, from: data) else {
-            return .placeholder
+    // MARK: - Helpers
+
+    private func makeEntry(at now: Date) -> WidgetEntry {
+        let cal = Calendar.current
+        let today = cal.startOfDay(for: now)
+        let tomorrow = cal.date(byAdding: .day, value: 1, to: today) ?? today
+
+        let days = loadDays()
+
+        // 오늘 근무가 이미 끝났으면 targetDate = 내일
+        let todayDay = days.first { cal.isDate($0.date, inSameDayAs: today) }
+        let targetDate: Date
+        if let todayDay, todayDay.isWork,
+           let endDate = todayDay.shiftEndDate(on: today),
+           now >= endDate {
+            targetDate = tomorrow
+        } else {
+            targetDate = today
         }
-        return WidgetEntry(date: Date(), days: days)
+
+        return WidgetEntry(date: now, days: days, targetDate: targetDate)
+    }
+
+    private func loadDays() -> [WidgetScheduleDay] {
+        guard let ud = UserDefaults(suiteName: appGroupID) else {
+            print("[WidgetProvider] ❌ App Group 접근 불가 — \(appGroupID)")
+            return []
+        }
+        guard let data = ud.data(forKey: daysKey) else {
+            print("[WidgetProvider] ❌ 데이터 없음 — key: \(daysKey)")
+            return []
+        }
+        guard let days = try? JSONDecoder().decode([WidgetScheduleDay].self, from: data) else {
+            print("[WidgetProvider] ❌ 디코딩 실패 (\(data.count) bytes)")
+            return []
+        }
+        print("[WidgetProvider] ✅ \(days.count)개 날짜 로드 성공")
+        return days
     }
 
     private func nextMidnight() -> Date {
