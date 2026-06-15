@@ -18,28 +18,19 @@ struct ShiftWidget4x2: Widget {
 
 struct ShiftWidget4x2View: View {
     let entry: WidgetEntry
-    @Environment(\.widgetContentMargins) private var contentMargins
 
     var body: some View {
         let today = Date()
-        ZStack {
-            // 하단 흰 영역: 컨텐츠 마진 바깥까지 음수 패딩으로 확장 → edge-to-edge
-            VStack(spacing: 0) {
-                Color.clear.frame(height: Layout.headerHeight)
-                WidgetColors.surface
-                    .padding(.horizontal, -contentMargins.leading)
-                    .padding(.bottom, -contentMargins.bottom)
-            }
-            // 컨텐츠
-            VStack(spacing: 0) {
-                headerContent(today: today)
-                    .padding(.horizontal, Layout.headerHPad)
-                    .frame(height: Layout.headerHeight)
-                WeekGrid(days: entry.weekDays(around: today), today: today)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .padding(.horizontal, Layout.gridHPad)
-                    .padding(.bottom, Layout.gridBPad)
-            }
+        VStack(spacing: 0) {
+            headerContent(today: today)
+                .padding(.horizontal, Layout.headerHPad)
+                .frame(height: Layout.headerHeight)
+            WidgetColors.surface
+                .overlay(
+                    WeekGrid(days: entry.weekDays(around: today), today: today)
+                        .padding(.horizontal, Layout.gridHPad)
+                        .padding(.bottom, Layout.gridBPad)
+                )
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
