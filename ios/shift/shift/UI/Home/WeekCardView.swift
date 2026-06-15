@@ -77,7 +77,7 @@ struct DayRowView: View {
             Spacer()
         }
         .padding(.horizontal, 14)
-        .padding(.vertical, 10)
+        .padding(.vertical, 12)
         .background(isToday ? Color.accentColor.opacity(0.06) : Color.clear)
         .overlay(alignment: .leading) {
             if isToday { Color.accentColor.frame(width: 3) }
