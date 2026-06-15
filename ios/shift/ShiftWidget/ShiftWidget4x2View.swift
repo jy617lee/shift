@@ -7,32 +7,39 @@ struct ShiftWidget4x2: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: WidgetProvider()) { entry in
             ShiftWidget4x2View(entry: entry)
-                .containerBackground(WidgetColors.surface, for: .widget)
+                .containerBackground(WidgetColors.headerBg, for: .widget)
                 .widgetURL(URL(string: "shift://open?source=widget_4x2"))
         }
         .configurationDisplayName("주간 스케줄")
         .description("이번 주 근무 일정을 한눈에 확인하세요.")
         .supportedFamilies([.systemMedium])
-        .contentMarginsDisabled()
     }
 }
 
 struct ShiftWidget4x2View: View {
     let entry: WidgetEntry
+    @Environment(\.widgetContentMargins) private var contentMargins
 
     var body: some View {
         let today = Date()
-        VStack(spacing: 0) {
-            ZStack {
-                WidgetColors.headerBg
+        ZStack {
+            // 하단 흰 영역: 컨텐츠 마진 바깥까지 음수 패딩으로 확장 → edge-to-edge
+            VStack(spacing: 0) {
+                Color.clear.frame(height: Layout.headerHeight)
+                WidgetColors.surface
+                    .padding(.horizontal, -contentMargins.leading)
+                    .padding(.bottom, -contentMargins.bottom)
+            }
+            // 컨텐츠
+            VStack(spacing: 0) {
                 headerContent(today: today)
                     .padding(.horizontal, Layout.headerHPad)
+                    .frame(height: Layout.headerHeight)
+                WeekGrid(days: entry.weekDays(around: today), today: today)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .padding(.horizontal, Layout.gridHPad)
+                    .padding(.bottom, Layout.gridBPad)
             }
-            .frame(height: Layout.headerHeight)
-            WeekGrid(days: entry.weekDays(around: today), today: today)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .padding(.horizontal, Layout.gridHPad)
-                .padding(.bottom, Layout.gridBPad)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
