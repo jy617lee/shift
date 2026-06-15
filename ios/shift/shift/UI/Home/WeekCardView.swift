@@ -85,7 +85,7 @@ struct DayRowView: View {
     }
 
     private var dateColumn: some View {
-        VStack(spacing: 0) {
+        VStack(spacing: 2) {
             Text(Self.dayFmt.string(from: day.date))
                 .font(.system(size: 10, weight: .medium))
                 .foregroundStyle(dayColor)

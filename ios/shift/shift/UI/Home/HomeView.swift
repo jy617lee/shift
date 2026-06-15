@@ -96,16 +96,16 @@ struct HomeView: View {
                 RoundedRectangle(cornerRadius: 8)
                     .fill(Color.accentColor)
                     .frame(width: 28, height: 28)
-                Text("+")
-                    .font(.system(size: 16, weight: .bold))
+                Image(systemName: "plus")
+                    .font(.system(size: 14, weight: .bold))
                     .foregroundStyle(.white)
             }
             Text("Shift")
                 .font(.system(size: 16, weight: .medium))
             Spacer()
             Button { showSettings = true } label: {
-                Image(systemName: "gearshape.fill")
-                    .font(.system(size: 20))
+                Image(systemName: "gear")
+                    .font(.system(size: 22))
                     .foregroundStyle(ShiftColors.mutedForeground)
             }
             .buttonStyle(.plain)

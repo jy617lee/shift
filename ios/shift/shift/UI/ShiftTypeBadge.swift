@@ -12,7 +12,7 @@ struct ShiftTypeBadge: View {
             .font(.system(size: 11, weight: .medium))
             .foregroundStyle(fg)
             .padding(.horizontal, 8)
-            .padding(.vertical, 2)
+            .padding(.vertical, 4)
             .background(bg, in: RoundedRectangle(cornerRadius: 6))
     }
 
