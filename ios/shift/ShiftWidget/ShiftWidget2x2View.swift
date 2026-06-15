@@ -28,12 +28,12 @@ struct ShiftWidget2x2View: View {
 
         VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .lastTextBaseline, spacing: 5) {
-                Text(today.formatted(.dateTime.weekday(.abbreviated)))
-                    .font(.system(size: Layout.dayLabelSize, weight: .medium))
-                    .foregroundStyle(WidgetColors.primary.opacity(0.8))
                 Text(String(dayNumber))
                     .font(.system(size: Layout.dateLabelSize, weight: .semibold))
                     .foregroundStyle(WidgetColors.primary)
+                Text(today.formatted(.dateTime.weekday(.abbreviated)))
+                    .font(.system(size: Layout.dayLabelSize, weight: .medium))
+                    .foregroundStyle(WidgetColors.primary.opacity(0.8))
             }
             Rectangle()
                 .fill(Color(white: 0.85))
